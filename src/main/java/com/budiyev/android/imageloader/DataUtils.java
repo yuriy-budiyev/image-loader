@@ -44,19 +44,19 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 @SuppressWarnings("SameParameterValue")
-public final class LoadUtils {
+public final class DataUtils {
     private static final String HASH_ALGORITHM_SHA256 = "SHA-256";
 
-    private LoadUtils() {
+    private DataUtils() {
     }
 
     /**
      * Generate SHA-256 hash string with {@link Character#MAX_RADIX} radix
-     * for specified {@link String}; usable for keys of {@link ImageSource} implementations
+     * for specified {@link String}; usable for keys of {@link DataDescriptor} implementations
      *
      * @param string Source string
      * @return SHA-256 hash string
-     * @see ImageSource#getKey()
+     * @see DataDescriptor#getKey()
      */
     @NonNull
     public static String generateSHA256(@NonNull String string) {

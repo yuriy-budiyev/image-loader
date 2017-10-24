@@ -23,43 +23,30 @@
  */
 package com.budiyev.android.imageloader;
 
+import android.graphics.Bitmap;
+import android.support.annotation.AnyThread;
 import android.support.annotation.NonNull;
 
-final class ObjectImageSource<T> implements ImageSource<T> {
-    private final T mData;
-    private final String mKey;
-
-    public ObjectImageSource(@NonNull T data) {
-        mData = data;
-        mKey = LoadUtils.generateSHA256(data.toString());
-    }
-
+public interface DataDescriptor<T> {
+    /**
+     * Source data from which {@link Bitmap} should be loaded
+     * in load method of {@link BitmapLoader}
+     *
+     * @return Source data
+     */
     @NonNull
-    @Override
-    public T getData() {
-        return mData;
-    }
+    @AnyThread
+    T getData();
 
+    /**
+     * Must be unique for each image. If you want to use storage caching, ensure that
+     * returned value doesn't contain characters that can't be used in file name,
+     * {@link DataDescriptor}s considered to be equal if their keys are equal
+     *
+     * @return Unique identifier
+     * @see DataUtils#generateSHA256(String)
+     */
     @NonNull
-    @Override
-    public String getKey() {
-        return mKey;
-    }
-
-    @Override
-    public int hashCode() {
-        return mKey.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return obj == this ||
-                obj instanceof ObjectImageSource && mKey.equals(((ObjectImageSource) obj).mKey);
-    }
-
-    @NonNull
-    @Override
-    public String toString() {
-        return "StringImageSource [key: " + mKey + ", data: " + mData + "]";
-    }
+    @AnyThread
+    String getKey();
 }

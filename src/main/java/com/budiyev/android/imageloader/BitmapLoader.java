@@ -39,7 +39,7 @@ public interface BitmapLoader<T> {
      * {@link NullPointerException}.
      * @throws Throwable if unable to load {@link Bitmap}, this exception will be transferred
      *                   to {@link ErrorCallback#onError(Object, Throwable)} method.
-     * @see LoadUtils
+     * @see DataUtils
      * @see ImageUtils
      */
     @Nullable

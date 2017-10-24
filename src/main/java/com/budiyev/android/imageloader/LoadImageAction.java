@@ -49,7 +49,7 @@ final class LoadImageAction<T> {
     private final ImageCache mMemoryImageCache;
     private final ImageCache mStorageImageCache;
     private final Callbacks<T> mCallbacks;
-    private final ImageSource<T> mSource;
+    private final DataDescriptor<T> mDescriptor;
     private final WeakReference<ImageView> mView;
     private final Drawable mPlaceholder;
     private final boolean mFadeEnabled;
@@ -61,7 +61,7 @@ final class LoadImageAction<T> {
             @NonNull PauseLock pauseLock, @NonNull BitmapLoader<T> bitmapLoader,
             @Nullable BitmapProcessor<T> bitmapProcessor, @Nullable ImageCache memoryImageCache,
             @Nullable ImageCache storageImageCache, boolean fadeEnabled, long fadeDuration,
-            @Nullable Callbacks<T> callbacks, @NonNull ImageSource<T> source,
+            @Nullable Callbacks<T> callbacks, @NonNull DataDescriptor<T> descriptor,
             @NonNull ImageView view, @NonNull Drawable placeholder) {
         mContext = context;
         mMainThreadHandler = mainThreadHandler;
@@ -73,7 +73,7 @@ final class LoadImageAction<T> {
         mCallbacks = callbacks;
         mFadeEnabled = fadeEnabled;
         mFadeDuration = fadeDuration;
-        mSource = source;
+        mDescriptor = descriptor;
         mView = new WeakReference<>(view);
         mPlaceholder = placeholder;
     }
@@ -85,9 +85,8 @@ final class LoadImageAction<T> {
         mFuture = InternalUtils.getImageLoaderExecutor().submit(new LoadImageTask());
     }
 
-    @NonNull
-    public ImageSource<T> getSource() {
-        return mSource;
+    public boolean hasSameDescriptor(@NonNull String descriptorKey) {
+        return mDescriptor.getKey().equals(descriptorKey);
     }
 
     public void cancel() {
@@ -110,8 +109,8 @@ final class LoadImageAction<T> {
         }
         Bitmap bitmap = null;
         ImageCache storageImageCache = mStorageImageCache;
-        String key = mSource.getKey();
-        T data = mSource.getData();
+        String key = mDescriptor.getKey();
+        T data = mDescriptor.getData();
         if (storageImageCache != null) {
             bitmap = storageImageCache.get(key);
         }

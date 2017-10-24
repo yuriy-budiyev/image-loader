@@ -78,7 +78,7 @@ public final class ImageLoader<T> {
     }
 
     /**
-     * Load image into view from specified {@code data}, using default {@link ImageSource},
+     * Load image into view from specified {@code data}, using default {@link DataDescriptor},
      * {@code data}'s toString() method will be used for key generation, any characters allowed
      *
      * @param data Source data
@@ -86,22 +86,22 @@ public final class ImageLoader<T> {
      */
     @MainThread
     public void load(@NonNull T data, @NonNull ImageView view) {
-        load(new ObjectImageSource<>(data), view, null);
+        load(new StringDataDescriptor<>(data), view, null);
     }
 
     /**
-     * Load image into view from specified {@link ImageSource}
+     * Load image into view from specified {@link DataDescriptor}
      *
-     * @param source Image source
-     * @param view   Image view
+     * @param descriptor Source data descriptor
+     * @param view       Image view
      */
     @MainThread
-    public void load(@NonNull ImageSource<T> source, @NonNull ImageView view) {
-        load(source, view, null);
+    public void load(@NonNull DataDescriptor<T> descriptor, @NonNull ImageView view) {
+        load(descriptor, view, null);
     }
 
     /**
-     * Load image into view from specified {@code data}, using default {@link ImageSource},
+     * Load image into view from specified {@code data}, using default {@link DataDescriptor},
      * {@code data}'s toString() method will be used for key generation, any characters allowed
      *
      * @param data Source data
@@ -110,34 +110,34 @@ public final class ImageLoader<T> {
     @MainThread
     public void load(@NonNull T data, @NonNull ImageView view,
             @Nullable LoadCallback<T> loadCallback, @Nullable ErrorCallback<T> errorCallback) {
-        load(new ObjectImageSource<>(data), view, new Callbacks<>(loadCallback, errorCallback));
+        load(new StringDataDescriptor<>(data), view, new Callbacks<>(loadCallback, errorCallback));
     }
 
     /**
-     * Load image into view from specified {@link ImageSource}
+     * Load image into view from specified {@link DataDescriptor}
      *
-     * @param source Image source
-     * @param view   Image view
+     * @param descriptor Source data descriptor
+     * @param view       Image view
      */
     @MainThread
-    public void load(@NonNull ImageSource<T> source, @NonNull ImageView view,
+    public void load(@NonNull DataDescriptor<T> descriptor, @NonNull ImageView view,
             @Nullable LoadCallback<T> loadCallback, @Nullable ErrorCallback<T> errorCallback) {
-        load(source, view, new Callbacks<>(loadCallback, errorCallback));
+        load(descriptor, view, new Callbacks<>(loadCallback, errorCallback));
     }
 
     /**
-     * Delete cached image for specified {@code data}, using default {@link ImageSource},
+     * Delete cached image for specified {@code data}, using default {@link DataDescriptor},
      * {@code data}'s toString() method will be used for key generation, any characters allowed
      */
     public void invalidate(@NonNull T data) {
-        invalidate(new ObjectImageSource<>(data));
+        invalidate(new StringDataDescriptor<>(data));
     }
 
     /**
-     * Delete cached image for specified {@link ImageSource}
+     * Delete cached image for specified {@link DataDescriptor}
      */
-    public void invalidate(@NonNull ImageSource<T> source) {
-        String key = source.getKey();
+    public void invalidate(@NonNull DataDescriptor<T> descriptor) {
+        String key = descriptor.getKey();
         ImageCache memoryCache = mMemoryCache;
         if (memoryCache != null) {
             memoryCache.remove(key);
@@ -194,12 +194,13 @@ public final class ImageLoader<T> {
     }
 
     @MainThread
-    private void load(@NonNull ImageSource<T> source, @NonNull ImageView view,
+    private void load(@NonNull DataDescriptor<T> descriptor, @NonNull ImageView view,
             @Nullable Callbacks<T> callbacks) {
-        ImageCache memoryImageCache = mMemoryCache;
         Bitmap image = null;
+        String key = descriptor.getKey();
+        ImageCache memoryImageCache = mMemoryCache;
         if (memoryImageCache != null) {
-            image = memoryImageCache.get(source.getKey());
+            image = memoryImageCache.get(key);
         }
         if (image != null) {
             view.setImageBitmap(image);
@@ -207,23 +208,22 @@ public final class ImageLoader<T> {
         }
         LoadImageAction<?> currentAction = InternalUtils.getLoadImageAction(view);
         if (currentAction != null) {
-            if (!currentAction.getSource().getKey().equals(source.getKey())) {
-                currentAction.cancel();
-            } else {
+            if (currentAction.hasSameDescriptor(key)) {
                 return;
             }
+            currentAction.cancel();
         }
         Drawable placeholder;
         PlaceholderProvider<T> placeholderProvider = mPlaceholderProvider;
         if (placeholderProvider != null) {
-            placeholder = placeholderProvider.get(mContext, source.getData());
+            placeholder = placeholderProvider.get(mContext, descriptor.getData());
         } else {
             placeholder = new ColorDrawable(Color.TRANSPARENT);
         }
         LoadImageAction<T> action =
                 new LoadImageAction<>(mContext, mMainThreadHandler, mPauseLock, mBitmapLoader,
                         mBitmapProcessor, mMemoryCache, mStorageCache, mFadeEnabled, mFadeDuration,
-                        callbacks, source, view, placeholder);
+                        callbacks, descriptor, view, placeholder);
         view.setImageDrawable(new PlaceholderDrawable(placeholder, action));
         action.execute();
     }
@@ -289,7 +289,7 @@ public final class ImageLoader<T> {
         /**
          * Custom image loader builder
          *
-         * @see ImageSource
+         * @see DataDescriptor
          * @see BitmapLoader
          */
         @NonNull
