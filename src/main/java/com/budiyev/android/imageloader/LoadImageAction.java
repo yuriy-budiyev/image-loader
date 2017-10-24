@@ -31,6 +31,7 @@ import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
+import android.view.View;
 import android.widget.ImageView;
 
 import java.lang.ref.WeakReference;
@@ -175,6 +176,7 @@ final class LoadImageAction<T> {
                 return;
             }
             if (mFadeEnabled) {
+                view.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
                 view.setImageDrawable(
                         new FadeBitmapDrawable(mContext.getResources(), mPlaceholder, mImage,
                                 mFadeDuration));
