@@ -101,7 +101,7 @@ final class StorageImageCache implements ImageCache {
             file.delete();
         }
         try (OutputStream outputStream = new FileOutputStream(file)) {
-            mCompressMode.compress(value, outputStream);
+            value.compress(mCompressMode.getFormat(), mCompressMode.getQuality(), outputStream);
         } catch (IOException e) {
             if (file.exists()) {
                 //noinspection ResultOfMethodCallIgnored

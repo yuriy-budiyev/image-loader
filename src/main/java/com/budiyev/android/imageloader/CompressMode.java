@@ -26,8 +26,6 @@ package com.budiyev.android.imageloader;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
-import java.io.OutputStream;
-
 public enum CompressMode {
     /**
      * Lossless compression, supports transparency, no quality loss, used by default
@@ -48,7 +46,12 @@ public enum CompressMode {
         mQuality = quality;
     }
 
-    void compress(@NonNull Bitmap bitmap, @NonNull OutputStream stream) {
-        bitmap.compress(mFormat, mQuality, stream);
+    @NonNull
+    Bitmap.CompressFormat getFormat() {
+        return mFormat;
+    }
+
+    int getQuality() {
+        return mQuality;
     }
 }
