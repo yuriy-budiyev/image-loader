@@ -24,6 +24,7 @@
 package com.budiyev.android.imageloader;
 
 import android.graphics.Bitmap;
+import android.support.annotation.AnyThread;
 import android.support.annotation.NonNull;
 
 public interface ImageSource<T> {
@@ -34,6 +35,7 @@ public interface ImageSource<T> {
      * @return Source data
      */
     @NonNull
+    @AnyThread
     T getData();
 
     /**
@@ -45,5 +47,6 @@ public interface ImageSource<T> {
      * @see LoadUtils#generateSHA256(String)
      */
     @NonNull
+    @AnyThread
     String getKey();
 }

@@ -24,8 +24,10 @@
 package com.budiyev.android.imageloader;
 
 import android.graphics.Bitmap;
+import android.support.annotation.AnyThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.WorkerThread;
 
 public interface ImageCache {
     /**
@@ -34,16 +36,19 @@ public interface ImageCache {
      * @param key   Unique key
      * @param value Image bitmap
      */
+    @WorkerThread
     void put(@NonNull String key, @NonNull Bitmap value);
 
     /**
-     * Get {@link Bitmap} for the specified {@code key}
+     * Get {@link Bitmap} for the specified {@code key}, this method called on the main thread
+     * if it's a memory cache, and on a worker one otherwise
      *
      * @param key Unique key
      * @return Image {@link Bitmap} or {@code null}, if there are no entry
      * for the specified {@code key}
      */
     @Nullable
+    @AnyThread
     Bitmap get(@NonNull String key);
 
     /**
@@ -51,10 +56,12 @@ public interface ImageCache {
      *
      * @param key Unique key
      */
+    @AnyThread
     void remove(@NonNull String key);
 
     /**
      * Clear cache
      */
+    @AnyThread
     void clear();
 }
