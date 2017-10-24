@@ -36,5 +36,5 @@ public interface PlaceholderProvider<T> {
      * @return Placeholder image
      */
     @NonNull
-    Drawable get(@NonNull Context context, T data);
+    Drawable get(@NonNull Context context, @NonNull T data);
 }
