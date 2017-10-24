@@ -25,6 +25,7 @@ package com.budiyev.android.imageloader;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 
 public interface PlaceholderProvider<T> {
@@ -36,5 +37,6 @@ public interface PlaceholderProvider<T> {
      * @return Placeholder image
      */
     @NonNull
+    @MainThread
     Drawable get(@NonNull Context context, @NonNull T data);
 }
