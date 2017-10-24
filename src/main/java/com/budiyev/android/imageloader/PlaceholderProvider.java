@@ -28,13 +28,17 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 
+/**
+ * Placeholder provider, provides a drawable that will be displayed while image,
+ * associated with {@code data} is loading
+ */
 public interface PlaceholderProvider<T> {
     /**
-     * Get placeholder for concrete source data
+     * Get placeholder for data
      *
      * @param context Context
      * @param data    Data
-     * @return Placeholder image
+     * @return Placeholder drawable
      */
     @NonNull
     @MainThread

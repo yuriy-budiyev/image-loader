@@ -33,7 +33,7 @@ public interface BitmapLoader<T> {
     /**
      * Load {@link Bitmap} from source data
      *
-     * @param data Source data
+     * @param data Data
      * @return Loaded bitmap; or {@code null} if unable to load it, in that case,
      * {@link ErrorCallback#onError(Object, Throwable)} will be called with
      * {@link NullPointerException}.

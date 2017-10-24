@@ -27,12 +27,15 @@ import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
 
+/**
+ * Load callback
+ */
 public interface LoadCallback<T> {
     /**
      * Called when image is loaded
      *
-     * @param data  Source data
-     * @param image Loaded image
+     * @param data  Data
+     * @param image Image
      */
     @WorkerThread
     void onLoaded(@NonNull T data, @NonNull Bitmap image);

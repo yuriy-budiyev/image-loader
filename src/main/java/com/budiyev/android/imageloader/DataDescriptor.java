@@ -23,16 +23,18 @@
  */
 package com.budiyev.android.imageloader;
 
-import android.graphics.Bitmap;
 import android.support.annotation.AnyThread;
 import android.support.annotation.NonNull;
 
+/**
+ * Data descriptor, provides data and key that identifies this data
+ */
 public interface DataDescriptor<T> {
     /**
-     * Source data from which {@link Bitmap} should be loaded
-     * in load method of {@link BitmapLoader}
+     * Data, that will be transferred to {@link BitmapLoader}, {@link PlaceholderProvider},
+     * {@link LoadCallback} and {@link ErrorCallback}
      *
-     * @return Source data
+     * @return Data
      */
     @NonNull
     @AnyThread

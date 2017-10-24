@@ -27,8 +27,10 @@ import android.graphics.Bitmap;
 import android.support.annotation.AnyThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.WorkerThread;
 
+/**
+ * Common image cache interface, implementations should be thread safe
+ */
 public interface ImageCache {
     /**
      * Put {@link Bitmap} into cache
@@ -36,12 +38,12 @@ public interface ImageCache {
      * @param key   Unique key
      * @param value Image bitmap
      */
-    @WorkerThread
+    @AnyThread
     void put(@NonNull String key, @NonNull Bitmap value);
 
     /**
      * Get {@link Bitmap} for the specified {@code key}, this method called on the main thread
-     * if it's a memory cache, and on a worker one otherwise
+     * if it's a memory cache, and on a worker thread otherwise
      *
      * @param key Unique key
      * @return Image {@link Bitmap} or {@code null}, if there are no entry
