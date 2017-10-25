@@ -6,6 +6,6 @@ Image loader tool for Android
 ### Usage
 ```
 dependencies {
-    implementation 'com.budiyev.android:image-loader:1.4.6'
+    implementation 'com.budiyev.android:image-loader:1.4.7'
 }
 ```
