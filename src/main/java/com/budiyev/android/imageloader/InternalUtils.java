@@ -35,18 +35,11 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 final class InternalUtils {
     private static final String URI_SCHEME_HTTP = "http";
     private static final String URI_SCHEME_HTTPS = "https";
     private static final String URI_SCHEME_FTP = "ftp";
-    private static final Lock LOADER_EXECUTOR_LOCK = new ReentrantLock();
-    private static final Lock CACHE_EXECUTOR_LOCK = new ReentrantLock();
-    private static volatile ThreadPoolExecutor sImageLoaderExecutor;
-    private static volatile ThreadPoolExecutor sStorageCacheExecutor;
 
     private InternalUtils() {
     }
@@ -83,41 +76,5 @@ final class InternalUtils {
             closeable.close();
         } catch (IOException ignored) {
         }
-    }
-
-    @NonNull
-    public static ThreadPoolExecutor getImageLoaderExecutor() {
-        ThreadPoolExecutor executor = sImageLoaderExecutor;
-        if (executor == null) {
-            LOADER_EXECUTOR_LOCK.lock();
-            try {
-                executor = sImageLoaderExecutor;
-                if (executor == null) {
-                    executor = new ImageLoaderExecutor(Runtime.getRuntime().availableProcessors());
-                    sImageLoaderExecutor = executor;
-                }
-            } finally {
-                LOADER_EXECUTOR_LOCK.unlock();
-            }
-        }
-        return executor;
-    }
-
-    @NonNull
-    public static ThreadPoolExecutor getStorageCacheExecutor() {
-        ThreadPoolExecutor executor = sStorageCacheExecutor;
-        if (executor == null) {
-            CACHE_EXECUTOR_LOCK.lock();
-            try {
-                executor = sStorageCacheExecutor;
-                if (executor == null) {
-                    executor = new ImageLoaderExecutor();
-                    sStorageCacheExecutor = executor;
-                }
-            } finally {
-                CACHE_EXECUTOR_LOCK.unlock();
-            }
-        }
-        return executor;
     }
 }

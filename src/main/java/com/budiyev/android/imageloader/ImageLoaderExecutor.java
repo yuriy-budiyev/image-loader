@@ -31,22 +31,18 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 final class ImageLoaderExecutor extends ThreadPoolExecutor {
-    public ImageLoaderExecutor() {
-        this(1);
-    }
-
     public ImageLoaderExecutor(int poolSize) {
         super(poolSize, poolSize, 0L, TimeUnit.NANOSECONDS, new LinkedBlockingQueue<Runnable>(),
-                new ImageLoaderThreadFactory());
+                new ImageLoaderThreadFactory(), new ThreadPoolExecutor.DiscardPolicy());
     }
 
     @Override
-    protected void afterExecute(Runnable runnable, Throwable throwable) {
-        if (throwable == null && runnable instanceof Future<?>) {
-            Future<?> future = (Future<?>) runnable;
-            if (future.isDone()) {
+    protected void afterExecute(Runnable r, Throwable t) {
+        if (t == null && r instanceof Future<?>) {
+            Future<?> f = (Future<?>) r;
+            if (f.isDone()) {
                 try {
-                    future.get();
+                    f.get();
                 } catch (InterruptedException | CancellationException ignored) {
                 } catch (ExecutionException e) {
                     throw new RuntimeException(e.getCause());

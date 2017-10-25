@@ -23,25 +23,16 @@
  */
 package com.budiyev.android.imageloader;
 
+import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.atomic.AtomicInteger;
-
-final class ImageLoaderThreadFactory implements ThreadFactory {
-    private final AtomicInteger mCounter = new AtomicInteger(1);
-
+public class EmptyPlaceholderProvider<T> implements PlaceholderProvider<T> {
     @NonNull
     @Override
-    public Thread newThread(@NonNull Runnable r) {
-        mCounter.compareAndSet(Integer.MAX_VALUE, 0);
-        Thread t = new Thread(r, "ImageLoader thread #" + mCounter.getAndIncrement());
-        if (t.getPriority() != Thread.MIN_PRIORITY) {
-            t.setPriority(Thread.MIN_PRIORITY);
-        }
-        if (t.isDaemon()) {
-            t.setDaemon(false);
-        }
-        return t;
+    public Drawable get(@NonNull Context context, @NonNull T data) {
+        return new ColorDrawable(Color.TRANSPARENT);
     }
 }

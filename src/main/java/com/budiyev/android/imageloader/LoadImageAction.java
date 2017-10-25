@@ -35,6 +35,7 @@ import android.widget.ImageView;
 
 import java.lang.ref.WeakReference;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 /**
@@ -43,6 +44,7 @@ import java.util.concurrent.Future;
 final class LoadImageAction<T> {
     private final Context mContext;
     private final Handler mMainThreadHandler;
+    private final ExecutorService mExecutor;
     private final PauseLock mPauseLock;
     private final BitmapLoader<T> mBitmapLoader;
     private final BitmapProcessor<T> mBitmapProcessor;
@@ -58,13 +60,15 @@ final class LoadImageAction<T> {
     private volatile boolean mCancelled;
 
     public LoadImageAction(@NonNull Context context, @NonNull Handler mainThreadHandler,
-            @NonNull PauseLock pauseLock, @NonNull BitmapLoader<T> bitmapLoader,
-            @Nullable BitmapProcessor<T> bitmapProcessor, @Nullable ImageCache memoryImageCache,
-            @Nullable ImageCache storageImageCache, boolean fadeEnabled, long fadeDuration,
-            @Nullable Callbacks<T> callbacks, @NonNull DataDescriptor<T> descriptor,
-            @NonNull ImageView view, @NonNull Drawable placeholder) {
+            @NonNull ExecutorService executor, @NonNull PauseLock pauseLock,
+            @NonNull BitmapLoader<T> bitmapLoader, @Nullable BitmapProcessor<T> bitmapProcessor,
+            @Nullable ImageCache memoryImageCache, @Nullable ImageCache storageImageCache,
+            boolean fadeEnabled, long fadeDuration, @Nullable Callbacks<T> callbacks,
+            @NonNull DataDescriptor<T> descriptor, @NonNull ImageView view,
+            @NonNull Drawable placeholder) {
         mContext = context;
         mMainThreadHandler = mainThreadHandler;
+        mExecutor = executor;
         mPauseLock = pauseLock;
         mBitmapLoader = bitmapLoader;
         mBitmapProcessor = bitmapProcessor;
@@ -82,7 +86,7 @@ final class LoadImageAction<T> {
         if (mCancelled) {
             return;
         }
-        mFuture = InternalUtils.getImageLoaderExecutor().submit(new LoadImageTask());
+        mFuture = mExecutor.submit(new LoadImageTask());
     }
 
     public boolean hasSameDescriptor(@NonNull String descriptorKey) {

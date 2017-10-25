@@ -28,8 +28,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Handler;
@@ -41,6 +39,7 @@ import android.widget.ImageView;
 
 import java.io.File;
 import java.io.FileDescriptor;
+import java.util.concurrent.ExecutorService;
 
 /**
  * Image loader is a universal tool for loading bitmaps efficiently in Android
@@ -56,6 +55,7 @@ public final class ImageLoader<T> {
     private final ImageCache mMemoryCache;
     private final ImageCache mStorageCache;
     private final PlaceholderProvider<T> mPlaceholderProvider;
+    private final ExecutorService mExecutor;
     private final boolean mFadeEnabled;
     private final long mFadeDuration;
 
@@ -65,14 +65,26 @@ public final class ImageLoader<T> {
     private ImageLoader(@NonNull Context context, @NonNull BitmapLoader<T> bitmapLoader,
             @Nullable BitmapProcessor<T> bitmapProcessor, @Nullable ImageCache memoryCache,
             @Nullable ImageCache storageCache, @Nullable PlaceholderProvider<T> placeholderProvider,
-            boolean fadeEnabled, long fadeDuration) {
+            @Nullable ExecutorService executor, boolean fadeEnabled, long fadeDuration) {
         mContext = context;
         mMainThreadHandler = new Handler(context.getMainLooper());
         mBitmapLoader = bitmapLoader;
         mBitmapProcessor = bitmapProcessor;
         mMemoryCache = memoryCache;
         mStorageCache = storageCache;
-        mPlaceholderProvider = placeholderProvider;
+        if (placeholderProvider != null) {
+            mPlaceholderProvider = placeholderProvider;
+        } else {
+            mPlaceholderProvider = new EmptyPlaceholderProvider<>();
+        }
+        if (executor != null) {
+            mExecutor = executor;
+        } else {
+            mExecutor = new ImageLoaderExecutor(Runtime.getRuntime().availableProcessors());
+        }
+        if (storageCache instanceof StorageImageCache) {
+            ((StorageImageCache) storageCache).setExecutor(mExecutor);
+        }
         mFadeEnabled = fadeEnabled;
         mFadeDuration = fadeDuration;
     }
@@ -213,17 +225,12 @@ public final class ImageLoader<T> {
             }
             currentAction.cancel();
         }
-        Drawable placeholder;
-        PlaceholderProvider<T> placeholderProvider = mPlaceholderProvider;
-        if (placeholderProvider != null) {
-            placeholder = placeholderProvider.get(mContext, descriptor.getData());
-        } else {
-            placeholder = new ColorDrawable(Color.TRANSPARENT);
-        }
+        Context context = mContext;
+        Drawable placeholder = mPlaceholderProvider.get(context, descriptor.getData());
         LoadImageAction<T> action =
-                new LoadImageAction<>(mContext, mMainThreadHandler, mPauseLock, mBitmapLoader,
-                        mBitmapProcessor, mMemoryCache, mStorageCache, mFadeEnabled, mFadeDuration,
-                        callbacks, descriptor, view, placeholder);
+                new LoadImageAction<>(context, mMainThreadHandler, mExecutor, mPauseLock,
+                        mBitmapLoader, mBitmapProcessor, mMemoryCache, mStorageCache, mFadeEnabled,
+                        mFadeDuration, callbacks, descriptor, view, placeholder);
         view.setImageDrawable(new PlaceholderDrawable(placeholder, action));
         action.execute();
     }
@@ -308,6 +315,7 @@ public final class ImageLoader<T> {
         private ImageCache mMemoryCache;
         private ImageCache mStorageCache;
         private PlaceholderProvider<T> mPlaceholderProvider;
+        private ExecutorService mExecutor;
         private boolean mFadeEnabled = true;
         private long mFadeDuration = 250L;
 
@@ -446,6 +454,17 @@ public final class ImageLoader<T> {
         }
 
         /**
+         * Bitmap processor, processes bitmap before showing it
+         *
+         * @see BitmapProcessor
+         */
+        @NonNull
+        public Builder<T> processor(@Nullable BitmapProcessor<T> processor) {
+            mBitmapProcessor = processor;
+            return this;
+        }
+
+        /**
          * Whether to enable fade effect for images that isn't cached in memory,
          * allows to specify fade effect duration
          */
@@ -466,13 +485,11 @@ public final class ImageLoader<T> {
         }
 
         /**
-         * Bitmap processor, processes bitmap before showing it
-         *
-         * @see BitmapProcessor
+         * Custom executor
          */
         @NonNull
-        public Builder<T> processor(@Nullable BitmapProcessor<T> processor) {
-            mBitmapProcessor = processor;
+        public Builder<T> executor(@Nullable ExecutorService executor) {
+            mExecutor = executor;
             return this;
         }
 
@@ -482,7 +499,7 @@ public final class ImageLoader<T> {
         @NonNull
         public ImageLoader<T> build() {
             return new ImageLoader<>(mContext, mBitmapLoader, mBitmapProcessor, mMemoryCache,
-                    mStorageCache, mPlaceholderProvider, mFadeEnabled, mFadeDuration);
+                    mStorageCache, mPlaceholderProvider, mExecutor, mFadeEnabled, mFadeDuration);
         }
     }
 }

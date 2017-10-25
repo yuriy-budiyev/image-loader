@@ -38,12 +38,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-/**
- * Default implementation of {@link ImageCache} for {@link ImageLoader}
- */
+@SuppressWarnings("ResultOfMethodCallIgnored")
 final class StorageImageCache implements ImageCache {
     public static final String DEFAULT_DIRECTORY = "image_loader_cache";
     public static final long DEFAULT_MAX_SIZE = 52428800L;
@@ -54,6 +53,7 @@ final class StorageImageCache implements ImageCache {
     private final File mDirectory;
     private final CompressMode mCompressMode;
     private final long mMaxSize;
+    private volatile ExecutorService mExecutor;
     private volatile boolean mCacheFitting;
     private volatile boolean mCacheFitRequested;
 
@@ -87,24 +87,25 @@ final class StorageImageCache implements ImageCache {
         mFileFilter = new CacheFileFilter();
         mFitCacheSizeTask = new FitCacheSizeTask();
         if (!directory.exists()) {
-            //noinspection ResultOfMethodCallIgnored
             directory.mkdirs();
         }
         fitCache();
+    }
+
+    public void setExecutor(@Nullable ExecutorService executor) {
+        mExecutor = executor;
     }
 
     @Override
     public void put(@NonNull String key, @NonNull Bitmap value) {
         File file = new File(mDirectory, key);
         if (file.exists()) {
-            //noinspection ResultOfMethodCallIgnored
             file.delete();
         }
         try (OutputStream outputStream = new FileOutputStream(file)) {
             value.compress(mCompressMode.getFormat(), mCompressMode.getQuality(), outputStream);
         } catch (IOException e) {
             if (file.exists()) {
-                //noinspection ResultOfMethodCallIgnored
                 file.delete();
             }
         }
@@ -115,7 +116,6 @@ final class StorageImageCache implements ImageCache {
     @Override
     public Bitmap get(@NonNull String key) {
         File file = new File(mDirectory, key);
-        //noinspection ResultOfMethodCallIgnored
         file.setLastModified(System.currentTimeMillis());
         try (InputStream inputStream = new FileInputStream(file)) {
             return BitmapFactory.decodeStream(inputStream);
@@ -126,7 +126,6 @@ final class StorageImageCache implements ImageCache {
 
     @Override
     public void remove(@NonNull String key) {
-        //noinspection ResultOfMethodCallIgnored
         new File(mDirectory, key).delete();
     }
 
@@ -137,7 +136,6 @@ final class StorageImageCache implements ImageCache {
             return;
         }
         for (File file : files) {
-            //noinspection ResultOfMethodCallIgnored
             file.delete();
         }
     }
@@ -148,13 +146,17 @@ final class StorageImageCache implements ImageCache {
     }
 
     private void fitCache() {
+        ExecutorService executor = mExecutor;
+        if (executor == null) {
+            return;
+        }
         mFitLock.lock();
         try {
             if (mCacheFitting) {
                 mCacheFitRequested = true;
             } else {
                 mCacheFitting = true;
-                InternalUtils.getStorageCacheExecutor().execute(mFitCacheSizeTask);
+                executor.execute(mFitCacheSizeTask);
             }
         } finally {
             mFitLock.unlock();
@@ -176,7 +178,6 @@ final class StorageImageCache implements ImageCache {
                         for (int i = files.length - 1; size > mMaxSize && i >= 0; i--) {
                             File removing = files[i];
                             size -= removing.length();
-                            //noinspection ResultOfMethodCallIgnored
                             removing.delete();
                         }
                     }
