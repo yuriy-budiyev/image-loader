@@ -27,7 +27,7 @@ public final class MyImageLoader {
     }
 
     /**
-     * Load image form {@code uri} to {@code view}
+     * Load image form {@code url} to {@code view}
      *
      * @param url  Source URL
      * @param view Target image view
