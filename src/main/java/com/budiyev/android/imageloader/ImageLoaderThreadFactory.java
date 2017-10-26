@@ -23,10 +23,10 @@
  */
 package com.budiyev.android.imageloader;
 
-import android.support.annotation.NonNull;
-
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import android.support.annotation.NonNull;
 
 final class ImageLoaderThreadFactory implements ThreadFactory {
     private final AtomicInteger mCounter = new AtomicInteger(1);

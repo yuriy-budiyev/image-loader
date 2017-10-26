@@ -23,12 +23,6 @@
  */
 package com.budiyev.android.imageloader;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
@@ -41,6 +35,12 @@ import java.util.Comparator;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 final class StorageImageCache implements ImageCache {

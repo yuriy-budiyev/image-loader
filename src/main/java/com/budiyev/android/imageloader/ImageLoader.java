@@ -23,6 +23,10 @@
  */
 package com.budiyev.android.imageloader;
 
+import java.io.File;
+import java.io.FileDescriptor;
+import java.util.concurrent.ExecutorService;
+
 import android.app.Application;
 import android.content.Context;
 import android.content.res.Resources;
@@ -36,10 +40,6 @@ import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.widget.ImageView;
-
-import java.io.File;
-import java.io.FileDescriptor;
-import java.util.concurrent.ExecutorService;
 
 /**
  * Image loader is a universal tool for loading bitmaps efficiently in Android

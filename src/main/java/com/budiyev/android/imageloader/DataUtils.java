@@ -23,6 +23,15 @@
  */
 package com.budiyev.android.imageloader;
 
+import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -33,15 +42,6 @@ import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
-
-import java.io.File;
-import java.io.FileDescriptor;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 @SuppressWarnings("SameParameterValue")
 public final class DataUtils {

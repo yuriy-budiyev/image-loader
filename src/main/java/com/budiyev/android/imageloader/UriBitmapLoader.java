@@ -23,14 +23,14 @@
  */
 package com.budiyev.android.imageloader;
 
+import java.io.InputStream;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
-import java.io.InputStream;
 
 final class UriBitmapLoader implements BitmapLoader<Uri> {
     @Nullable

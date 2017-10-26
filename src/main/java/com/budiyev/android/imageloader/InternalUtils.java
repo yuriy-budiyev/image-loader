@@ -23,6 +23,11 @@
  */
 package com.budiyev.android.imageloader;
 
+import java.io.Closeable;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -30,11 +35,6 @@ import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.widget.ImageView;
-
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 
 final class InternalUtils {
     private static final String URI_SCHEME_HTTP = "http";

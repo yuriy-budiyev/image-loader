@@ -23,15 +23,15 @@
  */
 package com.budiyev.android.imageloader;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 
 final class FileBitmapLoader implements BitmapLoader<File> {
     @Nullable

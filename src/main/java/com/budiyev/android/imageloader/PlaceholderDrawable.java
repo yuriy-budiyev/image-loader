@@ -23,12 +23,12 @@
  */
 package com.budiyev.android.imageloader;
 
+import java.lang.ref.WeakReference;
+
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
-import java.lang.ref.WeakReference;
 
 /**
  * {@link Drawable} that holds reference to {@link LoadImageAction}
