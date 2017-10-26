@@ -4,8 +4,79 @@
 Image loader tool for Android
 
 ### Usage
-```
+```gradle
 dependencies {
     implementation 'com.budiyev.android:image-loader:1.5.0'
+}
+```
+
+### Simple singleton implementation
+```java
+/**
+ * Simple image loader that automatically cares about memory and storage caching,
+ * read documentation for more info
+ */
+public final class MyImageLoader {
+    private static volatile MyImageLoader sInstance;
+    private final ImageLoader<Uri> mLoader;
+
+    private MyImageLoader(@NonNull Context context) {
+        mLoader = ImageLoader.builder(context).uri().memoryCache().storageCache().build();
+    }
+
+    /**
+     * Load image form {@code uri} to {@code view}
+     *
+     * @param url  Source URL
+     * @param view Target image view
+     */
+    public void load(@NonNull String url, @NonNull ImageView view) {
+        mLoader.load(Uri.parse(url), view);
+    }
+
+    /**
+     * Get (or create, if not exist) loader instance
+     *
+     * @param context Context
+     * @return Loader instance
+     */
+    @NonNull
+    public static MyImageLoader with(@NonNull Context context) {
+        MyImageLoader instance = sInstance;
+        if (instance == null) {
+            synchronized (MyImageLoader.class) {
+                instance = sInstance;
+                if (instance == null) {
+                    instance = new MyImageLoader(context);
+                    sInstance = instance;
+                }
+            }
+        }
+        return instance;
+    }
+
+    /**
+     * Clear memory cache if it exists, would be good to call this method in
+     * {@link Application#onTrimMemory(int)} method,
+     * read documentation for more info
+     */
+    public static void clearMemoryCache() {
+        MyImageLoader instance = sInstance;
+        if (instance != null) {
+            instance.mLoader.clearMemoryCache();
+        }
+    }
+}
+```
+### Usage sample
+```java
+public class MainActivity extends AppCompatActivity {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        ImageView view = findViewById(R.id.image_view);
+        MyImageLoader.with(this).load("https://some.url/image", view);
+    }
 }
 ```
