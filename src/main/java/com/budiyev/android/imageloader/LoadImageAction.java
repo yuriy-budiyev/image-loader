@@ -25,7 +25,9 @@ package com.budiyev.android.imageloader;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.TransitionDrawable;
 import android.os.Handler;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
@@ -55,7 +57,7 @@ final class LoadImageAction<T> {
     private final WeakReference<ImageView> mView;
     private final Drawable mPlaceholder;
     private final boolean mFadeEnabled;
-    private final long mFadeDuration;
+    private final int mFadeDuration;
     private volatile Future<?> mFuture;
     private volatile boolean mCancelled;
 
@@ -63,7 +65,7 @@ final class LoadImageAction<T> {
             @NonNull ExecutorService executor, @NonNull PauseLock pauseLock,
             @NonNull BitmapLoader<T> bitmapLoader, @Nullable BitmapProcessor<T> bitmapProcessor,
             @Nullable ImageCache memoryImageCache, @Nullable ImageCache storageImageCache,
-            boolean fadeEnabled, long fadeDuration, @Nullable Callbacks<T> callbacks,
+            boolean fadeEnabled, int fadeDuration, @Nullable Callbacks<T> callbacks,
             @NonNull DataDescriptor<T> descriptor, @NonNull ImageView view,
             @NonNull Drawable placeholder) {
         mContext = context;
@@ -178,9 +180,10 @@ final class LoadImageAction<T> {
                 return;
             }
             if (mFadeEnabled) {
-                view.setImageDrawable(
-                        new FadeBitmapDrawable(mContext.getResources(), mPlaceholder, mImage,
-                                mFadeDuration));
+                TransitionDrawable drawable = new TransitionDrawable(new Drawable[] {mPlaceholder,
+                        new BitmapDrawable(mContext.getResources(), mImage)});
+                view.setImageDrawable(drawable);
+                drawable.startTransition(mFadeDuration);
             } else {
                 view.setImageBitmap(mImage);
             }

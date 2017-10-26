@@ -57,8 +57,8 @@ final class InternalUtils {
     }
 
     @Nullable
-    public static InputStream getDataStreamFromUri(@NonNull Context context,
-            @NonNull Uri uri) throws IOException {
+    public static InputStream getDataStreamFromUri(@NonNull Context context, @NonNull Uri uri)
+            throws IOException {
         String scheme = uri.getScheme();
         if (URI_SCHEME_HTTP.equalsIgnoreCase(scheme) || URI_SCHEME_HTTPS.equalsIgnoreCase(scheme) ||
                 URI_SCHEME_FTP.equalsIgnoreCase(scheme)) {

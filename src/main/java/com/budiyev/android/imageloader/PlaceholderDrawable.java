@@ -38,7 +38,7 @@ final class PlaceholderDrawable extends LayerDrawable {
 
     public PlaceholderDrawable(@NonNull Drawable placeholder,
             @NonNull LoadImageAction<?> loadImageAction) {
-        super(new Drawable[]{placeholder});
+        super(new Drawable[] {placeholder});
         mLoadImageActionReference = new WeakReference<LoadImageAction<?>>(loadImageAction);
     }
 

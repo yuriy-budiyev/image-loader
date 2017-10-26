@@ -57,7 +57,7 @@ public final class ImageLoader<T> {
     private final PlaceholderProvider<T> mPlaceholderProvider;
     private final ExecutorService mExecutor;
     private final boolean mFadeEnabled;
-    private final long mFadeDuration;
+    private final int mFadeDuration;
 
     /**
      * @see Builder
@@ -65,7 +65,7 @@ public final class ImageLoader<T> {
     private ImageLoader(@NonNull Context context, @NonNull BitmapLoader<T> bitmapLoader,
             @Nullable BitmapProcessor<T> bitmapProcessor, @Nullable ImageCache memoryCache,
             @Nullable ImageCache storageCache, @Nullable PlaceholderProvider<T> placeholderProvider,
-            @Nullable ExecutorService executor, boolean fadeEnabled, long fadeDuration) {
+            @Nullable ExecutorService executor, boolean fadeEnabled, int fadeDuration) {
         mContext = context;
         mMainThreadHandler = new Handler(context.getMainLooper());
         mBitmapLoader = bitmapLoader;
@@ -317,7 +317,7 @@ public final class ImageLoader<T> {
         private PlaceholderProvider<T> mPlaceholderProvider;
         private ExecutorService mExecutor;
         private boolean mFadeEnabled = true;
-        private long mFadeDuration = 250L;
+        private int mFadeDuration = 250;
 
         private Builder(@NonNull Context context, @NonNull BitmapLoader<T> bitmapLoader) {
             mContext = context;
@@ -469,7 +469,7 @@ public final class ImageLoader<T> {
          * allows to specify fade effect duration
          */
         @NonNull
-        public Builder<T> fade(boolean enabled, long duration) {
+        public Builder<T> fade(boolean enabled, int duration) {
             mFadeEnabled = enabled;
             mFadeDuration = duration;
             return this;

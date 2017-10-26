@@ -83,8 +83,8 @@ public final class DataUtils {
     @Nullable
     @WorkerThread
     public static Bitmap loadSampledBitmapFromUri(@NonNull Context context, @NonNull Uri uri,
-            int requiredWidth, int requiredHeight, boolean ignoreTotalNumberOfPixels) throws
-            IOException {
+            int requiredWidth, int requiredHeight, boolean ignoreTotalNumberOfPixels)
+            throws IOException {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         try (InputStream inputStream = InternalUtils.getDataStreamFromUri(context, uri)) {

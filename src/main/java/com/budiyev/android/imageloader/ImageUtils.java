@@ -49,7 +49,7 @@ public final class ImageUtils {
     @NonNull
     public static Bitmap invertColors(@NonNull Bitmap image) {
         return applyColorFilter(image, new ColorMatrixColorFilter(
-                new float[]{-1, 0, 0, 0, 255, 0, -1, 0, 0, 255, 0, 0, -1, 0, 255, 0, 0, 0, 1, 0}));
+                new float[] {-1, 0, 0, 0, 255, 0, -1, 0, 0, 255, 0, 0, -1, 0, 255, 0, 0, 0, 1, 0}));
     }
 
     /**
