@@ -77,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ImageView view = findViewById(R.id.image_view);
+        
         MyImageLoader.with(this).load("https://some.url/image", view);
     }
 }
