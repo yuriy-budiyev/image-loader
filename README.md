@@ -30,6 +30,7 @@ public final class MyImageLoader {
      * @param url  Source URL
      * @param view Target image view
      */
+    @MainThread
     public void load(@NonNull String url, @NonNull ImageView view) {
         mLoader.load(Uri.parse(url), view);
     }
