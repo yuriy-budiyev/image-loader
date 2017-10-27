@@ -27,7 +27,6 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
-import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -69,12 +68,14 @@ final class FadeBitmapDrawable extends BitmapDrawable {
                     mFadeState = STATE_DONE;
                     super.draw(canvas);
                 } else {
+                    int placeholderAlpha = mPlaceholder.getAlpha();
+                    mPlaceholder.setAlpha(MAX_ALPHA - alpha);
                     mPlaceholder.draw(canvas);
-                    Paint paint = super.getPaint();
-                    int paintAlpha = paint.getAlpha();
-                    paint.setAlpha(alpha);
+                    mPlaceholder.setAlpha(placeholderAlpha);
+                    int imageAlpha = super.getAlpha();
+                    super.setAlpha(alpha);
                     super.draw(canvas);
-                    paint.setAlpha(paintAlpha);
+                    super.setAlpha(imageAlpha);
                     invalidateSelf();
                 }
                 break;
