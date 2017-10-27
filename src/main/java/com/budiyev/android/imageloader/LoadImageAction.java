@@ -30,9 +30,7 @@ import java.util.concurrent.Future;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.TransitionDrawable;
 import android.os.Handler;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
@@ -57,7 +55,7 @@ final class LoadImageAction<T> {
     private final WeakReference<ImageView> mView;
     private final Drawable mPlaceholder;
     private final boolean mFadeEnabled;
-    private final int mFadeDuration;
+    private final long mFadeDuration;
     private volatile Future<?> mFuture;
     private volatile boolean mCancelled;
 
@@ -65,7 +63,7 @@ final class LoadImageAction<T> {
             @NonNull ExecutorService executor, @NonNull PauseLock pauseLock,
             @NonNull BitmapLoader<T> bitmapLoader, @Nullable BitmapProcessor<T> bitmapProcessor,
             @Nullable ImageCache memoryImageCache, @Nullable ImageCache storageImageCache,
-            boolean fadeEnabled, int fadeDuration, @Nullable Callbacks<T> callbacks,
+            boolean fadeEnabled, long fadeDuration, @Nullable Callbacks<T> callbacks,
             @NonNull DataDescriptor<T> descriptor, @NonNull ImageView view,
             @NonNull Drawable placeholder) {
         mContext = context;
@@ -180,10 +178,9 @@ final class LoadImageAction<T> {
                 return;
             }
             if (mFadeEnabled) {
-                TransitionDrawable drawable = new TransitionDrawable(new Drawable[] {mPlaceholder,
-                        new BitmapDrawable(mContext.getResources(), mImage)});
-                view.setImageDrawable(drawable);
-                drawable.startTransition(mFadeDuration);
+                view.setImageDrawable(
+                        new FadeBitmapDrawable(mContext.getResources(), mImage, mPlaceholder,
+                                mFadeDuration));
             } else {
                 view.setImageBitmap(mImage);
             }
