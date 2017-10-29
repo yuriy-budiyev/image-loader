@@ -35,11 +35,12 @@ public interface ErrorCallback<T> {
     /**
      * Called when {@link BitmapLoader} was unable to load {@link Bitmap}
      *
-     * @param data  Data
-     * @param error Throwable, that has been thrown by {@link BitmapLoader#load(Context, Object)}
-     *              method or {@link ImageNotLoadedException} if {@link BitmapLoader}
-     *              returned {@code null}
+     * @param context Context
+     * @param data    Data
+     * @param error   Throwable, that has been thrown by {@link BitmapLoader#load(Context, Object)}
+     *                method or {@link ImageNotLoadedException} if {@link BitmapLoader}
+     *                returned {@code null}
      */
     @WorkerThread
-    void onError(@NonNull T data, @NonNull Throwable error);
+    void onError(@NonNull Context context, @NonNull T data, @NonNull Throwable error);
 }

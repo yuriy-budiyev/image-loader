@@ -129,14 +129,14 @@ final class LoadImageAction<T> {
             } catch (Throwable error) {
                 ErrorCallback<T> errorCallback = mErrorCallback;
                 if (errorCallback != null) {
-                    errorCallback.onError(data, error);
+                    errorCallback.onError(mContext, data, error);
                 }
                 return;
             }
             if (image == null) {
                 ErrorCallback<T> errorCallback = mErrorCallback;
                 if (errorCallback != null) {
-                    errorCallback.onError(data, new ImageNotLoadedException());
+                    errorCallback.onError(mContext, data, new ImageNotLoadedException());
                 }
                 return;
             }
@@ -146,7 +146,7 @@ final class LoadImageAction<T> {
         }
         LoadCallback<T> loadCallback = mLoadCallback;
         if (loadCallback != null) {
-            loadCallback.onLoaded(data, image);
+            loadCallback.onLoaded(mContext, data, image);
         }
         if (mCancelled) {
             return;
@@ -192,30 +192,33 @@ final class LoadImageAction<T> {
                 return;
             }
             DisplayCallback<T> displayCallback = mDisplayCallback;
+            Context context = mContext;
             Bitmap image = mImage;
             if (mFadeEnabled) {
                 view.setImageDrawable(
-                        new FadeBitmapDrawable(mMainThreadHandler, mContext.getResources(), image,
+                        new FadeBitmapDrawable(mMainThreadHandler, context.getResources(), image,
                                 mPlaceholder, mFadeDuration, displayCallback == null ? null :
-                                new FadeCallback<>(displayCallback, mDescriptor.getData(), image,
-                                        view)));
+                                new FadeCallback<>(context, displayCallback, mDescriptor.getData(),
+                                        image, view)));
             } else {
                 view.setImageBitmap(image);
                 if (displayCallback != null) {
-                    displayCallback.onDisplayed(mDescriptor.getData(), image, view);
+                    displayCallback.onDisplayed(context, mDescriptor.getData(), image, view);
                 }
             }
         }
     }
 
     private static final class FadeCallback<T> implements FadeBitmapDrawable.FadeCallback {
+        private final Context mContext;
         private final DisplayCallback<T> mDisplayCallback;
         private final T mData;
         private final Bitmap mImage;
         private final ImageView mView;
 
-        private FadeCallback(@NonNull DisplayCallback<T> displayCallback, @NonNull T data,
-                @NonNull Bitmap image, @NonNull ImageView view) {
+        private FadeCallback(@NonNull Context context, @NonNull DisplayCallback<T> displayCallback,
+                @NonNull T data, @NonNull Bitmap image, @NonNull ImageView view) {
+            mContext = context;
             mDisplayCallback = displayCallback;
             mData = data;
             mImage = image;
@@ -224,7 +227,7 @@ final class LoadImageAction<T> {
 
         @Override
         public void onDone() {
-            mDisplayCallback.onDisplayed(mData, mImage, mView);
+            mDisplayCallback.onDisplayed(mContext, mData, mImage, mView);
         }
     }
 }

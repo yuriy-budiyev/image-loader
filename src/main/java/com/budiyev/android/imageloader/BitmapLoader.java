@@ -35,10 +35,10 @@ public interface BitmapLoader<T> {
      *
      * @param data Data
      * @return Loaded bitmap; or {@code null} if unable to load it, in that case,
-     * {@link ErrorCallback#onError(Object, Throwable)} will be called with
+     * {@link ErrorCallback#onError(Context, Object, Throwable)} will be called with
      * {@link NullPointerException}.
      * @throws Throwable if unable to load {@link Bitmap}, this exception will be transferred
-     *                   to {@link ErrorCallback#onError(Object, Throwable)} method.
+     *                   to {@link ErrorCallback#onError(Context, Object, Throwable)} method.
      * @see DataUtils
      * @see ImageUtils
      */

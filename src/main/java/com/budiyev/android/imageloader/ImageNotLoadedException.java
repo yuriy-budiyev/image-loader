@@ -23,8 +23,10 @@
  */
 package com.budiyev.android.imageloader;
 
+import android.content.Context;
+
 /**
- * Exception, that will be transferred to {@link ErrorCallback#onError(Object, Throwable)}
+ * Exception, that will be transferred to {@link ErrorCallback#onError(Context, Object, Throwable)}
  * if {@link BitmapLoader} will return {@code null}
  */
 public final class ImageNotLoadedException extends Exception {
