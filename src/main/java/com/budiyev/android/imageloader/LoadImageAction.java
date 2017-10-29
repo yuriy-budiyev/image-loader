@@ -50,7 +50,9 @@ final class LoadImageAction<T> {
     private final BitmapProcessor<T> mBitmapProcessor;
     private final ImageCache mMemoryImageCache;
     private final ImageCache mStorageImageCache;
-    private final Callbacks<T> mCallbacks;
+    private final LoadCallback<T> mLoadCallback;
+    private final DisplayCallback<T> mDisplayCallback;
+    private final ErrorCallback<T> mErrorCallback;
     private final DataDescriptor<T> mDescriptor;
     private final WeakReference<ImageView> mView;
     private final Drawable mPlaceholder;
@@ -63,7 +65,8 @@ final class LoadImageAction<T> {
             @NonNull ExecutorService executor, @NonNull PauseLock pauseLock,
             @NonNull BitmapLoader<T> bitmapLoader, @Nullable BitmapProcessor<T> bitmapProcessor,
             @Nullable ImageCache memoryImageCache, @Nullable ImageCache storageImageCache,
-            boolean fadeEnabled, long fadeDuration, @Nullable Callbacks<T> callbacks,
+            @Nullable LoadCallback<T> loadCallback, @Nullable DisplayCallback<T> displayCallback,
+            @Nullable ErrorCallback<T> errorCallback, boolean fadeEnabled, long fadeDuration,
             @NonNull DataDescriptor<T> descriptor, @NonNull ImageView view,
             @NonNull Drawable placeholder) {
         mContext = context;
@@ -74,7 +77,9 @@ final class LoadImageAction<T> {
         mBitmapProcessor = bitmapProcessor;
         mMemoryImageCache = memoryImageCache;
         mStorageImageCache = storageImageCache;
-        mCallbacks = callbacks;
+        mLoadCallback = loadCallback;
+        mDisplayCallback = displayCallback;
+        mErrorCallback = errorCallback;
         mFadeEnabled = fadeEnabled;
         mFadeDuration = fadeDuration;
         mDescriptor = descriptor;
@@ -111,44 +116,53 @@ final class LoadImageAction<T> {
         if (mCancelled) {
             return;
         }
-        Bitmap bitmap = null;
+        Bitmap image = null;
         ImageCache storageImageCache = mStorageImageCache;
         String key = mDescriptor.getKey();
         T data = mDescriptor.getData();
         if (storageImageCache != null) {
-            bitmap = storageImageCache.get(key);
+            image = storageImageCache.get(key);
         }
-        if (bitmap == null) {
+        if (image == null) {
             try {
-                bitmap = mBitmapLoader.load(mContext, data);
+                image = mBitmapLoader.load(mContext, data);
             } catch (Throwable error) {
-                Callbacks.notifyError(mCallbacks, data, error);
+                ErrorCallback<T> errorCallback = mErrorCallback;
+                if (errorCallback != null) {
+                    errorCallback.onError(data, error);
+                }
                 return;
             }
-            if (bitmap == null) {
-                Callbacks.notifyError(mCallbacks, data, new Exception("Image is not loaded"));
+            if (image == null) {
+                ErrorCallback<T> errorCallback = mErrorCallback;
+                if (errorCallback != null) {
+                    errorCallback.onError(data, new ImageNotLoadedException());
+                }
                 return;
             }
             if (storageImageCache != null) {
-                storageImageCache.put(key, bitmap);
+                storageImageCache.put(key, image);
             }
         }
-        Callbacks.notifyLoaded(mCallbacks, data, bitmap);
+        LoadCallback<T> loadCallback = mLoadCallback;
+        if (loadCallback != null) {
+            loadCallback.onLoaded(data, image);
+        }
         if (mCancelled) {
             return;
         }
         ImageCache memoryImageCache = mMemoryImageCache;
         if (memoryImageCache != null) {
-            memoryImageCache.put(key, bitmap);
+            memoryImageCache.put(key, image);
         }
         BitmapProcessor<T> bitmapProcessor = mBitmapProcessor;
         if (bitmapProcessor != null) {
-            bitmap = bitmapProcessor.process(mContext, data, bitmap);
+            image = bitmapProcessor.process(mContext, data, image);
         }
         if (mCancelled) {
             return;
         }
-        mMainThreadHandler.post(new SetImageAction(bitmap));
+        mMainThreadHandler.post(new SetImageAction(image));
     }
 
     private final class LoadImageTask implements Callable<Void> {
@@ -177,13 +191,40 @@ final class LoadImageAction<T> {
             if (view == null || InternalUtils.getLoadImageAction(view) != LoadImageAction.this) {
                 return;
             }
+            DisplayCallback<T> displayCallback = mDisplayCallback;
+            Bitmap image = mImage;
             if (mFadeEnabled) {
                 view.setImageDrawable(
-                        new FadeBitmapDrawable(mContext.getResources(), mImage, mPlaceholder,
-                                mFadeDuration));
+                        new FadeBitmapDrawable(mMainThreadHandler, mContext.getResources(), image,
+                                mPlaceholder, mFadeDuration, displayCallback == null ? null :
+                                new FadeCallback<>(displayCallback, mDescriptor.getData(), image,
+                                        view)));
             } else {
-                view.setImageBitmap(mImage);
+                view.setImageBitmap(image);
+                if (displayCallback != null) {
+                    displayCallback.onDisplayed(mDescriptor.getData(), image, view);
+                }
             }
+        }
+    }
+
+    private static final class FadeCallback<T> implements FadeBitmapDrawable.FadeCallback {
+        private final DisplayCallback<T> mDisplayCallback;
+        private final T mData;
+        private final Bitmap mImage;
+        private final ImageView mView;
+
+        private FadeCallback(@NonNull DisplayCallback<T> displayCallback, @NonNull T data,
+                @NonNull Bitmap image, @NonNull ImageView view) {
+            mDisplayCallback = displayCallback;
+            mData = data;
+            mImage = image;
+            mView = view;
+        }
+
+        @Override
+        public void onDone() {
+            mDisplayCallback.onDisplayed(mData, mImage, mView);
         }
     }
 }

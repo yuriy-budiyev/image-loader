@@ -23,23 +23,24 @@
  */
 package com.budiyev.android.imageloader;
 
-import android.content.Context;
 import android.graphics.Bitmap;
+import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
-import android.support.annotation.WorkerThread;
+import android.widget.ImageView;
 
 /**
- * Error callback
+ * Display callback
  */
-public interface ErrorCallback<T> {
+public interface DisplayCallback<T> {
     /**
-     * Called when {@link BitmapLoader} was unable to load {@link Bitmap}
+     * Called when {@code image} displayed on {@code view},
+     * if {@link BitmapProcessor} specified, processed image will be transferred here,
+     * if fade effect is on, this method will be called after fade is done
      *
      * @param data  Data
-     * @param error Throwable, that has been thrown by {@link BitmapLoader#load(Context, Object)}
-     *              method or {@link ImageNotLoadedException} if {@link BitmapLoader}
-     *              returned {@code null}
+     * @param image Image
+     * @param view  View
      */
-    @WorkerThread
-    void onError(@NonNull T data, @NonNull Throwable error);
+    @MainThread
+    void onDisplayed(@NonNull T data, @NonNull Bitmap image, @NonNull ImageView view);
 }

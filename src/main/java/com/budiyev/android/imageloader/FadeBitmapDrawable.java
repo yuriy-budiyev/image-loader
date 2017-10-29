@@ -30,6 +30,7 @@ import android.graphics.ColorFilter;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Handler;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -39,16 +40,21 @@ final class FadeBitmapDrawable extends BitmapDrawable {
     private static final int STATE_RUNNING = 1;
     private static final int STATE_DONE = 3;
     private static final int MAX_ALPHA = 255;
+    private final Handler mMainThreadHandler;
     private final Drawable mPlaceholder;
     private final long mDuration;
+    private final FadeCallback mCallback;
     private long mStartTime;
     private int mFadeState = STATE_IDLE;
 
-    public FadeBitmapDrawable(@NonNull Resources resources, @NonNull Bitmap bitmap,
-            @NonNull Drawable placeholder, long duration) {
+    public FadeBitmapDrawable(@NonNull Handler mainThreadHandler, @NonNull Resources resources,
+            @NonNull Bitmap bitmap, @NonNull Drawable placeholder, long duration,
+            @Nullable FadeCallback callback) {
         super(resources, bitmap);
+        mMainThreadHandler = mainThreadHandler;
         mPlaceholder = placeholder;
         mDuration = duration;
+        mCallback = callback;
     }
 
     @Override
@@ -67,6 +73,10 @@ final class FadeBitmapDrawable extends BitmapDrawable {
                 if (alpha == MAX_ALPHA) {
                     mFadeState = STATE_DONE;
                     super.draw(canvas);
+                    FadeCallback callback = mCallback;
+                    if (callback != null) {
+                        mMainThreadHandler.post(new CallbackAction(callback));
+                    }
                 } else {
                     int placeholderAlpha = mPlaceholder.getAlpha();
                     mPlaceholder.setAlpha(MAX_ALPHA - alpha);
@@ -118,6 +128,23 @@ final class FadeBitmapDrawable extends BitmapDrawable {
             default: {
                 return super.getOpacity();
             }
+        }
+    }
+
+    public interface FadeCallback {
+        void onDone();
+    }
+
+    private final class CallbackAction implements Runnable {
+        private final FadeCallback mCallback;
+
+        private CallbackAction(@NonNull FadeCallback callback) {
+            mCallback = callback;
+        }
+
+        @Override
+        public void run() {
+            mCallback.onDone();
         }
     }
 }

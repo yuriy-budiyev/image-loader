@@ -23,23 +23,12 @@
  */
 package com.budiyev.android.imageloader;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.support.annotation.NonNull;
-import android.support.annotation.WorkerThread;
-
 /**
- * Error callback
+ * Exception, that will be transferred to {@link ErrorCallback#onError(Object, Throwable)}
+ * if {@link BitmapLoader} will return {@code null}
  */
-public interface ErrorCallback<T> {
-    /**
-     * Called when {@link BitmapLoader} was unable to load {@link Bitmap}
-     *
-     * @param data  Data
-     * @param error Throwable, that has been thrown by {@link BitmapLoader#load(Context, Object)}
-     *              method or {@link ImageNotLoadedException} if {@link BitmapLoader}
-     *              returned {@code null}
-     */
-    @WorkerThread
-    void onError(@NonNull T data, @NonNull Throwable error);
+public final class ImageNotLoadedException extends Exception {
+    ImageNotLoadedException() {
+        super("Image is not loaded");
+    }
 }

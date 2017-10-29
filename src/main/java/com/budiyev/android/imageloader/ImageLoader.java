@@ -56,6 +56,9 @@ public final class ImageLoader<T> {
     private final ImageCache mStorageCache;
     private final PlaceholderProvider<T> mPlaceholderProvider;
     private final ExecutorService mExecutor;
+    private final LoadCallback<T> mLoadCallback;
+    private final DisplayCallback<T> mDisplayCallback;
+    private final ErrorCallback<T> mErrorCallback;
     private final boolean mFadeEnabled;
     private final long mFadeDuration;
 
@@ -65,13 +68,18 @@ public final class ImageLoader<T> {
     private ImageLoader(@NonNull Context context, @NonNull BitmapLoader<T> bitmapLoader,
             @Nullable BitmapProcessor<T> bitmapProcessor, @Nullable ImageCache memoryCache,
             @Nullable ImageCache storageCache, @Nullable PlaceholderProvider<T> placeholderProvider,
-            @Nullable ExecutorService executor, boolean fadeEnabled, long fadeDuration) {
+            @Nullable ExecutorService executor, @Nullable LoadCallback<T> loadCallback,
+            @Nullable DisplayCallback<T> displayCallback, @Nullable ErrorCallback<T> errorCallback,
+            boolean fadeEnabled, long fadeDuration) {
         mContext = context;
         mMainThreadHandler = new Handler(context.getMainLooper());
         mBitmapLoader = bitmapLoader;
         mBitmapProcessor = bitmapProcessor;
         mMemoryCache = memoryCache;
         mStorageCache = storageCache;
+        mLoadCallback = loadCallback;
+        mDisplayCallback = displayCallback;
+        mErrorCallback = errorCallback;
         if (placeholderProvider != null) {
             mPlaceholderProvider = placeholderProvider;
         } else {
@@ -98,7 +106,7 @@ public final class ImageLoader<T> {
      */
     @MainThread
     public void load(@NonNull T data, @NonNull ImageView view) {
-        load(new StringDataDescriptor<>(data), view, null);
+        load(new StringDataDescriptor<>(data), view);
     }
 
     /**
@@ -109,32 +117,32 @@ public final class ImageLoader<T> {
      */
     @MainThread
     public void load(@NonNull DataDescriptor<T> descriptor, @NonNull ImageView view) {
-        load(descriptor, view, null);
-    }
-
-    /**
-     * Load image into view from specified {@code data}, using default {@link DataDescriptor},
-     * {@code data}'s toString() method will be used for key generation, any characters allowed
-     *
-     * @param data Source data
-     * @param view Image view
-     */
-    @MainThread
-    public void load(@NonNull T data, @NonNull ImageView view,
-            @Nullable LoadCallback<T> loadCallback, @Nullable ErrorCallback<T> errorCallback) {
-        load(new StringDataDescriptor<>(data), view, new Callbacks<>(loadCallback, errorCallback));
-    }
-
-    /**
-     * Load image into view from specified {@link DataDescriptor}
-     *
-     * @param descriptor Source data descriptor
-     * @param view       Image view
-     */
-    @MainThread
-    public void load(@NonNull DataDescriptor<T> descriptor, @NonNull ImageView view,
-            @Nullable LoadCallback<T> loadCallback, @Nullable ErrorCallback<T> errorCallback) {
-        load(descriptor, view, new Callbacks<>(loadCallback, errorCallback));
+        Bitmap image = null;
+        String key = descriptor.getKey();
+        ImageCache memoryImageCache = mMemoryCache;
+        if (memoryImageCache != null) {
+            image = memoryImageCache.get(key);
+        }
+        if (image != null) {
+            view.setImageBitmap(image);
+            return;
+        }
+        LoadImageAction<?> currentAction = InternalUtils.getLoadImageAction(view);
+        if (currentAction != null) {
+            if (currentAction.hasSameDescriptor(key)) {
+                return;
+            }
+            currentAction.cancel();
+        }
+        Context context = mContext;
+        Drawable placeholder = mPlaceholderProvider.get(context, descriptor.getData());
+        LoadImageAction<T> action =
+                new LoadImageAction<>(context, mMainThreadHandler, mExecutor, mPauseLock,
+                        mBitmapLoader, mBitmapProcessor, mMemoryCache, mStorageCache, mLoadCallback,
+                        mDisplayCallback, mErrorCallback, mFadeEnabled, mFadeDuration, descriptor,
+                        view, placeholder);
+        view.setImageDrawable(new PlaceholderDrawable(placeholder, action));
+        action.execute();
     }
 
     /**
@@ -203,36 +211,6 @@ public final class ImageLoader<T> {
     public void clearAllCaches() {
         clearMemoryCache();
         clearStorageCache();
-    }
-
-    @MainThread
-    private void load(@NonNull DataDescriptor<T> descriptor, @NonNull ImageView view,
-            @Nullable Callbacks<T> callbacks) {
-        Bitmap image = null;
-        String key = descriptor.getKey();
-        ImageCache memoryImageCache = mMemoryCache;
-        if (memoryImageCache != null) {
-            image = memoryImageCache.get(key);
-        }
-        if (image != null) {
-            view.setImageBitmap(image);
-            return;
-        }
-        LoadImageAction<?> currentAction = InternalUtils.getLoadImageAction(view);
-        if (currentAction != null) {
-            if (currentAction.hasSameDescriptor(key)) {
-                return;
-            }
-            currentAction.cancel();
-        }
-        Context context = mContext;
-        Drawable placeholder = mPlaceholderProvider.get(context, descriptor.getData());
-        LoadImageAction<T> action =
-                new LoadImageAction<>(context, mMainThreadHandler, mExecutor, mPauseLock,
-                        mBitmapLoader, mBitmapProcessor, mMemoryCache, mStorageCache, mFadeEnabled,
-                        mFadeDuration, callbacks, descriptor, view, placeholder);
-        view.setImageDrawable(new PlaceholderDrawable(placeholder, action));
-        action.execute();
     }
 
     /**
@@ -316,6 +294,9 @@ public final class ImageLoader<T> {
         private ImageCache mStorageCache;
         private PlaceholderProvider<T> mPlaceholderProvider;
         private ExecutorService mExecutor;
+        private LoadCallback<T> mLoadCallback;
+        private DisplayCallback<T> mDisplayCallback;
+        private ErrorCallback<T> mErrorCallback;
         private boolean mFadeEnabled = true;
         private long mFadeDuration = 250L;
 
@@ -493,13 +474,32 @@ public final class ImageLoader<T> {
             return this;
         }
 
+        @NonNull
+        public Builder<T> onLoaded(@Nullable LoadCallback<T> callback) {
+            mLoadCallback = callback;
+            return this;
+        }
+
+        @NonNull
+        public Builder<T> onDisplayed(@Nullable DisplayCallback<T> callback) {
+            mDisplayCallback = callback;
+            return this;
+        }
+
+        @NonNull
+        public Builder<T> onError(@Nullable ErrorCallback<T> callback) {
+            mErrorCallback = callback;
+            return this;
+        }
+
         /**
          * Create new image loader instance with specified parameters
          */
         @NonNull
         public ImageLoader<T> build() {
             return new ImageLoader<>(mContext, mBitmapLoader, mBitmapProcessor, mMemoryCache,
-                    mStorageCache, mPlaceholderProvider, mExecutor, mFadeEnabled, mFadeDuration);
+                    mStorageCache, mPlaceholderProvider, mExecutor, mLoadCallback, mDisplayCallback,
+                    mErrorCallback, mFadeEnabled, mFadeDuration);
         }
     }
 }
