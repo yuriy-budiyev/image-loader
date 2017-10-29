@@ -106,7 +106,8 @@ public final class ImageLoader<T> {
      */
     @MainThread
     public void load(@NonNull T data, @NonNull ImageView view) {
-        load(new StringDataDescriptor<>(data), view);
+        load(new StringDataDescriptor<>(data), view, mLoadCallback, mDisplayCallback,
+                mErrorCallback);
     }
 
     /**
@@ -117,6 +118,41 @@ public final class ImageLoader<T> {
      */
     @MainThread
     public void load(@NonNull DataDescriptor<T> descriptor, @NonNull ImageView view) {
+        load(descriptor, view, mLoadCallback, mDisplayCallback, mErrorCallback);
+    }
+
+    /**
+     * Load image into view from specified {@code data}, using default {@link DataDescriptor},
+     * {@code data}'s toString() method will be used for key generation, any characters allowed,
+     * override callbacks, specified in builder
+     *
+     * @param data            Source data
+     * @param view            Image view
+     * @param loadCallback    Load callback
+     * @param displayCallback Display callback
+     * @param errorCallback   Error callback
+     */
+    @MainThread
+    public void load(@NonNull T data, @NonNull ImageView view,
+            @Nullable LoadCallback<T> loadCallback, @Nullable DisplayCallback<T> displayCallback,
+            @Nullable ErrorCallback<T> errorCallback) {
+        load(new StringDataDescriptor<>(data), view, loadCallback, displayCallback, errorCallback);
+    }
+
+    /**
+     * Load image into view from specified {@link DataDescriptor},
+     * override callbacks, specified in builder
+     *
+     * @param descriptor      Source data descriptor
+     * @param view            Image view
+     * @param loadCallback    Load callback
+     * @param displayCallback Display callback
+     * @param errorCallback   Error callback
+     */
+    @MainThread
+    public void load(@NonNull DataDescriptor<T> descriptor, @NonNull ImageView view,
+            @Nullable LoadCallback<T> loadCallback, @Nullable DisplayCallback<T> displayCallback,
+            @Nullable ErrorCallback<T> errorCallback) {
         Bitmap image = null;
         String key = descriptor.getKey();
         ImageCache memoryImageCache = mMemoryCache;
@@ -138,8 +174,8 @@ public final class ImageLoader<T> {
         Drawable placeholder = mPlaceholderProvider.get(context, descriptor.getData());
         LoadImageAction<T> action =
                 new LoadImageAction<>(context, mMainThreadHandler, mExecutor, mPauseLock,
-                        mBitmapLoader, mBitmapProcessor, mMemoryCache, mStorageCache, mLoadCallback,
-                        mDisplayCallback, mErrorCallback, mFadeEnabled, mFadeDuration, descriptor,
+                        mBitmapLoader, mBitmapProcessor, mMemoryCache, mStorageCache, loadCallback,
+                        displayCallback, errorCallback, mFadeEnabled, mFadeDuration, descriptor,
                         view, placeholder);
         view.setImageDrawable(new PlaceholderDrawable(placeholder, action));
         action.execute();
