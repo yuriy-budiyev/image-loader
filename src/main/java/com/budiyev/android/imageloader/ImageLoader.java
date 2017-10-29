@@ -474,18 +474,27 @@ public final class ImageLoader<T> {
             return this;
         }
 
+        /**
+         * Load callback
+         */
         @NonNull
         public Builder<T> onLoaded(@Nullable LoadCallback<T> callback) {
             mLoadCallback = callback;
             return this;
         }
 
+        /**
+         * Display callback
+         */
         @NonNull
         public Builder<T> onDisplayed(@Nullable DisplayCallback<T> callback) {
             mDisplayCallback = callback;
             return this;
         }
 
+        /**
+         * Error callback
+         */
         @NonNull
         public Builder<T> onError(@Nullable ErrorCallback<T> callback) {
             mErrorCallback = callback;
