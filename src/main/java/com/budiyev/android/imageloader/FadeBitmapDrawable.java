@@ -135,7 +135,7 @@ final class FadeBitmapDrawable extends BitmapDrawable {
         void onDone();
     }
 
-    private final class CallbackAction implements Runnable {
+    private static final class CallbackAction implements Runnable {
         private final FadeCallback mCallback;
 
         private CallbackAction(@NonNull FadeCallback callback) {
