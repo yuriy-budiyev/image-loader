@@ -23,9 +23,12 @@
  */
 package com.budiyev.android.imageloader;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 
 import android.content.Context;
@@ -40,8 +43,19 @@ final class InternalUtils {
     private static final String URI_SCHEME_HTTP = "http";
     private static final String URI_SCHEME_HTTPS = "https";
     private static final String URI_SCHEME_FTP = "ftp";
+    private static final int BUFFER_SIZE = 32768;
 
     private InternalUtils() {
+    }
+
+    @NonNull
+    public static InputStream buffer(@NonNull InputStream inputStream) {
+        return new BufferedInputStream(inputStream, BUFFER_SIZE);
+    }
+
+    @NonNull
+    public static OutputStream buffer(@NonNull OutputStream outputStream) {
+        return new BufferedOutputStream(outputStream, BUFFER_SIZE);
     }
 
     @Nullable

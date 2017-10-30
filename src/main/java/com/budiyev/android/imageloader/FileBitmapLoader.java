@@ -37,7 +37,7 @@ final class FileBitmapLoader implements BitmapLoader<File> {
     @Nullable
     @Override
     public Bitmap load(@NonNull Context context, @NonNull File data) throws Throwable {
-        try (InputStream inputStream = new FileInputStream(data)) {
+        try (InputStream inputStream = InternalUtils.buffer(new FileInputStream(data))) {
             return BitmapFactory.decodeStream(inputStream);
         }
     }

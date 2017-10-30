@@ -102,7 +102,7 @@ final class StorageImageCache implements ImageCache {
         if (file.exists()) {
             file.delete();
         }
-        try (OutputStream outputStream = new FileOutputStream(file)) {
+        try (OutputStream outputStream = InternalUtils.buffer(new FileOutputStream(file))) {
             value.compress(mCompressMode.getFormat(), mCompressMode.getQuality(), outputStream);
         } catch (IOException e) {
             if (file.exists()) {
@@ -117,7 +117,7 @@ final class StorageImageCache implements ImageCache {
     public Bitmap get(@NonNull String key) {
         File file = new File(mDirectory, key);
         file.setLastModified(System.currentTimeMillis());
-        try (InputStream inputStream = new FileInputStream(file)) {
+        try (InputStream inputStream = InternalUtils.buffer(new FileInputStream(file))) {
             return BitmapFactory.decodeStream(inputStream);
         } catch (IOException e) {
             return null;

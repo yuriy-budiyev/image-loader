@@ -36,8 +36,12 @@ final class UriBitmapLoader implements BitmapLoader<Uri> {
     @Nullable
     @Override
     public Bitmap load(@NonNull Context context, @NonNull Uri data) throws Throwable {
-        try (InputStream inputStream = InternalUtils.getDataStreamFromUri(context, data)) {
-            return BitmapFactory.decodeStream(inputStream);
+        InputStream dataStream = InternalUtils.getDataStreamFromUri(context, data);
+        if (dataStream == null) {
+            return null;
+        }
+        try (InputStream stream = InternalUtils.buffer(dataStream)) {
+            return BitmapFactory.decodeStream(stream);
         }
     }
 }

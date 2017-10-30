@@ -47,7 +47,7 @@ final class ResourceBitmapLoader implements BitmapLoader<Integer> {
         } else if (typedValue.density != TypedValue.DENSITY_NONE) {
             options.inDensity = typedValue.density;
         }
-        InputStream inputStream = resources.openRawResource(data, typedValue);
+        InputStream inputStream = InternalUtils.buffer(resources.openRawResource(data, typedValue));
         Bitmap bitmap = BitmapFactory.decodeStream(inputStream, null, options);
         InternalUtils.close(inputStream);
         return bitmap;
