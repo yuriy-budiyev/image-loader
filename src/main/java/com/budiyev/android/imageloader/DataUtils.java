@@ -101,6 +101,7 @@ public final class DataUtils {
         options.inSampleSize =
                 calculateSampleSize(options.outWidth, options.outHeight, requiredWidth,
                         requiredHeight, ignoreTotalNumberOfPixels);
+        inputStream = null;
         try {
             inputStream = InternalUtils.getDataStreamFromUri(context, uri);
             if (inputStream == null) {
@@ -140,6 +141,7 @@ public final class DataUtils {
         options.inSampleSize =
                 calculateSampleSize(options.outWidth, options.outHeight, requiredWidth,
                         requiredHeight, ignoreTotalNumberOfPixels);
+        inputStream = null;
         try {
             inputStream = InternalUtils.buffer(new FileInputStream(file));
             return BitmapFactory.decodeStream(inputStream, null, options);
@@ -176,6 +178,7 @@ public final class DataUtils {
         options.inSampleSize =
                 calculateSampleSize(options.outWidth, options.outHeight, requiredWidth,
                         requiredHeight, ignoreTotalNumberOfPixels);
+        inputStream = null;
         try {
             inputStream = InternalUtils.buffer(new FileInputStream(fileDescriptor));
             return BitmapFactory.decodeStream(inputStream, null, options);
@@ -219,6 +222,7 @@ public final class DataUtils {
         options.inSampleSize =
                 calculateSampleSize(options.outWidth, options.outHeight, requiredWidth,
                         requiredHeight, ignoreTotalNumberOfPixels);
+        inputStream = null;
         try {
             inputStream = InternalUtils.buffer(resources.openRawResource(resourceId, typedValue));
             return BitmapFactory.decodeStream(inputStream, null, options);
