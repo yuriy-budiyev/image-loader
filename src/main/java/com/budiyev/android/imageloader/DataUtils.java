@@ -268,11 +268,11 @@ public final class DataUtils {
             if (ignoreTotalNumberOfPixels) {
                 return sampleSize;
             }
-            long totalPixels = (sourceWidth * sourceHeight) / (sampleSize * sampleSize);
-            long totalRequiredPixels = requiredWidth * requiredHeight;
+            int totalPixels = (sourceWidth * sourceHeight) / (sampleSize * sampleSize);
+            int totalRequiredPixels = requiredWidth * requiredHeight;
             while (totalPixels > totalRequiredPixels) {
                 sampleSize *= 2;
-                totalPixels /= 4L;
+                totalPixels /= 4;
             }
         }
         return sampleSize;
