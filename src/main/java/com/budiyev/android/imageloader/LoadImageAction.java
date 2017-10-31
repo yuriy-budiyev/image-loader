@@ -31,6 +31,7 @@ import java.util.concurrent.Future;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
@@ -194,7 +195,7 @@ final class LoadImageAction<T> {
             DisplayCallback<T> displayCallback = mDisplayCallback;
             Context context = mContext;
             Bitmap image = mImage;
-            if (mFadeEnabled) {
+            if (mFadeEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 view.setImageDrawable(
                         new FadeBitmapDrawable(mMainThreadHandler, context.getResources(), image,
                                 mPlaceholder, mFadeDuration, displayCallback == null ? null :

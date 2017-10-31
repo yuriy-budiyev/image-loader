@@ -483,7 +483,8 @@ public final class ImageLoader<T> {
 
         /**
          * Whether to enable fade effect for images that isn't cached in memory,
-         * allows to specify fade effect duration
+         * allows to specify fade effect duration,
+         * supported on API 19+
          */
         @NonNull
         public Builder<T> fade(boolean enabled, long duration) {
@@ -493,7 +494,8 @@ public final class ImageLoader<T> {
         }
 
         /**
-         * Whether to enable fade effect for images that isn't cached in memory
+         * Whether to enable fade effect for images that isn't cached in memory,
+         * supported on API 19+
          */
         @NonNull
         public Builder<T> fade(boolean enabled) {

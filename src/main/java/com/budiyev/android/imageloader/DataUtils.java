@@ -90,6 +90,9 @@ public final class DataUtils {
         InputStream inputStream = null;
         try {
             inputStream = InternalUtils.getDataStreamFromUri(context, uri);
+            if (inputStream == null) {
+                return null;
+            }
             BitmapFactory.decodeStream(inputStream, null, options);
         } finally {
             InternalUtils.close(inputStream);
@@ -98,15 +101,16 @@ public final class DataUtils {
         options.inSampleSize =
                 calculateSampleSize(options.outWidth, options.outHeight, requiredWidth,
                         requiredHeight, ignoreTotalNumberOfPixels);
-        Bitmap bitmap;
         try {
             inputStream = InternalUtils.getDataStreamFromUri(context, uri);
-            bitmap = BitmapFactory.decodeStream(inputStream, null, options);
+            if (inputStream == null) {
+                return null;
+            }
+            inputStream = InternalUtils.buffer(inputStream);
+            return BitmapFactory.decodeStream(inputStream, null, options);
         } finally {
             InternalUtils.close(inputStream);
         }
-        return bitmap;
-
     }
 
     /**
@@ -136,14 +140,12 @@ public final class DataUtils {
         options.inSampleSize =
                 calculateSampleSize(options.outWidth, options.outHeight, requiredWidth,
                         requiredHeight, ignoreTotalNumberOfPixels);
-        Bitmap bitmap;
         try {
-            inputStream = new FileInputStream(file);
-            bitmap = BitmapFactory.decodeStream(inputStream, null, options);
+            inputStream = InternalUtils.buffer(new FileInputStream(file));
+            return BitmapFactory.decodeStream(inputStream, null, options);
         } finally {
             InternalUtils.close(inputStream);
         }
-        return bitmap;
 
     }
 
@@ -174,14 +176,12 @@ public final class DataUtils {
         options.inSampleSize =
                 calculateSampleSize(options.outWidth, options.outHeight, requiredWidth,
                         requiredHeight, ignoreTotalNumberOfPixels);
-        Bitmap bitmap;
         try {
-            inputStream = new FileInputStream(fileDescriptor);
-            bitmap = BitmapFactory.decodeStream(inputStream, null, options);
+            inputStream = InternalUtils.buffer(new FileInputStream(fileDescriptor));
+            return BitmapFactory.decodeStream(inputStream, null, options);
         } finally {
             InternalUtils.close(inputStream);
         }
-        return bitmap;
     }
 
     /**
@@ -219,15 +219,12 @@ public final class DataUtils {
         options.inSampleSize =
                 calculateSampleSize(options.outWidth, options.outHeight, requiredWidth,
                         requiredHeight, ignoreTotalNumberOfPixels);
-        Bitmap bitmap;
         try {
-            inputStream = resources.openRawResource(resourceId, typedValue);
-            bitmap = BitmapFactory.decodeStream(inputStream, null, options);
+            inputStream = InternalUtils.buffer(resources.openRawResource(resourceId, typedValue));
+            return BitmapFactory.decodeStream(inputStream, null, options);
         } finally {
             InternalUtils.close(inputStream);
         }
-        return bitmap;
-
     }
 
     /**

@@ -102,12 +102,16 @@ final class StorageImageCache implements ImageCache {
         if (file.exists()) {
             file.delete();
         }
-        try (OutputStream outputStream = InternalUtils.buffer(new FileOutputStream(file))) {
+        OutputStream outputStream = null;
+        try {
+            outputStream = InternalUtils.buffer(new FileOutputStream(file));
             value.compress(mCompressMode.getFormat(), mCompressMode.getQuality(), outputStream);
         } catch (IOException e) {
             if (file.exists()) {
                 file.delete();
             }
+        } finally {
+            InternalUtils.close(outputStream);
         }
         fitCache();
     }
@@ -117,10 +121,14 @@ final class StorageImageCache implements ImageCache {
     public Bitmap get(@NonNull String key) {
         File file = new File(mDirectory, key);
         file.setLastModified(System.currentTimeMillis());
-        try (InputStream inputStream = InternalUtils.buffer(new FileInputStream(file))) {
+        InputStream inputStream = null;
+        try {
+            inputStream = InternalUtils.buffer(new FileInputStream(file));
             return BitmapFactory.decodeStream(inputStream);
         } catch (IOException e) {
             return null;
+        } finally {
+            InternalUtils.close(inputStream);
         }
     }
 
