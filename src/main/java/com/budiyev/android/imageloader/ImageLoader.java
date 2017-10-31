@@ -88,7 +88,7 @@ public final class ImageLoader<T> {
         if (executor != null) {
             mExecutor = executor;
         } else {
-            mExecutor = new ImageLoaderExecutor(Runtime.getRuntime().availableProcessors());
+            mExecutor = new ImageLoaderExecutor(InternalUtils.getPoolSize());
         }
         if (storageCache instanceof StorageImageCache) {
             ((StorageImageCache) storageCache).setExecutor(mExecutor);

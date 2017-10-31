@@ -44,6 +44,7 @@ final class InternalUtils {
     private static final String URI_SCHEME_HTTPS = "https";
     private static final String URI_SCHEME_FTP = "ftp";
     private static final int BUFFER_SIZE = 32768;
+    private static final int MAX_POOL_SIZE = 4;
 
     private InternalUtils() {
     }
@@ -90,5 +91,9 @@ final class InternalUtils {
             closeable.close();
         } catch (IOException ignored) {
         }
+    }
+
+    public static int getPoolSize() {
+        return Math.min(Runtime.getRuntime().availableProcessors(), MAX_POOL_SIZE);
     }
 }
