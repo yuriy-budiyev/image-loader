@@ -87,16 +87,26 @@ public final class DataUtils {
             throws IOException {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
-        try (InputStream inputStream = InternalUtils.getDataStreamFromUri(context, uri)) {
+        InputStream inputStream = null;
+        try {
+            inputStream = InternalUtils.getDataStreamFromUri(context, uri);
             BitmapFactory.decodeStream(inputStream, null, options);
+        } finally {
+            InternalUtils.close(inputStream);
         }
         options.inJustDecodeBounds = false;
         options.inSampleSize =
                 calculateSampleSize(options.outWidth, options.outHeight, requiredWidth,
                         requiredHeight, ignoreTotalNumberOfPixels);
-        try (InputStream inputStream = InternalUtils.getDataStreamFromUri(context, uri)) {
-            return BitmapFactory.decodeStream(inputStream, null, options);
+        Bitmap bitmap;
+        try {
+            inputStream = InternalUtils.getDataStreamFromUri(context, uri);
+            bitmap = BitmapFactory.decodeStream(inputStream, null, options);
+        } finally {
+            InternalUtils.close(inputStream);
         }
+        return bitmap;
+
     }
 
     /**
@@ -115,16 +125,26 @@ public final class DataUtils {
             int requiredHeight, boolean ignoreTotalNumberOfPixels) throws IOException {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
-        try (InputStream inputStream = new FileInputStream(file)) {
+        InputStream inputStream = null;
+        try {
+            inputStream = new FileInputStream(file);
             BitmapFactory.decodeStream(inputStream, null, options);
+        } finally {
+            InternalUtils.close(inputStream);
         }
         options.inJustDecodeBounds = false;
         options.inSampleSize =
                 calculateSampleSize(options.outWidth, options.outHeight, requiredWidth,
                         requiredHeight, ignoreTotalNumberOfPixels);
-        try (InputStream inputStream = new FileInputStream(file)) {
-            return BitmapFactory.decodeStream(inputStream, null, options);
+        Bitmap bitmap;
+        try {
+            inputStream = new FileInputStream(file);
+            bitmap = BitmapFactory.decodeStream(inputStream, null, options);
+        } finally {
+            InternalUtils.close(inputStream);
         }
+        return bitmap;
+
     }
 
     /**
@@ -143,16 +163,24 @@ public final class DataUtils {
             int requiredWidth, int requiredHeight, boolean ignoreTotalNumberOfPixels) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
-        InputStream inputStream = new FileInputStream(fileDescriptor);
-        BitmapFactory.decodeStream(inputStream, null, options);
-        InternalUtils.close(inputStream);
+        InputStream inputStream = null;
+        try {
+            inputStream = new FileInputStream(fileDescriptor);
+            BitmapFactory.decodeStream(inputStream, null, options);
+        } finally {
+            InternalUtils.close(inputStream);
+        }
         options.inJustDecodeBounds = false;
         options.inSampleSize =
                 calculateSampleSize(options.outWidth, options.outHeight, requiredWidth,
                         requiredHeight, ignoreTotalNumberOfPixels);
-        inputStream = new FileInputStream(fileDescriptor);
-        Bitmap bitmap = BitmapFactory.decodeStream(inputStream, null, options);
-        InternalUtils.close(inputStream);
+        Bitmap bitmap;
+        try {
+            inputStream = new FileInputStream(fileDescriptor);
+            bitmap = BitmapFactory.decodeStream(inputStream, null, options);
+        } finally {
+            InternalUtils.close(inputStream);
+        }
         return bitmap;
     }
 
@@ -175,21 +203,29 @@ public final class DataUtils {
         TypedValue typedValue = new TypedValue();
         options.inJustDecodeBounds = true;
         options.inTargetDensity = resources.getDisplayMetrics().densityDpi;
-        InputStream inputStream = resources.openRawResource(resourceId, typedValue);
         if (typedValue.density == TypedValue.DENSITY_DEFAULT) {
             options.inDensity = DisplayMetrics.DENSITY_DEFAULT;
         } else if (typedValue.density != TypedValue.DENSITY_NONE) {
             options.inDensity = typedValue.density;
         }
-        BitmapFactory.decodeStream(inputStream, null, options);
-        InternalUtils.close(inputStream);
+        InputStream inputStream = null;
+        try {
+            inputStream = resources.openRawResource(resourceId, typedValue);
+            BitmapFactory.decodeStream(inputStream, null, options);
+        } finally {
+            InternalUtils.close(inputStream);
+        }
         options.inJustDecodeBounds = false;
         options.inSampleSize =
                 calculateSampleSize(options.outWidth, options.outHeight, requiredWidth,
                         requiredHeight, ignoreTotalNumberOfPixels);
-        inputStream = resources.openRawResource(resourceId, typedValue);
-        Bitmap bitmap = BitmapFactory.decodeStream(inputStream, null, options);
-        InternalUtils.close(inputStream);
+        Bitmap bitmap;
+        try {
+            inputStream = resources.openRawResource(resourceId, typedValue);
+            bitmap = BitmapFactory.decodeStream(inputStream, null, options);
+        } finally {
+            InternalUtils.close(inputStream);
+        }
         return bitmap;
 
     }
