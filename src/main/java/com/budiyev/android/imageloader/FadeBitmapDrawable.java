@@ -27,6 +27,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
+import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -120,18 +121,7 @@ final class FadeBitmapDrawable extends BitmapDrawable {
 
     @Override
     public int getOpacity() {
-        switch (mFadeState) {
-            case STATE_IDLE: {
-                return mPlaceholder.getOpacity();
-            }
-            case STATE_RUNNING: {
-                return Math.min(mPlaceholder.getOpacity(), super.getOpacity());
-            }
-            case STATE_DONE:
-            default: {
-                return super.getOpacity();
-            }
-        }
+        return PixelFormat.TRANSLUCENT;
     }
 
     public interface FadeCallback {

@@ -334,7 +334,7 @@ public final class ImageLoader<T> {
         private DisplayCallback<T> mDisplayCallback;
         private ErrorCallback<T> mErrorCallback;
         private boolean mFadeEnabled = true;
-        private long mFadeDuration = 250L;
+        private long mFadeDuration = 200L;
 
         private Builder(@NonNull Context context, @NonNull BitmapLoader<T> bitmapLoader) {
             mContext = context;
