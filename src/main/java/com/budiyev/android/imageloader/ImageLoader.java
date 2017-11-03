@@ -252,8 +252,8 @@ public final class ImageLoader<T> {
             }
             return;
         }
-        new LoadImageAction<>(context, mExecutor, mPauseLock, mBitmapLoader, mStorageCache,
-                loadCallback, errorCallback, descriptor).execute();
+        new LoadImageAction<>(context, mExecutor, mPauseLock, mBitmapLoader, memoryCache,
+                mStorageCache, loadCallback, errorCallback, descriptor).execute();
     }
 
     /**

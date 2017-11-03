@@ -1,26 +1,3 @@
-/*
- * MIT License
- *
- * Copyright (c) 2017 Yuriy Budiyev [yuriy.budiyev@yandex.ru]
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
 package com.budiyev.android.imageloader;
 
 import java.util.concurrent.Callable;
@@ -37,20 +14,23 @@ final class LoadImageAction<T> {
     private final ExecutorService mExecutor;
     private final PauseLock mPauseLock;
     private final BitmapLoader<T> mBitmapLoader;
-    private final ImageCache mStorageCache;
+    private final ImageCache mMemoryImageCache;
+    private final ImageCache mStorageImageCache;
     private final LoadCallback<T> mLoadCallback;
     private final ErrorCallback<T> mErrorCallback;
     private final DataDescriptor<T> mDescriptor;
 
     public LoadImageAction(@NonNull Context context, @NonNull ExecutorService executor,
             @NonNull PauseLock pauseLock, @NonNull BitmapLoader<T> bitmapLoader,
-            @Nullable ImageCache storageCache, @Nullable LoadCallback<T> loadCallback,
-            @Nullable ErrorCallback<T> errorCallback, @NonNull DataDescriptor<T> descriptor) {
+            @Nullable ImageCache memoryImageCache, @Nullable ImageCache storageImageCache,
+            @Nullable LoadCallback<T> loadCallback, @Nullable ErrorCallback<T> errorCallback,
+            @NonNull DataDescriptor<T> descriptor) {
         mContext = context;
         mExecutor = executor;
         mPauseLock = pauseLock;
         mBitmapLoader = bitmapLoader;
-        mStorageCache = storageCache;
+        mMemoryImageCache = memoryImageCache;
+        mStorageImageCache = storageImageCache;
         mLoadCallback = loadCallback;
         mErrorCallback = errorCallback;
         mDescriptor = descriptor;
@@ -68,11 +48,11 @@ final class LoadImageAction<T> {
             }
         }
         Bitmap image = null;
-        ImageCache storageCache = mStorageCache;
+        ImageCache storageImageCache = mStorageImageCache;
         String key = mDescriptor.getKey();
         T data = mDescriptor.getData();
-        if (storageCache != null) {
-            image = storageCache.get(key);
+        if (storageImageCache != null) {
+            image = storageImageCache.get(key);
         }
         if (image == null) {
             try {
@@ -91,9 +71,13 @@ final class LoadImageAction<T> {
                 }
                 return;
             }
-            if (storageCache != null) {
-                storageCache.put(key, image);
+            if (storageImageCache != null) {
+                storageImageCache.put(key, image);
             }
+        }
+        ImageCache memoryImageCache = mMemoryImageCache;
+        if (memoryImageCache != null) {
+            memoryImageCache.put(key, image);
         }
         LoadCallback<T> loadCallback = mLoadCallback;
         if (loadCallback != null) {
