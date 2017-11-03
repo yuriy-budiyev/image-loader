@@ -30,6 +30,7 @@ import java.util.concurrent.Future;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Handler;
@@ -100,6 +101,7 @@ final class LoadImageAction<T> {
     }
 
     public void cancel() {
+        mView.clear();
         mCancelled = true;
         Future<?> future = mFuture;
         if (future != null) {
@@ -196,11 +198,11 @@ final class LoadImageAction<T> {
             Context context = mContext;
             Bitmap image = mImage;
             if (mFadeEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                view.setImageDrawable(
-                        new FadeBitmapDrawable(mMainThreadHandler, context.getResources(), image,
-                                mPlaceholder, mFadeDuration, displayCallback == null ? null :
-                                new FadeCallback<>(context, displayCallback, mDescriptor.getData(),
-                                        image, view)));
+                view.setImageDrawable(new FadeDrawable(mPlaceholder,
+                        new BitmapDrawable(context.getResources(), image), mFadeDuration,
+                        mMainThreadHandler, displayCallback == null ? null :
+                        new FadeCallback<>(context, displayCallback, mDescriptor.getData(), image,
+                                view)));
             } else {
                 view.setImageBitmap(image);
                 if (displayCallback != null) {
@@ -210,7 +212,7 @@ final class LoadImageAction<T> {
         }
     }
 
-    private static final class FadeCallback<T> implements FadeBitmapDrawable.FadeCallback {
+    private static final class FadeCallback<T> implements FadeDrawable.FadeCallback {
         private final Context mContext;
         private final DisplayCallback<T> mDisplayCallback;
         private final T mData;
