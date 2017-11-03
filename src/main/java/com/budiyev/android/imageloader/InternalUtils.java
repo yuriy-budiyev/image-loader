@@ -61,7 +61,7 @@ final class InternalUtils {
 
     @Nullable
     @MainThread
-    public static LoadImageAction<?> getLoadImageAction(@Nullable ImageView view) {
+    public static LoadAndDisplayImageAction<?> getLoadImageAction(@Nullable ImageView view) {
         if (view != null) {
             Drawable drawable = view.getDrawable();
             if (drawable instanceof PlaceholderDrawable) {
