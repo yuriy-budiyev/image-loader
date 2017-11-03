@@ -25,7 +25,7 @@ apply plugin: 'com.jfrog.bintray'
 ext {
     libraryName = 'ImageLoader'
     libraryDescription = 'Image loader tool for Android'
-    libraryVersion = '1.6.5'
+    libraryVersion = '1.6.6'
     artifact = 'image-loader'
     developerId = 'yuriy-budiyev'
     developerName = 'Yuriy Budiyev'
@@ -46,7 +46,7 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 26
-        versionCode 26
+        versionCode 27
         versionName libraryVersion
     }
 
