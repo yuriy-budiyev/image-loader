@@ -159,8 +159,16 @@ public final class ImageLoader<T> {
         if (memoryImageCache != null) {
             image = memoryImageCache.get(key);
         }
+        Context context = mContext;
+        T data = descriptor.getData();
         if (image != null) {
+            if (loadCallback != null) {
+                loadCallback.onLoaded(context, data, image);
+            }
             view.setImageBitmap(image);
+            if (displayCallback != null) {
+                displayCallback.onDisplayed(context, data, image, view);
+            }
             return;
         }
         LoadImageAction<?> currentAction = InternalUtils.getLoadImageAction(view);
@@ -170,8 +178,7 @@ public final class ImageLoader<T> {
             }
             currentAction.cancel();
         }
-        Context context = mContext;
-        Drawable placeholder = mPlaceholderProvider.get(context, descriptor.getData());
+        Drawable placeholder = mPlaceholderProvider.get(context, data);
         LoadImageAction<T> action =
                 new LoadImageAction<>(context, mMainThreadHandler, mExecutor, mPauseLock,
                         mBitmapLoader, mBitmapProcessor, mMemoryCache, mStorageCache, loadCallback,

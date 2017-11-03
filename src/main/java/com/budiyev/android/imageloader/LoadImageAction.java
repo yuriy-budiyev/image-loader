@@ -101,12 +101,12 @@ final class LoadImageAction<T> {
     }
 
     public void cancel() {
-        mView.clear();
         mCancelled = true;
         Future<?> future = mFuture;
         if (future != null) {
             future.cancel(false);
         }
+        mView.clear();
     }
 
     @WorkerThread
@@ -143,16 +143,19 @@ final class LoadImageAction<T> {
                 }
                 return;
             }
+            if (mCancelled) {
+                return;
+            }
             if (storageImageCache != null) {
                 storageImageCache.put(key, image);
             }
         }
+        if (mCancelled) {
+            return;
+        }
         LoadCallback<T> loadCallback = mLoadCallback;
         if (loadCallback != null) {
             loadCallback.onLoaded(mContext, data, image);
-        }
-        if (mCancelled) {
-            return;
         }
         ImageCache memoryImageCache = mMemoryImageCache;
         if (memoryImageCache != null) {
