@@ -25,8 +25,8 @@ package com.budiyev.android.imageloader;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.support.annotation.AnyThread;
 import android.support.annotation.NonNull;
+import android.support.annotation.WorkerThread;
 
 /**
  * Load callback
@@ -39,6 +39,6 @@ public interface LoadCallback<T> {
      * @param data    Data
      * @param image   Image
      */
-    @AnyThread
+    @WorkerThread
     void onLoaded(@NonNull Context context, @NonNull T data, @NonNull Bitmap image);
 }

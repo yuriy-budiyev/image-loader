@@ -35,7 +35,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Handler;
-import android.support.annotation.AnyThread;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
@@ -98,7 +97,6 @@ public final class ImageLoader<T> {
         mFadeDuration = fadeDuration;
     }
 
-
     /**
      * Load image into view from specified {@code data}, using default {@link DataDescriptor},
      * {@code data}'s toString() method will be used for key generation, any characters allowed
@@ -157,103 +155,30 @@ public final class ImageLoader<T> {
             @Nullable ErrorCallback<T> errorCallback) {
         Bitmap image = null;
         String key = descriptor.getKey();
-        ImageCache memoryCache = mMemoryCache;
-        if (memoryCache != null) {
-            image = memoryCache.get(key);
+        ImageCache memoryImageCache = mMemoryCache;
+        if (memoryImageCache != null) {
+            image = memoryImageCache.get(key);
         }
-        Context context = mContext;
-        T data = descriptor.getData();
         if (image != null) {
-            if (loadCallback != null) {
-                loadCallback.onLoaded(context, data, image);
-            }
             view.setImageBitmap(image);
-            if (displayCallback != null) {
-                displayCallback.onDisplayed(context, data, image, view);
-            }
             return;
         }
-        LoadAndDisplayImageAction<?> currentAction = InternalUtils.getLoadImageAction(view);
+        LoadImageAction<?> currentAction = InternalUtils.getLoadImageAction(view);
         if (currentAction != null) {
             if (currentAction.hasSameDescriptor(key)) {
                 return;
             }
             currentAction.cancel();
         }
-        Drawable placeholder = mPlaceholderProvider.get(context, data);
-        LoadAndDisplayImageAction<T> action =
-                new LoadAndDisplayImageAction<>(context, mMainThreadHandler, mExecutor, mPauseLock,
+        Context context = mContext;
+        Drawable placeholder = mPlaceholderProvider.get(context, descriptor.getData());
+        LoadImageAction<T> action =
+                new LoadImageAction<>(context, mMainThreadHandler, mExecutor, mPauseLock,
                         mBitmapLoader, mBitmapProcessor, mMemoryCache, mStorageCache, loadCallback,
                         displayCallback, errorCallback, mFadeEnabled, mFadeDuration, descriptor,
                         view, placeholder);
         view.setImageDrawable(new PlaceholderDrawable(placeholder, action));
         action.execute();
-    }
-
-    /**
-     * Load image from specified {@code data}, using default {@link DataDescriptor},
-     * {@code data}'s toString() method will be used for key generation, any characters allowed
-     *
-     * @param data Source data
-     */
-    @AnyThread
-    public void load(@NonNull T data) {
-        load(new StringDataDescriptor<>(data), mLoadCallback, mErrorCallback);
-    }
-
-    /**
-     * Load image from specified {@link DataDescriptor}
-     *
-     * @param descriptor Source data descriptor
-     */
-    @AnyThread
-    public void load(@NonNull DataDescriptor<T> descriptor) {
-        load(descriptor, mLoadCallback, mErrorCallback);
-    }
-
-
-    /**
-     * Load image from specified {@code data}, using default {@link DataDescriptor},
-     * {@code data}'s toString() method will be used for key generation, any characters allowed,
-     * override callbacks, specified in builder
-     *
-     * @param data          Source data
-     * @param loadCallback  Load callback
-     * @param errorCallback Error callback
-     */
-    @AnyThread
-    public void load(@NonNull T data, @Nullable LoadCallback<T> loadCallback,
-            @Nullable ErrorCallback<T> errorCallback) {
-        load(new StringDataDescriptor<>(data), loadCallback, errorCallback);
-    }
-
-    /**
-     * Load image from specified {@link DataDescriptor},
-     * override callbacks, specified in builder
-     *
-     * @param descriptor    Source data descriptor
-     * @param loadCallback  Load callback
-     * @param errorCallback Error callback
-     */
-    @AnyThread
-    public void load(@NonNull DataDescriptor<T> descriptor, @Nullable LoadCallback<T> loadCallback,
-            @Nullable ErrorCallback<T> errorCallback) {
-        Bitmap image = null;
-        String key = descriptor.getKey();
-        ImageCache memoryCache = mMemoryCache;
-        if (memoryCache != null) {
-            image = memoryCache.get(key);
-        }
-        Context context = mContext;
-        T data = descriptor.getData();
-        if (image != null) {
-            if (loadCallback != null) {
-                loadCallback.onLoaded(context, data, image);
-            }
-            return;
-        }
-        new LoadImageAction<>(context, mExecutor, mPauseLock, mBitmapLoader, memoryCache,
-                mStorageCache, loadCallback, errorCallback, descriptor).execute();
     }
 
     /**
