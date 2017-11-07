@@ -33,7 +33,8 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -45,7 +46,9 @@ import android.support.annotation.Nullable;
 final class StorageImageCache implements ImageCache {
     public static final String DEFAULT_DIRECTORY = "image_loader_cache";
     public static final long DEFAULT_MAX_SIZE = 52428800L;
-    private final Lock mLock = new ReentrantLock();
+    private final ReadWriteLock mReadWriteLock = new ReentrantReadWriteLock();
+    private final Lock mReadLock = mReadWriteLock.readLock();
+    private final Lock mWriteLock = mReadWriteLock.writeLock();
     private final Comparator<File> mFileComparator = new FileComparator();
     private final FileFilter mFileFilter = new CacheFileFilter();
     private final CompressMode mCompressMode;
@@ -85,7 +88,7 @@ final class StorageImageCache implements ImageCache {
 
     @Override
     public void put(@NonNull String key, @NonNull Bitmap value) {
-        mLock.lock();
+        mWriteLock.lock();
         try {
             File file = getFile(key);
             if (file.exists()) {
@@ -119,14 +122,14 @@ final class StorageImageCache implements ImageCache {
             } catch (Exception ignored) {
             }
         } finally {
-            mLock.unlock();
+            mWriteLock.unlock();
         }
     }
 
     @Nullable
     @Override
     public Bitmap get(@NonNull String key) {
-        mLock.lock();
+        mReadLock.lock();
         try {
             File file = getFile(key);
             if (!file.exists()) {
@@ -143,26 +146,26 @@ final class StorageImageCache implements ImageCache {
                 InternalUtils.close(stream);
             }
         } finally {
-            mLock.unlock();
+            mReadLock.unlock();
         }
     }
 
     @Override
     public void remove(@NonNull String key) {
-        mLock.lock();
+        mWriteLock.lock();
         try {
             File file = getFile(key);
             if (file.exists()) {
                 file.delete();
             }
         } finally {
-            mLock.unlock();
+            mWriteLock.unlock();
         }
     }
 
     @Override
     public void clear() {
-        mLock.lock();
+        mWriteLock.lock();
         try {
             File[] files = getFiles();
             if (files != null) {
@@ -171,7 +174,7 @@ final class StorageImageCache implements ImageCache {
                 }
             }
         } finally {
-            mLock.unlock();
+            mWriteLock.unlock();
         }
     }
 
