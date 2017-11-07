@@ -62,9 +62,8 @@ final class KeyLock {
         mLock.lock();
         try {
             lock = mLockMap.get(key);
-            lock.unlock();
-            if (!lock.isLocked()) {
-                mLockMap.remove(key);
+            if (lock != null) {
+                lock.unlock();
             }
         } finally {
             mLock.unlock();
