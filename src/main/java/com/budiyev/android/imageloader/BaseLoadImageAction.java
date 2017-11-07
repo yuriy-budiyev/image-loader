@@ -143,33 +143,37 @@ abstract class BaseLoadImageAction<T> {
         if (storageCache != null) {
             image = storageCache.get(key);
         }
+        Context context = mContext;
         if (image == null) {
             try {
-                image = mBitmapLoader.load(mContext, data);
+                image = mBitmapLoader.load(context, data);
             } catch (Throwable error) {
                 ErrorCallback<T> errorCallback = mErrorCallback;
                 if (errorCallback != null) {
-                    errorCallback.onError(mContext, data, error);
+                    errorCallback.onError(context, data, error);
                 }
                 return;
             }
             if (image == null) {
                 ErrorCallback<T> errorCallback = mErrorCallback;
                 if (errorCallback != null) {
-                    errorCallback.onError(mContext, data, new ImageNotLoadedException());
+                    errorCallback.onError(context, data, new ImageNotLoadedException());
                 }
                 return;
             }
-            if (storageCache != null) {
-                storageCache.put(key, image);
-            }
+        }
+        if (mCancelled) {
+            return;
+        }
+        if (storageCache != null) {
+            storageCache.put(key, image);
         }
         if (mCancelled) {
             return;
         }
         LoadCallback<T> loadCallback = mLoadCallback;
         if (loadCallback != null) {
-            loadCallback.onLoaded(mContext, data, image);
+            loadCallback.onLoaded(context, data, image);
         }
         onImageLoaded(image);
     }
