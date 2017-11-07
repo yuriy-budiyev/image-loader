@@ -32,7 +32,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -44,16 +45,12 @@ import android.support.annotation.Nullable;
 final class StorageImageCache implements ImageCache {
     public static final String DEFAULT_DIRECTORY = "image_loader_cache";
     public static final long DEFAULT_MAX_SIZE = 52428800L;
-    private final KeyLock mLock = new KeyLock();
+    private final Lock mLock = new ReentrantLock();
     private final Comparator<File> mFileComparator = new FileComparator();
     private final FileFilter mFileFilter = new CacheFileFilter();
-    private final Runnable mFitCacheSizeTask = new FitCacheSizeTask();
     private final CompressMode mCompressMode;
     private final File mDirectory;
     private final long mMaxSize;
-    private volatile ExecutorService mExecutor;
-    private volatile boolean mCacheFitting;
-    private volatile boolean mCacheFitRequested;
 
     public StorageImageCache(@NonNull Context context) {
         this(getDefaultDirectory(context));
@@ -86,16 +83,9 @@ final class StorageImageCache implements ImageCache {
         }
     }
 
-    public void setExecutor(@Nullable ExecutorService executor) {
-        if (mExecutor != null) {
-            return;
-        }
-        mExecutor = executor;
-    }
-
     @Override
     public void put(@NonNull String key, @NonNull Bitmap value) {
-        mLock.lock(key);
+        mLock.lock();
         try {
             File file = getFile(key);
             if (file.exists()) {
@@ -109,20 +99,40 @@ final class StorageImageCache implements ImageCache {
             } finally {
                 InternalUtils.close(stream);
             }
+            try {
+                File[] files = getFiles();
+                if (files != null && files.length != 0) {
+                    Arrays.sort(files, mFileComparator);
+                    long size = 0L;
+                    boolean removing = false;
+                    for (File cached : files) {
+                        if (removing) {
+                            cached.delete();
+                        } else {
+                            size += cached.length();
+                            if (size >= mMaxSize) {
+                                removing = true;
+                            }
+                        }
+                    }
+                }
+            } catch (Exception ignored) {
+            }
         } finally {
-            mLock.unlock(key);
+            mLock.unlock();
         }
     }
 
     @Nullable
     @Override
     public Bitmap get(@NonNull String key) {
-        mLock.lock(key);
+        mLock.lock();
         try {
             File file = getFile(key);
             if (!file.exists()) {
                 return null;
             }
+            file.setLastModified(System.currentTimeMillis());
             InputStream stream = null;
             try {
                 stream = InternalUtils.buffer(new FileInputStream(file));
@@ -133,20 +143,20 @@ final class StorageImageCache implements ImageCache {
                 InternalUtils.close(stream);
             }
         } finally {
-            mLock.unlock(key);
+            mLock.unlock();
         }
     }
 
     @Override
     public void remove(@NonNull String key) {
-        mLock.lock(key);
+        mLock.lock();
         try {
             File file = getFile(key);
             if (file.exists()) {
                 file.delete();
             }
         } finally {
-            mLock.unlock(key);
+            mLock.unlock();
         }
     }
 
@@ -182,76 +192,6 @@ final class StorageImageCache implements ImageCache {
             directory = context.getCacheDir();
         }
         return new File(directory, DEFAULT_DIRECTORY);
-    }
-
-    private void fitCache() {
-        ExecutorService executor = mExecutor;
-        if (executor == null) {
-            return;
-        }
-        mLock.lock();
-        try {
-            if (mCacheFitting) {
-                mCacheFitRequested = true;
-            } else {
-                mCacheFitting = true;
-                executor.execute(mFitCacheSizeTask);
-            }
-        } finally {
-            mLock.unlock();
-        }
-    }
-
-    private final class FitCacheSizeTask implements Runnable {
-        @Override
-        public void run() {
-            for (; ; ) {
-                try {
-                    File[] files;
-                    mLock.lock();
-                    try {
-                        files = getFiles();
-                        if (files != null) {
-                            Arrays.sort(files, mFileComparator);
-                        }
-                    } finally {
-                        mLock.unlock();
-                    }
-                    if (files != null && files.length != 0) {
-                        long size = 0L;
-                        boolean removing = false;
-                        for (File file : files) {
-                            String key = file.getName();
-                            mLock.lock(key);
-                            try {
-                                if (removing) {
-                                    file.delete();
-                                } else {
-                                    size += file.length();
-                                    if (size >= mMaxSize) {
-                                        removing = true;
-                                    }
-                                }
-                            } finally {
-                                mLock.unlock(key);
-                            }
-                        }
-                    }
-                } catch (Exception ignored) {
-                }
-                mLock.lock();
-                try {
-                    if (mCacheFitRequested) {
-                        mCacheFitRequested = false;
-                    } else {
-                        mCacheFitting = false;
-                        break;
-                    }
-                } finally {
-                    mLock.unlock();
-                }
-            }
-        }
     }
 
     private static final class CacheFileFilter implements FileFilter {
