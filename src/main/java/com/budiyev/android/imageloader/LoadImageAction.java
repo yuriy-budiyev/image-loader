@@ -165,7 +165,7 @@ final class LoadImageAction<T> {
         if (bitmapProcessor != null) {
             image = bitmapProcessor.process(mContext, data, image);
         }
-        if (mCancelled) {
+        if (mCancelled || mView.get() == null) {
             return;
         }
         mMainThreadHandler.post(new SetImageAction(image));
