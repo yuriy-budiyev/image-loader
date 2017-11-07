@@ -35,6 +35,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Handler;
+import android.support.annotation.AnyThread;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
@@ -155,9 +156,9 @@ public final class ImageLoader<T> {
             @Nullable ErrorCallback<T> errorCallback) {
         Bitmap image = null;
         String key = descriptor.getKey();
-        ImageCache memoryImageCache = mMemoryCache;
-        if (memoryImageCache != null) {
-            image = memoryImageCache.get(key);
+        ImageCache memoryCache = mMemoryCache;
+        if (memoryCache != null) {
+            image = memoryCache.get(key);
         }
         Context context = mContext;
         T data = descriptor.getData();
@@ -182,10 +183,75 @@ public final class ImageLoader<T> {
         DisplayImageAction<T> action =
                 new DisplayImageAction<>(context, descriptor, mBitmapLoader, mPauseLock,
                         mStorageCache, loadCallback, errorCallback, mMainThreadHandler,
-                        mBitmapProcessor, mMemoryCache, displayCallback, view, placeholder,
+                        mBitmapProcessor, memoryCache, displayCallback, view, placeholder,
                         mFadeEnabled, mFadeDuration);
         view.setImageDrawable(new PlaceholderDrawable(placeholder, action));
         action.execute(mExecutor);
+    }
+
+    /**
+     * Load image from specified {@code data}, using default {@link DataDescriptor},
+     * {@code data}'s toString() method will be used for key generation, any characters allowed
+     *
+     * @param data Source data
+     */
+    @AnyThread
+    public void load(@NonNull T data) {
+        load(new StringDataDescriptor<>(data), mLoadCallback, mErrorCallback);
+    }
+
+    /**
+     * Load image from specified {@code data}, using default {@link DataDescriptor},
+     * {@code data}'s toString() method will be used for key generation, any characters allowed,
+     * override callbacks, specified in builder
+     *
+     * @param data          Source data
+     * @param loadCallback  Load callback
+     * @param errorCallback Error callback
+     */
+    @AnyThread
+    public void load(@NonNull T data, @Nullable LoadCallback<T> loadCallback,
+            @Nullable ErrorCallback<T> errorCallback) {
+        load(new StringDataDescriptor<>(data), loadCallback, errorCallback);
+    }
+
+    /**
+     * Load image from specified {@link DataDescriptor}
+     *
+     * @param descriptor Source data descriptor
+     */
+    @AnyThread
+    public void load(@NonNull DataDescriptor<T> descriptor) {
+        load(descriptor, mLoadCallback, mErrorCallback);
+    }
+
+    /**
+     * Load image from specified {@link DataDescriptor},
+     * override callbacks, specified in builder
+     *
+     * @param descriptor    Source data descriptor
+     * @param loadCallback  Load callback
+     * @param errorCallback Error callback
+     */
+    @AnyThread
+    public void load(@NonNull DataDescriptor<T> descriptor, @Nullable LoadCallback<T> loadCallback,
+            @Nullable ErrorCallback<T> errorCallback) {
+        Bitmap image = null;
+        String key = descriptor.getKey();
+        ImageCache memoryCache = mMemoryCache;
+        if (memoryCache != null) {
+            image = memoryCache.get(key);
+        }
+        Context context = mContext;
+        T data = descriptor.getData();
+        if (image != null) {
+            if (loadCallback != null) {
+                loadCallback.onLoaded(context, data, image);
+            }
+            return;
+        }
+        new LoadImageAction<>(context, descriptor, mBitmapLoader, mPauseLock, mStorageCache,
+                loadCallback, errorCallback).execute(mExecutor);
     }
 
     /**
