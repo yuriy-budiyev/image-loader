@@ -171,7 +171,7 @@ public final class ImageLoader<T> {
             }
             return;
         }
-        LoadImageAction<?> currentAction = InternalUtils.getLoadImageAction(view);
+        DisplayImageAction<?> currentAction = InternalUtils.getDisplayImageAction(view);
         if (currentAction != null) {
             if (currentAction.hasSameDescriptor(key)) {
                 return;
@@ -179,13 +179,13 @@ public final class ImageLoader<T> {
             currentAction.cancel();
         }
         Drawable placeholder = mPlaceholderProvider.get(context, data);
-        LoadImageAction<T> action =
-                new LoadImageAction<>(context, mMainThreadHandler, mExecutor, mPauseLock,
-                        mBitmapLoader, mBitmapProcessor, mMemoryCache, mStorageCache, loadCallback,
-                        displayCallback, errorCallback, mFadeEnabled, mFadeDuration, descriptor,
-                        view, placeholder);
+        DisplayImageAction<T> action =
+                new DisplayImageAction<>(context, descriptor, mBitmapLoader, mPauseLock,
+                        mStorageCache, loadCallback, errorCallback, mMainThreadHandler,
+                        mBitmapProcessor, mMemoryCache, displayCallback, view, placeholder,
+                        mFadeEnabled, mFadeDuration);
         view.setImageDrawable(new PlaceholderDrawable(placeholder, action));
-        action.execute();
+        action.execute(mExecutor);
     }
 
     /**

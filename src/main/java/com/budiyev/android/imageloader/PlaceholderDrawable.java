@@ -31,22 +31,22 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 /**
- * {@link Drawable} that holds reference to {@link LoadImageAction}
+ * {@link Drawable} that holds reference to {@link DisplayImageAction}
  */
 final class PlaceholderDrawable extends LayerDrawable {
-    private final WeakReference<LoadImageAction<?>> mLoadImageActionReference;
+    private final WeakReference<DisplayImageAction<?>> mActionReference;
 
     public PlaceholderDrawable(@NonNull Drawable placeholder,
-            @NonNull LoadImageAction<?> loadImageAction) {
+            @NonNull DisplayImageAction<?> action) {
         super(new Drawable[] {placeholder});
-        mLoadImageActionReference = new WeakReference<LoadImageAction<?>>(loadImageAction);
+        mActionReference = new WeakReference<DisplayImageAction<?>>(action);
     }
 
     /**
-     * {@link LoadImageAction} attached to this drawable
+     * {@link DisplayImageAction} attached to this drawable
      */
     @Nullable
-    public LoadImageAction<?> getLoadImageAction() {
-        return mLoadImageActionReference.get();
+    public DisplayImageAction<?> getAction() {
+        return mActionReference.get();
     }
 }
