@@ -282,7 +282,7 @@ public final class DataUtils {
      * Default memory cache
      */
     @NonNull
-    public ImageCache memoryCache() {
+    public static ImageCache memoryCache() {
         return new MemoryImageCache();
     }
 
@@ -290,7 +290,7 @@ public final class DataUtils {
      * Memory cache with specified maximum size
      */
     @NonNull
-    public ImageCache memoryCache(int maxSize) {
+    public static ImageCache memoryCache(int maxSize) {
         return new MemoryImageCache(maxSize);
     }
 
@@ -299,7 +299,7 @@ public final class DataUtils {
      * located in subdirectory of {@link Context#getExternalCacheDir()}
      */
     @NonNull
-    public ImageCache storageCache(@NonNull Context context) {
+    public static ImageCache storageCache(@NonNull Context context) {
         return new StorageImageCache(context);
     }
 
@@ -308,7 +308,7 @@ public final class DataUtils {
      * located in subdirectory of {@link Context#getExternalCacheDir()}
      */
     @NonNull
-    public ImageCache storageCache(@NonNull Context context, long maxSize) {
+    public static ImageCache storageCache(@NonNull Context context, long maxSize) {
         return new StorageImageCache(context, maxSize);
     }
 
@@ -319,8 +319,8 @@ public final class DataUtils {
      * @see CompressMode
      */
     @NonNull
-    public ImageCache storageCache(@NonNull Context context, @NonNull CompressMode compressMode,
-            long maxSize) {
+    public static ImageCache storageCache(@NonNull Context context,
+            @NonNull CompressMode compressMode, long maxSize) {
         return new StorageImageCache(context, compressMode, maxSize);
     }
 
@@ -328,7 +328,7 @@ public final class DataUtils {
      * Storage cache with specified directory
      */
     @NonNull
-    public ImageCache storageCache(@NonNull File directory) {
+    public static ImageCache storageCache(@NonNull File directory) {
         return new StorageImageCache(directory);
     }
 
@@ -336,7 +336,7 @@ public final class DataUtils {
      * Storage cache with specified directory and maximum size
      */
     @NonNull
-    public ImageCache storageCache(@NonNull File directory, long maxSize) {
+    public static ImageCache storageCache(@NonNull File directory, long maxSize) {
         return new StorageImageCache(directory, maxSize);
     }
 
@@ -346,8 +346,8 @@ public final class DataUtils {
      * @see CompressMode
      */
     @NonNull
-    public ImageCache storageCache(@NonNull File directory, @NonNull CompressMode compressMode,
-            long maxSize) {
+    public static ImageCache storageCache(@NonNull File directory,
+            @NonNull CompressMode compressMode, long maxSize) {
         return new StorageImageCache(directory, compressMode, maxSize);
     }
 }
