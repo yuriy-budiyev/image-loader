@@ -93,6 +93,9 @@ final class StorageImageCache implements ImageCache {
     }
 
     public void setExecutor(@Nullable ExecutorService executor) {
+        if (mExecutor != null) {
+            return;
+        }
         mExecutor = executor;
     }
 
