@@ -18,15 +18,15 @@ final class MemoryImageCache implements ImageCache {
         mCache = new InternalCacheImpl(maxSize);
     }
 
-    @Override
-    public void put(@NonNull String key, @NonNull Bitmap value) {
-        mCache.put(key, value);
-    }
-
     @Nullable
     @Override
     public Bitmap get(@NonNull String key) {
         return mCache.get(key);
+    }
+
+    @Override
+    public void put(@NonNull String key, @NonNull Bitmap value) {
+        mCache.put(key, value);
     }
 
     @Override

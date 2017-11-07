@@ -33,15 +33,6 @@ import android.support.annotation.Nullable;
  */
 public interface ImageCache {
     /**
-     * Put {@link Bitmap} into cache
-     *
-     * @param key   Unique key
-     * @param value Image bitmap
-     */
-    @AnyThread
-    void put(@NonNull String key, @NonNull Bitmap value);
-
-    /**
      * Get {@link Bitmap} for the specified {@code key}, this method called on the main thread
      * if it's a memory cache, and on a worker thread otherwise
      *
@@ -52,6 +43,15 @@ public interface ImageCache {
     @Nullable
     @AnyThread
     Bitmap get(@NonNull String key);
+
+    /**
+     * Put {@link Bitmap} into cache
+     *
+     * @param key   Unique key
+     * @param value Image bitmap
+     */
+    @AnyThread
+    void put(@NonNull String key, @NonNull Bitmap value);
 
     /**
      * Remove entry with specified {@code key} from cache

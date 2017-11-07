@@ -86,6 +86,30 @@ final class StorageImageCache implements ImageCache {
         }
     }
 
+    @Nullable
+    @Override
+    public Bitmap get(@NonNull String key) {
+        mReadLock.lock();
+        try {
+            File file = getFile(key);
+            if (!file.exists()) {
+                return null;
+            }
+            file.setLastModified(System.currentTimeMillis());
+            InputStream stream = null;
+            try {
+                stream = InternalUtils.buffer(new FileInputStream(file));
+                return BitmapFactory.decodeStream(stream);
+            } catch (IOException e) {
+                return null;
+            } finally {
+                InternalUtils.close(stream);
+            }
+        } finally {
+            mReadLock.unlock();
+        }
+    }
+
     @Override
     public void put(@NonNull String key, @NonNull Bitmap value) {
         mWriteLock.lock();
@@ -123,30 +147,6 @@ final class StorageImageCache implements ImageCache {
             }
         } finally {
             mWriteLock.unlock();
-        }
-    }
-
-    @Nullable
-    @Override
-    public Bitmap get(@NonNull String key) {
-        mReadLock.lock();
-        try {
-            File file = getFile(key);
-            if (!file.exists()) {
-                return null;
-            }
-            file.setLastModified(System.currentTimeMillis());
-            InputStream stream = null;
-            try {
-                stream = InternalUtils.buffer(new FileInputStream(file));
-                return BitmapFactory.decodeStream(stream);
-            } catch (IOException e) {
-                return null;
-            } finally {
-                InternalUtils.close(stream);
-            }
-        } finally {
-            mReadLock.unlock();
         }
     }
 
