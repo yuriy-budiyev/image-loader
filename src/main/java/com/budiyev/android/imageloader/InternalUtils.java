@@ -60,7 +60,7 @@ final class InternalUtils {
 
     @Nullable
     public static byte[] readBytes(@NonNull File file) {
-        InputStream input = null;
+        FileInputStream input = null;
         ByteArrayOutputStream output;
         try {
             input = new FileInputStream(file);
@@ -82,7 +82,7 @@ final class InternalUtils {
     }
 
     public static boolean writeBytes(@NonNull File file, byte[] bytes) {
-        OutputStream output = null;
+        FileOutputStream output = null;
         try {
             output = new FileOutputStream(file);
             int length = bytes.length;
