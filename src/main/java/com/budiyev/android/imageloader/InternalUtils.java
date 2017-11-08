@@ -25,7 +25,11 @@ package com.budiyev.android.imageloader;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -43,10 +47,57 @@ final class InternalUtils {
     private static final String URI_SCHEME_HTTP = "http";
     private static final String URI_SCHEME_HTTPS = "https";
     private static final String URI_SCHEME_FTP = "ftp";
-    private static final int BUFFER_SIZE = 32768;
+    private static final int BUFFER_SIZE = 16384;
     private static final int MAX_POOL_SIZE = 4;
 
     private InternalUtils() {
+    }
+
+    @NonNull
+    public static ByteArrayOutputStream byteOutput() {
+        return new ByteArrayOutputStream(BUFFER_SIZE);
+    }
+
+    @Nullable
+    public static byte[] readBytes(@NonNull File file) {
+        InputStream input = null;
+        ByteArrayOutputStream output;
+        try {
+            input = new FileInputStream(file);
+            output = new ByteArrayOutputStream(BUFFER_SIZE);
+            byte[] buffer = new byte[BUFFER_SIZE];
+            for (int read; ; ) {
+                read = input.read(buffer, 0, buffer.length);
+                if (read == -1) {
+                    break;
+                }
+                output.write(buffer, 0, read);
+            }
+            return output.toByteArray();
+        } catch (IOException e) {
+            return null;
+        } finally {
+            close(input);
+        }
+    }
+
+    public static boolean writeBytes(@NonNull File file, byte[] bytes) {
+        OutputStream output = null;
+        try {
+            output = new FileOutputStream(file);
+            int length = bytes.length;
+            int remaining = length;
+            for (int write; remaining > 0; ) {
+                write = Math.min(remaining, BUFFER_SIZE);
+                output.write(bytes, (length - remaining), write);
+                remaining -= write;
+            }
+            return true;
+        } catch (IOException e) {
+            return false;
+        } finally {
+            close(output);
+        }
     }
 
     @NonNull

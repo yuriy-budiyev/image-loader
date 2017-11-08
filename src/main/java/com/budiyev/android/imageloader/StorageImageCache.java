@@ -23,18 +23,11 @@
  */
 package com.budiyev.android.imageloader;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -46,9 +39,6 @@ import android.support.annotation.Nullable;
 final class StorageImageCache implements ImageCache {
     public static final String DEFAULT_DIRECTORY = "image_loader_cache";
     public static final long DEFAULT_MAX_SIZE = 52428800L;
-    private final ReadWriteLock mReadWriteLock = new ReentrantReadWriteLock();
-    private final Lock mReadLock = mReadWriteLock.readLock();
-    private final Lock mWriteLock = mReadWriteLock.writeLock();
     private final Comparator<File> mFileComparator = new FileComparator();
     private final FileFilter mFileFilter = new CacheFileFilter();
     private final CompressMode mCompressMode;
@@ -89,92 +79,57 @@ final class StorageImageCache implements ImageCache {
     @Nullable
     @Override
     public Bitmap get(@NonNull String key) {
-        mReadLock.lock();
-        try {
-            File file = getFile(key);
-            if (!file.exists()) {
-                return null;
-            }
+        File file = getFile(key);
+        if (!file.exists()) {
+            return null;
+        }
+        byte[] data = InternalUtils.readBytes(file);
+        if (data == null) {
+            return null;
+        }
+        Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+        if (bitmap != null) {
             file.setLastModified(System.currentTimeMillis());
-            InputStream stream = null;
-            try {
-                stream = InternalUtils.buffer(new FileInputStream(file));
-                return BitmapFactory.decodeStream(stream);
-            } catch (IOException e) {
-                return null;
-            } finally {
-                InternalUtils.close(stream);
-            }
-        } finally {
-            mReadLock.unlock();
+            return bitmap;
+        } else {
+            file.delete();
+            return null;
         }
     }
 
     @Override
     public void put(@NonNull String key, @NonNull Bitmap value) {
-        mWriteLock.lock();
-        try {
-            File file = getFile(key);
-            if (file.exists()) {
-                file.delete();
-            }
-            OutputStream stream = null;
-            try {
-                stream = InternalUtils.buffer(new FileOutputStream(file));
-                value.compress(mCompressMode.getFormat(), mCompressMode.getQuality(), stream);
-            } catch (IOException ignored) {
-            } finally {
-                InternalUtils.close(stream);
-            }
-            try {
-                File[] files = getFiles();
-                if (files != null && files.length != 0) {
-                    Arrays.sort(files, mFileComparator);
-                    long size = 0L;
-                    boolean removing = false;
-                    for (File cached : files) {
-                        if (removing) {
-                            cached.delete();
-                        } else {
-                            size += cached.length();
-                            if (size >= mMaxSize) {
-                                removing = true;
-                            }
-                        }
-                    }
-                }
-            } catch (Exception ignored) {
-            }
-        } finally {
-            mWriteLock.unlock();
+        File file = getFile(key);
+        if (file.exists()) {
+            file.delete();
+        }
+        ByteArrayOutputStream outputStream = InternalUtils.byteOutput();
+        boolean success =
+                value.compress(mCompressMode.getFormat(), mCompressMode.getQuality(), outputStream);
+        if (!success) {
+            return;
+        }
+        success = InternalUtils.writeBytes(file, outputStream.toByteArray());
+        if (!success) {
+            file.delete();
         }
     }
 
     @Override
     public void remove(@NonNull String key) {
-        mWriteLock.lock();
-        try {
-            File file = getFile(key);
-            if (file.exists()) {
-                file.delete();
-            }
-        } finally {
-            mWriteLock.unlock();
+        File file = getFile(key);
+        if (file.exists()) {
+            file.delete();
         }
     }
 
     @Override
     public void clear() {
-        mWriteLock.lock();
-        try {
-            File[] files = getFiles();
-            if (files != null) {
-                for (File file : files) {
-                    file.delete();
-                }
+        File[] files = getFiles();
+        if (files != null) {
+            for (File file : files) {
+                file.delete();
             }
-        } finally {
-            mWriteLock.unlock();
         }
     }
 
@@ -195,6 +150,31 @@ final class StorageImageCache implements ImageCache {
             directory = context.getCacheDir();
         }
         return new File(directory, DEFAULT_DIRECTORY);
+    }
+
+    private final class TrimAction implements Runnable {
+        @Override
+        public void run() {
+            try {
+                File[] files = getFiles();
+                if (files != null && files.length != 0) {
+                    Arrays.sort(files, mFileComparator);
+                    long size = 0L;
+                    boolean removing = false;
+                    for (File cached : files) {
+                        if (removing) {
+                            cached.delete();
+                        } else {
+                            size += cached.length();
+                            if (size >= mMaxSize) {
+                                removing = true;
+                            }
+                        }
+                    }
+                }
+            } catch (Exception ignored) {
+            }
+        }
     }
 
     private static final class CacheFileFilter implements FileFilter {
