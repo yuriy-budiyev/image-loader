@@ -161,16 +161,21 @@ abstract class BaseLoadImageAction<T> {
                 }
                 return;
             }
-            if (mCancelled) {
-                return;
-            }
-            if (storageCache != null) {
-                storageCache.put(key, image);
-            }
         }
         if (mCancelled) {
             return;
         }
+        notifyImageLoaded(context, data, image);
+        if (mCancelled) {
+            return;
+        }
+        if (storageCache != null) {
+            storageCache.put(key, image);
+        }
+    }
+
+    private void notifyImageLoaded(@NonNull Context context, @NonNull T data,
+            @NonNull Bitmap image) {
         LoadCallback<T> loadCallback = mLoadCallback;
         if (loadCallback != null) {
             loadCallback.onLoaded(context, data, image);

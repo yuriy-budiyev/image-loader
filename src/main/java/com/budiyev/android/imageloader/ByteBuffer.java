@@ -75,9 +75,4 @@ final class ByteBuffer extends OutputStream {
     public int getSize() {
         return mSize;
     }
-
-    @NonNull
-    public byte[] toArray() {
-        return Arrays.copyOf(mArray, mSize);
-    }
 }
