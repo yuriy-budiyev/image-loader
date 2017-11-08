@@ -191,7 +191,8 @@ public final class ImageLoader<T> {
 
     /**
      * Load image from specified {@code data}, using default {@link DataDescriptor},
-     * {@code data}'s toString() method will be used for key generation, any characters allowed
+     * {@code data}'s toString() method will be used for key generation, any characters allowed,
+     * memory cache is not used
      *
      * @param data Source data
      */
@@ -203,7 +204,8 @@ public final class ImageLoader<T> {
     /**
      * Load image from specified {@code data}, using default {@link DataDescriptor},
      * {@code data}'s toString() method will be used for key generation, any characters allowed,
-     * override callbacks, specified in builder
+     * override callbacks, specified in builder,
+     * memory cache is not used
      *
      * @param data          Source data
      * @param loadCallback  Load callback
@@ -216,7 +218,8 @@ public final class ImageLoader<T> {
     }
 
     /**
-     * Load image from specified {@link DataDescriptor}
+     * Load image from specified {@link DataDescriptor},
+     * memory cache is not used
      *
      * @param descriptor Source data descriptor
      */
@@ -227,7 +230,8 @@ public final class ImageLoader<T> {
 
     /**
      * Load image from specified {@link DataDescriptor},
-     * override callbacks, specified in builder
+     * override callbacks, specified in builder,
+     * memory cache is not used
      *
      * @param descriptor    Source data descriptor
      * @param loadCallback  Load callback
@@ -236,21 +240,7 @@ public final class ImageLoader<T> {
     @AnyThread
     public void load(@NonNull DataDescriptor<T> descriptor, @Nullable LoadCallback<T> loadCallback,
             @Nullable ErrorCallback<T> errorCallback) {
-        Bitmap image = null;
-        String key = descriptor.getKey();
-        ImageCache memoryCache = mMemoryCache;
-        if (memoryCache != null) {
-            image = memoryCache.get(key);
-        }
-        Context context = mContext;
-        T data = descriptor.getData();
-        if (image != null) {
-            if (loadCallback != null) {
-                loadCallback.onLoaded(context, data, image);
-            }
-            return;
-        }
-        new LoadImageAction<>(context, descriptor, mBitmapLoader, mPauseLock, mStorageCache,
+        new LoadImageAction<>(mContext, descriptor, mBitmapLoader, mPauseLock, mStorageCache,
                 loadCallback, errorCallback).execute(mExecutor);
     }
 

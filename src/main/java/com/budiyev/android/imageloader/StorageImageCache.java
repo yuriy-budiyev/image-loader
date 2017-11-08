@@ -27,7 +27,8 @@ import java.io.File;
 import java.io.FileFilter;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.concurrent.Executor;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -41,13 +42,13 @@ final class StorageImageCache implements ImageCache {
     public static final String DEFAULT_DIRECTORY = "image_loader_cache";
     public static final long DEFAULT_MAX_SIZE = 52428800L;
     private final Lock mTrimLock = new ReentrantLock();
-    private final Runnable mTrimAction = new TrimAction();
+    private final Callable<?> mTrimTask = new TrimTask();
     private final FileFilter mFileFilter = new CacheFileFilter();
     private final Comparator<File> mFileComparator = new FileComparator();
     private final CompressMode mCompressMode;
     private final File mDirectory;
     private final long mMaxSize;
-    private volatile Executor mExecutor;
+    private volatile ExecutorService mExecutor;
     private volatile boolean mTrimming;
     private volatile boolean mTrimRequested;
 
@@ -82,7 +83,7 @@ final class StorageImageCache implements ImageCache {
         }
     }
 
-    public void setExecutor(@Nullable Executor executor) {
+    public void setExecutor(@Nullable ExecutorService executor) {
         if (mExecutor != null) {
             return;
         }
@@ -151,7 +152,7 @@ final class StorageImageCache implements ImageCache {
     }
 
     private void trim() {
-        Executor executor = mExecutor;
+        ExecutorService executor = mExecutor;
         if (executor == null) {
             return;
         }
@@ -161,7 +162,7 @@ final class StorageImageCache implements ImageCache {
                 mTrimRequested = true;
             } else {
                 mTrimming = true;
-                executor.execute(mTrimAction);
+                executor.submit(mTrimTask);
             }
         } finally {
             mTrimLock.unlock();
@@ -177,9 +178,9 @@ final class StorageImageCache implements ImageCache {
         return new File(directory, DEFAULT_DIRECTORY);
     }
 
-    private final class TrimAction implements Runnable {
+    private final class TrimTask implements Callable<Void> {
         @Override
-        public void run() {
+        public Void call() throws Exception {
             for (; ; ) {
                 try {
                     File[] files = getFiles();
@@ -211,6 +212,7 @@ final class StorageImageCache implements ImageCache {
                     mTrimLock.unlock();
                 }
             }
+            return null;
         }
     }
 

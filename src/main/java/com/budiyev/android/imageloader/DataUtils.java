@@ -31,7 +31,7 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -345,8 +345,8 @@ public final class DataUtils {
      * @see CompressMode
      */
     @NonNull
-    public static ImageCache storageCache(@NonNull Context context, @NonNull Executor executor,
-            @NonNull CompressMode compressMode, long maxSize) {
+    public static ImageCache storageCache(@NonNull Context context,
+            @NonNull ExecutorService executor, @NonNull CompressMode compressMode, long maxSize) {
         StorageImageCache cache = new StorageImageCache(context, compressMode, maxSize);
         cache.setExecutor(executor);
         return cache;
@@ -397,8 +397,8 @@ public final class DataUtils {
      * @see CompressMode
      */
     @NonNull
-    public static ImageCache storageCache(@NonNull Executor executor, @NonNull File directory,
-            @NonNull CompressMode compressMode, long maxSize) {
+    public static ImageCache storageCache(@NonNull ExecutorService executor,
+            @NonNull File directory, @NonNull CompressMode compressMode, long maxSize) {
         StorageImageCache cache = new StorageImageCache(directory, compressMode, maxSize);
         cache.setExecutor(executor);
         return cache;
