@@ -23,7 +23,6 @@
  */
 package com.budiyev.android.imageloader;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.Arrays;
@@ -34,7 +33,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -98,11 +96,7 @@ final class StorageImageCache implements ImageCache {
         if (!file.exists()) {
             return null;
         }
-        byte[] data = InternalUtils.readBytes(file);
-        if (data == null) {
-            return null;
-        }
-        Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+        Bitmap bitmap = InternalUtils.decodeBitmap(file);
         if (bitmap != null) {
             file.setLastModified(System.currentTimeMillis());
             return bitmap;
@@ -118,9 +112,9 @@ final class StorageImageCache implements ImageCache {
         if (file.exists()) {
             file.delete();
         }
-        ByteArrayOutputStream outputStream = InternalUtils.byteOutput();
-        if (value.compress(mCompressMode.getFormat(), mCompressMode.getQuality(), outputStream)) {
-            if (InternalUtils.writeBytes(file, outputStream.toByteArray())) {
+        ByteBuffer outputBuffer = new ByteBuffer(InternalUtils.BUFFER_SIZE);
+        if (value.compress(mCompressMode.getFormat(), mCompressMode.getQuality(), outputBuffer)) {
+            if (InternalUtils.writeBytes(file, outputBuffer.getArray(), outputBuffer.getSize())) {
                 trim();
             } else {
                 file.delete();

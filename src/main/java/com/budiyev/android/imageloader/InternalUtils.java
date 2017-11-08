@@ -23,7 +23,6 @@
  */
 package com.budiyev.android.imageloader;
 
-import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,6 +32,8 @@ import java.io.InputStream;
 import java.net.URL;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.annotation.MainThread;
@@ -41,48 +42,19 @@ import android.support.annotation.Nullable;
 import android.widget.ImageView;
 
 final class InternalUtils {
+    public static final int BUFFER_SIZE = 16384;
     private static final String URI_SCHEME_HTTP = "http";
     private static final String URI_SCHEME_HTTPS = "https";
     private static final String URI_SCHEME_FTP = "ftp";
-    private static final int BUFFER_SIZE = 16384;
     private static final int MAX_POOL_SIZE = 4;
 
     private InternalUtils() {
     }
 
-    @NonNull
-    public static ByteArrayOutputStream byteOutput() {
-        return new ByteArrayOutputStream(BUFFER_SIZE);
-    }
-
-    @Nullable
-    public static byte[] readBytes(@NonNull File file) {
-        FileInputStream input = null;
-        ByteArrayOutputStream output;
-        try {
-            input = new FileInputStream(file);
-            output = new ByteArrayOutputStream(BUFFER_SIZE);
-            byte[] buffer = new byte[BUFFER_SIZE];
-            for (int read; ; ) {
-                read = input.read(buffer, 0, buffer.length);
-                if (read == -1) {
-                    break;
-                }
-                output.write(buffer, 0, read);
-            }
-            return output.toByteArray();
-        } catch (IOException e) {
-            return null;
-        } finally {
-            close(input);
-        }
-    }
-
-    public static boolean writeBytes(@NonNull File file, byte[] bytes) {
+    public static boolean writeBytes(@NonNull File file, byte[] bytes, int length) {
         FileOutputStream output = null;
         try {
             output = new FileOutputStream(file);
-            int length = bytes.length;
             int remaining = length;
             for (int write; remaining > 0; ) {
                 write = Math.min(remaining, BUFFER_SIZE);
@@ -94,6 +66,29 @@ final class InternalUtils {
             return false;
         } finally {
             close(output);
+        }
+    }
+
+    @Nullable
+    public static Bitmap decodeBitmap(@NonNull File file) {
+        FileInputStream inputStream = null;
+        try {
+            inputStream = new FileInputStream(file);
+            ByteBuffer outputBuffer = new ByteBuffer(BUFFER_SIZE);
+            byte[] buffer = new byte[BUFFER_SIZE];
+            for (int read; ; ) {
+                read = inputStream.read(buffer, 0, buffer.length);
+                if (read == -1) {
+                    break;
+                }
+                outputBuffer.write(buffer, 0, read);
+            }
+            return BitmapFactory
+                    .decodeByteArray(outputBuffer.getArray(), 0, outputBuffer.getSize());
+        } catch (IOException e) {
+            return null;
+        } finally {
+            close(inputStream);
         }
     }
 
