@@ -42,7 +42,6 @@ final class UriBitmapLoader implements BitmapLoader<Uri> {
             if (inputStream == null) {
                 return null;
             }
-            inputStream = InternalUtils.buffer(inputStream);
             return BitmapFactory.decodeStream(inputStream);
         } finally {
             InternalUtils.close(inputStream);

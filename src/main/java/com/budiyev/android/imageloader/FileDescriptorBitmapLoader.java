@@ -39,7 +39,7 @@ final class FileDescriptorBitmapLoader implements BitmapLoader<FileDescriptor> {
     public Bitmap load(@NonNull Context context, @NonNull FileDescriptor data) throws Throwable {
         InputStream inputStream = null;
         try {
-            inputStream = InternalUtils.buffer(new FileInputStream(data));
+            inputStream = new FileInputStream(data);
             return BitmapFactory.decodeStream(inputStream);
         } finally {
             InternalUtils.close(inputStream);

@@ -49,7 +49,7 @@ final class ResourceBitmapLoader implements BitmapLoader<Integer> {
         }
         InputStream inputStream = null;
         try {
-            inputStream = InternalUtils.buffer(resources.openRawResource(data, typedValue));
+            inputStream = resources.openRawResource(data, typedValue);
             return BitmapFactory.decodeStream(inputStream, null, options);
         } finally {
             InternalUtils.close(inputStream);

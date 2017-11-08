@@ -161,12 +161,12 @@ abstract class BaseLoadImageAction<T> {
                 }
                 return;
             }
-        }
-        if (mCancelled) {
-            return;
-        }
-        if (storageCache != null) {
-            storageCache.put(key, image);
+            if (mCancelled) {
+                return;
+            }
+            if (storageCache != null) {
+                storageCache.put(key, image);
+            }
         }
         if (mCancelled) {
             return;

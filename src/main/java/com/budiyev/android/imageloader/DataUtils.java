@@ -108,7 +108,6 @@ public final class DataUtils {
             if (inputStream == null) {
                 return null;
             }
-            inputStream = InternalUtils.buffer(inputStream);
             return BitmapFactory.decodeStream(inputStream, null, options);
         } finally {
             InternalUtils.close(inputStream);
@@ -144,7 +143,7 @@ public final class DataUtils {
                         requiredHeight, ignoreTotalNumberOfPixels);
         inputStream = null;
         try {
-            inputStream = InternalUtils.buffer(new FileInputStream(file));
+            inputStream = new FileInputStream(file);
             return BitmapFactory.decodeStream(inputStream, null, options);
         } finally {
             InternalUtils.close(inputStream);
@@ -181,7 +180,7 @@ public final class DataUtils {
                         requiredHeight, ignoreTotalNumberOfPixels);
         inputStream = null;
         try {
-            inputStream = InternalUtils.buffer(new FileInputStream(fileDescriptor));
+            inputStream = new FileInputStream(fileDescriptor);
             return BitmapFactory.decodeStream(inputStream, null, options);
         } finally {
             InternalUtils.close(inputStream);
@@ -225,7 +224,7 @@ public final class DataUtils {
                         requiredHeight, ignoreTotalNumberOfPixels);
         inputStream = null;
         try {
-            inputStream = InternalUtils.buffer(resources.openRawResource(resourceId, typedValue));
+            inputStream = resources.openRawResource(resourceId, typedValue);
             return BitmapFactory.decodeStream(inputStream, null, options);
         } finally {
             InternalUtils.close(inputStream);
