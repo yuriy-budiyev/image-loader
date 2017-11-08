@@ -91,6 +91,9 @@ public final class ImageLoader<T> {
         } else {
             mExecutor = new ImageLoaderExecutor(InternalUtils.getPoolSize());
         }
+        if (mStorageCache instanceof StorageImageCache) {
+            ((StorageImageCache) mStorageCache).setExecutor(mExecutor);
+        }
         mFadeEnabled = fadeEnabled;
         mFadeDuration = fadeDuration;
     }

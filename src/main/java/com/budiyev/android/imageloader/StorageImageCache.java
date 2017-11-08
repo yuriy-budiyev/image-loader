@@ -28,6 +28,9 @@ import java.io.File;
 import java.io.FileFilter;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.concurrent.Executor;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -39,11 +42,16 @@ import android.support.annotation.Nullable;
 final class StorageImageCache implements ImageCache {
     public static final String DEFAULT_DIRECTORY = "image_loader_cache";
     public static final long DEFAULT_MAX_SIZE = 52428800L;
-    private final Comparator<File> mFileComparator = new FileComparator();
+    private final Lock mTrimLock = new ReentrantLock();
+    private final Runnable mTrimAction = new TrimAction();
     private final FileFilter mFileFilter = new CacheFileFilter();
+    private final Comparator<File> mFileComparator = new FileComparator();
     private final CompressMode mCompressMode;
     private final File mDirectory;
     private final long mMaxSize;
+    private volatile Executor mExecutor;
+    private volatile boolean mTrimming;
+    private volatile boolean mTrimRequested;
 
     public StorageImageCache(@NonNull Context context) {
         this(getDefaultDirectory(context));
@@ -76,6 +84,13 @@ final class StorageImageCache implements ImageCache {
         }
     }
 
+    public void setExecutor(@Nullable Executor executor) {
+        if (mExecutor != null) {
+            return;
+        }
+        mExecutor = executor;
+    }
+
     @Nullable
     @Override
     public Bitmap get(@NonNull String key) {
@@ -104,14 +119,12 @@ final class StorageImageCache implements ImageCache {
             file.delete();
         }
         ByteArrayOutputStream outputStream = InternalUtils.byteOutput();
-        boolean success =
-                value.compress(mCompressMode.getFormat(), mCompressMode.getQuality(), outputStream);
-        if (!success) {
-            return;
-        }
-        success = InternalUtils.writeBytes(file, outputStream.toByteArray());
-        if (!success) {
-            file.delete();
+        if (value.compress(mCompressMode.getFormat(), mCompressMode.getQuality(), outputStream)) {
+            if (InternalUtils.writeBytes(file, outputStream.toByteArray())) {
+                trim();
+            } else {
+                file.delete();
+            }
         }
     }
 
@@ -143,6 +156,24 @@ final class StorageImageCache implements ImageCache {
         return mDirectory.listFiles(mFileFilter);
     }
 
+    private void trim() {
+        Executor executor = mExecutor;
+        if (executor == null) {
+            return;
+        }
+        mTrimLock.lock();
+        try {
+            if (mTrimming) {
+                mTrimRequested = true;
+            } else {
+                mTrimming = true;
+                executor.execute(mTrimAction);
+            }
+        } finally {
+            mTrimLock.unlock();
+        }
+    }
+
     @NonNull
     private static File getDefaultDirectory(@NonNull Context context) {
         File directory = context.getExternalCacheDir();
@@ -155,24 +186,36 @@ final class StorageImageCache implements ImageCache {
     private final class TrimAction implements Runnable {
         @Override
         public void run() {
-            try {
-                File[] files = getFiles();
-                if (files != null && files.length != 0) {
-                    Arrays.sort(files, mFileComparator);
-                    long size = 0L;
-                    boolean removing = false;
-                    for (File cached : files) {
-                        if (removing) {
-                            cached.delete();
-                        } else {
-                            size += cached.length();
-                            if (size >= mMaxSize) {
-                                removing = true;
+            for (; ; ) {
+                try {
+                    File[] files = getFiles();
+                    if (files != null && files.length != 0) {
+                        Arrays.sort(files, mFileComparator);
+                        long size = 0L;
+                        boolean removing = false;
+                        for (File cached : files) {
+                            if (removing) {
+                                cached.delete();
+                            } else {
+                                size += cached.length();
+                                if (size >= mMaxSize) {
+                                    removing = true;
+                                }
                             }
                         }
                     }
+                } catch (Exception ignored) {
                 }
-            } catch (Exception ignored) {
+                mTrimLock.lock();
+                try {
+                    if (!mTrimRequested) {
+                        mTrimming = false;
+                        break;
+                    }
+                    mTrimRequested = false;
+                } finally {
+                    mTrimLock.unlock();
+                }
             }
         }
     }

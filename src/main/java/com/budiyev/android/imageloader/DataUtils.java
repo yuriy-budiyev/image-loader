@@ -31,6 +31,7 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.concurrent.Executor;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -335,6 +336,24 @@ public final class DataUtils {
     }
 
     /**
+     * Default storage cache with specified maximum size and compress mode,
+     * located in subdirectory of {@link Context#getExternalCacheDir()}
+     *
+     * @param context      Context
+     * @param executor     Executor (only one thread will be used)
+     * @param compressMode Compress mode
+     * @param maxSize      Maximum size in bytes
+     * @see CompressMode
+     */
+    @NonNull
+    public static ImageCache storageCache(@NonNull Context context, @NonNull Executor executor,
+            @NonNull CompressMode compressMode, long maxSize) {
+        StorageImageCache cache = new StorageImageCache(context, compressMode, maxSize);
+        cache.setExecutor(executor);
+        return cache;
+    }
+
+    /**
      * Storage cache with specified directory
      *
      * @param directory Directory
@@ -367,5 +386,22 @@ public final class DataUtils {
     public static ImageCache storageCache(@NonNull File directory,
             @NonNull CompressMode compressMode, long maxSize) {
         return new StorageImageCache(directory, compressMode, maxSize);
+    }
+
+    /**
+     * Storage cache with specified directory, maximum size and compress mode
+     *
+     * @param executor     Executor (only one thread will be used)
+     * @param directory    Directory
+     * @param compressMode Compress mode
+     * @param maxSize      Maximum size in bytes
+     * @see CompressMode
+     */
+    @NonNull
+    public static ImageCache storageCache(@NonNull Executor executor, @NonNull File directory,
+            @NonNull CompressMode compressMode, long maxSize) {
+        StorageImageCache cache = new StorageImageCache(directory, compressMode, maxSize);
+        cache.setExecutor(executor);
+        return cache;
     }
 }
