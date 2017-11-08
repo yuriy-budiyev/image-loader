@@ -32,9 +32,11 @@ final class ByteBuffer extends OutputStream {
     private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;
     private byte[] mArray;
     private int mSize;
+    private int mInc;
 
     public ByteBuffer(int size) {
         mArray = new byte[size];
+        mInc = size;
     }
 
     @Override
@@ -53,6 +55,7 @@ final class ByteBuffer extends OutputStream {
 
     private void grow(int capacity) {
         if (capacity - mArray.length > 0) {
+            capacity = Math.max(mSize + mInc, capacity);
             int newCapacity = mArray.length << 1;
             if (newCapacity - capacity < 0) {
                 newCapacity = capacity;

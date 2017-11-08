@@ -112,7 +112,7 @@ final class StorageImageCache implements ImageCache {
         if (file.exists()) {
             file.delete();
         }
-        ByteBuffer outputBuffer = new ByteBuffer(InternalUtils.BUFFER_SIZE);
+        ByteBuffer outputBuffer = InternalUtils.byteBuffer();
         if (value.compress(mCompressMode.getFormat(), mCompressMode.getQuality(), outputBuffer)) {
             if (InternalUtils.writeBytes(file, outputBuffer.getArray(), outputBuffer.getSize())) {
                 trim();
