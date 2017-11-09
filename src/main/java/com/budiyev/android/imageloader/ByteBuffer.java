@@ -52,8 +52,9 @@ final class ByteBuffer extends OutputStream {
     }
 
     private void grow(int capacity) {
-        if (capacity > mArray.length) {
-            int c = mArray.length * 2;
+        int length = mArray.length;
+        if (capacity > length) {
+            int c = length * 2;
             if (c < capacity) {
                 c = capacity;
             }
