@@ -51,6 +51,15 @@ final class ByteBuffer extends OutputStream {
         mSize += length;
     }
 
+    @NonNull
+    public byte[] getArray() {
+        return mArray;
+    }
+
+    public int getSize() {
+        return mSize;
+    }
+
     private void grow(int capacity) {
         int length = mArray.length;
         if (capacity > length) {
@@ -63,14 +72,5 @@ final class ByteBuffer extends OutputStream {
             }
             mArray = Arrays.copyOf(mArray, c);
         }
-    }
-
-    @NonNull
-    public byte[] getArray() {
-        return mArray;
-    }
-
-    public int getSize() {
-        return mSize;
     }
 }
