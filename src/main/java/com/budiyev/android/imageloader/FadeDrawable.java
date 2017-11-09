@@ -47,6 +47,7 @@ final class FadeDrawable extends LayerDrawable {
     private final int mEndAlpha;
     private long mStartTime;
     private int mFadeState = STATE_IDLE;
+    private boolean mIgnoreInvalidation;
 
     public FadeDrawable(@NonNull Drawable startDrawable, @NonNull Drawable endDrawable,
             long fadeDuration, @NonNull Handler mainThreadHandler,
@@ -70,12 +71,14 @@ final class FadeDrawable extends LayerDrawable {
                 break;
             }
             case STATE_RUNNING: {
+                mIgnoreInvalidation = true;
                 long elapsed = SystemClock.uptimeMillis() - mStartTime;
                 int startAlpha = mStartAlpha - (int) (mStartAlpha * elapsed / mFadeDuration);
                 int endAlpha = (int) (mEndAlpha * elapsed / mFadeDuration);
                 Drawable startDrawable = getDrawable(START_DRAWABLE);
                 Drawable endDrawable = getDrawable(END_DRAWABLE);
-                if (startAlpha <= 0 || endAlpha >= mEndAlpha) {
+                boolean done = startAlpha <= 0 || endAlpha >= mEndAlpha;
+                if (done) {
                     mFadeState = STATE_DONE;
                     endDrawable.setAlpha(mEndAlpha);
                     endDrawable.draw(canvas);
@@ -88,6 +91,9 @@ final class FadeDrawable extends LayerDrawable {
                     startDrawable.draw(canvas);
                     endDrawable.setAlpha(endAlpha);
                     endDrawable.draw(canvas);
+                }
+                mIgnoreInvalidation = false;
+                if (!done) {
                     invalidateSelf();
                 }
                 break;
@@ -96,6 +102,20 @@ final class FadeDrawable extends LayerDrawable {
                 getDrawable(END_DRAWABLE).draw(canvas);
                 break;
             }
+        }
+    }
+
+    @Override
+    public void invalidateSelf() {
+        if (!mIgnoreInvalidation) {
+            super.invalidateSelf();
+        }
+    }
+
+    @Override
+    public void invalidateDrawable(@NonNull Drawable drawable) {
+        if (!mIgnoreInvalidation) {
+            super.invalidateDrawable(drawable);
         }
     }
 
