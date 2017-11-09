@@ -63,14 +63,14 @@ final class ByteBuffer extends OutputStream {
     private void grow(int capacity) {
         int length = mArray.length;
         if (capacity > length) {
-            int c = length * 2;
-            if (c < capacity) {
-                c = capacity;
+            length *= 2;
+            if (length < capacity) {
+                length = capacity;
             }
-            if (c > MAX_ARRAY_SIZE) {
-                c = (capacity > MAX_ARRAY_SIZE) ? Integer.MAX_VALUE : MAX_ARRAY_SIZE;
+            if (length > MAX_ARRAY_SIZE) {
+                length = (capacity > MAX_ARRAY_SIZE) ? Integer.MAX_VALUE : MAX_ARRAY_SIZE;
             }
-            mArray = Arrays.copyOf(mArray, c);
+            mArray = Arrays.copyOf(mArray, length);
         }
     }
 }
