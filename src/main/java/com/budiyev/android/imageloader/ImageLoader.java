@@ -285,19 +285,21 @@ public final class ImageLoader<T> {
     /**
      * Whether to enable fade effect for images that isn't cached in memory,
      * supported on API 19+
+     *
+     * @see #setFadeDuration(long)
      */
     public void setFadeEnabled(boolean fadeEnabled) {
         mFadeEnabled = fadeEnabled;
     }
 
     /**
-     * Whether to enable fade effect for images that isn't cached in memory,
-     * allows to specify fade effect duration,
+     * Fade effect duration in milliseconds,
      * supported on API 19+
+     *
+     * @see #setFadeEnabled(boolean)
      */
-    public void setFadeEnabled(boolean fadeEnabled, long duration) {
-        mFadeEnabled = fadeEnabled;
-        mFadeDuration = duration;
+    public void setFadeDuration(long fadeDuration) {
+        mFadeDuration = fadeDuration;
     }
 
     /**
