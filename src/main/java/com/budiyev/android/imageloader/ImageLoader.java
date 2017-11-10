@@ -60,8 +60,8 @@ public final class ImageLoader<T> {
     private final LoadCallback<T> mLoadCallback;
     private final DisplayCallback<T> mDisplayCallback;
     private final ErrorCallback<T> mErrorCallback;
-    private final boolean mFadeEnabled;
-    private final long mFadeDuration;
+    private volatile boolean mFadeEnabled;
+    private volatile long mFadeDuration;
 
     /**
      * @see Builder
@@ -280,6 +280,24 @@ public final class ImageLoader<T> {
      */
     public void setPauseLoading(boolean paused) {
         mPauseLock.setPaused(paused);
+    }
+
+    /**
+     * Whether to enable fade effect for images that isn't cached in memory,
+     * supported on API 19+
+     */
+    public void setFadeEnabled(boolean fadeEnabled) {
+        mFadeEnabled = fadeEnabled;
+    }
+
+    /**
+     * Whether to enable fade effect for images that isn't cached in memory,
+     * allows to specify fade effect duration,
+     * supported on API 19+
+     */
+    public void setFadeEnabled(boolean fadeEnabled, long duration) {
+        mFadeEnabled = fadeEnabled;
+        mFadeDuration = duration;
     }
 
     /**
@@ -546,6 +564,16 @@ public final class ImageLoader<T> {
 
         /**
          * Whether to enable fade effect for images that isn't cached in memory,
+         * supported on API 19+
+         */
+        @NonNull
+        public Builder<T> fade(boolean enabled) {
+            mFadeEnabled = enabled;
+            return this;
+        }
+
+        /**
+         * Whether to enable fade effect for images that isn't cached in memory,
          * allows to specify fade effect duration,
          * supported on API 19+
          */
@@ -553,16 +581,6 @@ public final class ImageLoader<T> {
         public Builder<T> fade(boolean enabled, long duration) {
             mFadeEnabled = enabled;
             mFadeDuration = duration;
-            return this;
-        }
-
-        /**
-         * Whether to enable fade effect for images that isn't cached in memory,
-         * supported on API 19+
-         */
-        @NonNull
-        public Builder<T> fade(boolean enabled) {
-            mFadeEnabled = enabled;
             return this;
         }
 
