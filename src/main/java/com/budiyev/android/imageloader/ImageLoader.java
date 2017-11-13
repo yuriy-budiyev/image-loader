@@ -63,8 +63,8 @@ public final class ImageLoader<T> {
     private final LoadCallback<T> mLoadCallback;
     private final DisplayCallback<T> mDisplayCallback;
     private final ErrorCallback<T> mErrorCallback;
-    private volatile boolean mFadeEnabled;
-    private volatile long mFadeDuration;
+    private final boolean mFadeEnabled;
+    private final long mFadeDuration;
 
     /**
      * @see Builder
@@ -101,74 +101,6 @@ public final class ImageLoader<T> {
     }
 
     /**
-     * Load image into view from specified {@code data}, using default {@link DataDescriptor},
-     * {@code data}'s toString() method will be used for key generation, any characters allowed
-     *
-     * @param data Source data
-     * @param view Image view
-     */
-    @MainThread
-    public void load(@NonNull T data, @NonNull ImageView view) {
-        load(new StringDataDescriptor<>(data), view, mFadeEnabled, mFadeDuration, mLoadCallback,
-                mDisplayCallback, mErrorCallback);
-    }
-
-    /**
-     * Load image into view from specified {@code data}, using default {@link DataDescriptor},
-     * {@code data}'s toString() method will be used for key generation, any characters allowed
-     *
-     * @param data Source data
-     * @param view Image view
-     */
-    @MainThread
-    public void load(@NonNull T data, @NonNull ImageView view, boolean fadeEnabled,
-            long fadeDuration) {
-        load(new StringDataDescriptor<>(data), view, fadeEnabled, fadeDuration, mLoadCallback,
-                mDisplayCallback, mErrorCallback);
-    }
-
-    /**
-     * Load image into view from specified {@code data}, using default {@link DataDescriptor},
-     * {@code data}'s toString() method will be used for key generation, any characters allowed,
-     * override callbacks, specified in builder
-     *
-     * @param data            Source data
-     * @param view            Image view
-     * @param loadCallback    Load callback
-     * @param displayCallback Display callback
-     * @param errorCallback   Error callback
-     */
-    @MainThread
-    public void load(@NonNull T data, @NonNull ImageView view,
-            @Nullable LoadCallback<T> loadCallback, @Nullable DisplayCallback<T> displayCallback,
-            @Nullable ErrorCallback<T> errorCallback) {
-        load(new StringDataDescriptor<>(data), view, mFadeEnabled, mFadeDuration, loadCallback,
-                displayCallback, errorCallback);
-    }
-
-    /**
-     * Load image into view from specified {@code data}, using default {@link DataDescriptor},
-     * {@code data}'s toString() method will be used for key generation, any characters allowed,
-     * override callbacks, specified in builder
-     *
-     * @param data            Source data
-     * @param view            Image view
-     * @param loadCallback    Load callback
-     * @param displayCallback Display callback
-     * @param errorCallback   Error callback
-     * @param fadeEnabled     Whether to enable or disable fade effect
-     * @param fadeDuration    Duration of fade effect if it's enabled
-     */
-    @MainThread
-    public void load(@NonNull T data, @NonNull ImageView view, boolean fadeEnabled,
-            long fadeDuration, @Nullable LoadCallback<T> loadCallback,
-            @Nullable DisplayCallback<T> displayCallback,
-            @Nullable ErrorCallback<T> errorCallback) {
-        load(new StringDataDescriptor<>(data), view, fadeEnabled, fadeDuration, loadCallback,
-                displayCallback, errorCallback);
-    }
-
-    /**
      * Load image into view from specified {@link DataDescriptor}
      *
      * @param descriptor Source data descriptor
@@ -176,66 +108,64 @@ public final class ImageLoader<T> {
      */
     @MainThread
     public void load(@NonNull DataDescriptor<T> descriptor, @NonNull ImageView view) {
-        load(descriptor, view, mFadeEnabled, mFadeDuration, mLoadCallback, mDisplayCallback,
-                mErrorCallback);
+        load(descriptor, view, mBitmapTransformation, mLoadCallback, mErrorCallback,
+                mDisplayCallback, mFadeEnabled, mFadeDuration);
     }
 
     /**
      * Load image into view from specified {@link DataDescriptor}
      *
-     * @param descriptor Source data descriptor
-     * @param view       Image view
+     * @param descriptor     Source data descriptor
+     * @param view           Image view
+     * @param transformation Bitmap transformation
      */
     @MainThread
     public void load(@NonNull DataDescriptor<T> descriptor, @NonNull ImageView view,
-            boolean fadeEnabled, long fadeDuration) {
-        load(descriptor, view, fadeEnabled, fadeDuration, mLoadCallback, mDisplayCallback,
-                mErrorCallback);
+            @Nullable BitmapTransformation<T> transformation) {
+        load(descriptor, view, transformation, mLoadCallback, mErrorCallback, mDisplayCallback,
+                mFadeEnabled, mFadeDuration);
     }
 
     /**
-     * Load image into view from specified {@link DataDescriptor},
-     * override callbacks, specified in builder
+     * Load image into view from specified {@link DataDescriptor}
      *
-     * @param descriptor      Source data descriptor
-     * @param view            Image view
-     * @param loadCallback    Load callback
-     * @param displayCallback Display callback
-     * @param errorCallback   Error callback
+     * @param descriptor     Source data descriptor
+     * @param view           Image view
+     * @param transformation Bitmap transformation
      */
     @MainThread
     public void load(@NonNull DataDescriptor<T> descriptor, @NonNull ImageView view,
-            @Nullable LoadCallback<T> loadCallback, @Nullable DisplayCallback<T> displayCallback,
-            @Nullable ErrorCallback<T> errorCallback) {
-        load(descriptor, view, mFadeEnabled, mFadeDuration, loadCallback, displayCallback,
-                errorCallback);
+            @Nullable BitmapTransformation<T> transformation,
+            @Nullable LoadCallback<T> loadCallback, @Nullable ErrorCallback<T> errorCallback,
+            @Nullable DisplayCallback<T> displayCallback) {
+        load(descriptor, view, transformation, loadCallback, errorCallback, displayCallback,
+                mFadeEnabled, mFadeDuration);
     }
 
     /**
-     * Load image into view from specified {@link DataDescriptor},
-     * override callbacks, specified in builder
+     * Load image into view from specified {@link DataDescriptor}
      *
      * @param descriptor      Source data descriptor
      * @param view            Image view
+     * @param transformation  Bitmap transformation
      * @param loadCallback    Load callback
-     * @param displayCallback Display callback
      * @param errorCallback   Error callback
+     * @param displayCallback Display callback
      * @param fadeEnabled     Whether to enable or disable fade effect
      * @param fadeDuration    Duration of fade effect if it's enabled
      */
     @MainThread
     public void load(@NonNull DataDescriptor<T> descriptor, @NonNull ImageView view,
-            boolean fadeEnabled, long fadeDuration, @Nullable LoadCallback<T> loadCallback,
-            @Nullable DisplayCallback<T> displayCallback,
-            @Nullable ErrorCallback<T> errorCallback) {
+            @Nullable BitmapTransformation<T> transformation,
+            @Nullable LoadCallback<T> loadCallback, @Nullable ErrorCallback<T> errorCallback,
+            @Nullable DisplayCallback<T> displayCallback, boolean fadeEnabled, long fadeDuration) {
         Bitmap image = null;
         String key = descriptor.getKey();
         ImageCache memoryCache = mMemoryCache;
-        BitmapTransformation<T> bitmapTransformation = mBitmapTransformation;
         T data = descriptor.getData();
         if (memoryCache != null) {
-            if (bitmapTransformation != null) {
-                image = memoryCache.get(key + bitmapTransformation.getKey(data));
+            if (transformation != null) {
+                image = memoryCache.get(key + transformation.getKey(data));
             } else {
                 image = memoryCache.get(key);
             }
@@ -275,38 +205,10 @@ public final class ImageLoader<T> {
         DisplayImageAction<T> action =
                 new DisplayImageAction<>(context, descriptor, mBitmapLoader, mPauseLock,
                         mStorageCache, loadCallback, errorCallback, mMainThreadHandler,
-                        bitmapTransformation, memoryCache, displayCallback, view, placeholder,
+                        transformation, memoryCache, displayCallback, view, placeholder,
                         errorDrawable, fadeEnabled, fadeDuration);
         view.setImageDrawable(new PlaceholderDrawable(placeholder, action));
         action.execute(mExecutor);
-    }
-
-    /**
-     * Load image from specified {@code data}, using default {@link DataDescriptor},
-     * {@code data}'s toString() method will be used for key generation, any characters allowed,
-     * memory cache is not used
-     *
-     * @param data Source data
-     */
-    @AnyThread
-    public void load(@NonNull T data) {
-        load(new StringDataDescriptor<>(data), mLoadCallback, mErrorCallback);
-    }
-
-    /**
-     * Load image from specified {@code data}, using default {@link DataDescriptor},
-     * {@code data}'s toString() method will be used for key generation, any characters allowed,
-     * override callbacks, specified in builder,
-     * memory cache is not used
-     *
-     * @param data          Source data
-     * @param loadCallback  Load callback
-     * @param errorCallback Error callback
-     */
-    @AnyThread
-    public void load(@NonNull T data, @Nullable LoadCallback<T> loadCallback,
-            @Nullable ErrorCallback<T> errorCallback) {
-        load(new StringDataDescriptor<>(data), loadCallback, errorCallback);
     }
 
     /**
@@ -332,14 +234,6 @@ public final class ImageLoader<T> {
             @Nullable ErrorCallback<T> errorCallback) {
         new LoadImageAction<>(mContext, descriptor, mBitmapLoader, mPauseLock, mMemoryCache,
                 mStorageCache, loadCallback, errorCallback).execute(mExecutor);
-    }
-
-    /**
-     * Delete cached image for specified {@code data}, using default {@link DataDescriptor},
-     * {@code data}'s toString() method will be used for key generation, any characters allowed
-     */
-    public void invalidate(@NonNull T data) {
-        invalidate(new StringDataDescriptor<>(data));
     }
 
     /**
@@ -373,23 +267,65 @@ public final class ImageLoader<T> {
     }
 
     /**
-     * Whether to enable fade effect for images that isn't cached in memory,
-     * supported on API 19+
-     *
-     * @see #setFadeDuration(long)
+     * Bitmap transformation, specified in builder
      */
-    public void setFadeEnabled(boolean fadeEnabled) {
-        mFadeEnabled = fadeEnabled;
+    @Nullable
+    public BitmapTransformation<T> getBitmapTransformation() {
+        return mBitmapTransformation;
     }
 
     /**
-     * Fade effect duration in milliseconds,
-     * supported on API 19+
-     *
-     * @see #setFadeEnabled(boolean)
+     * Placeholder provider, specified in builder
      */
-    public void setFadeDuration(long fadeDuration) {
-        mFadeDuration = fadeDuration;
+    @Nullable
+    public PlaceholderProvider<T> getPlaceholderProvider() {
+        return mPlaceholderProvider;
+    }
+
+    /**
+     * Error drawable provider, specified in builder
+     */
+    @Nullable
+    public ErrorDrawableProvider<T> getErrorDrawableProvider() {
+        return mErrorDrawableProvider;
+    }
+
+    /**
+     * Load callback, specified in builder
+     */
+    @Nullable
+    public LoadCallback<T> getLoadCallback() {
+        return mLoadCallback;
+    }
+
+    /**
+     * Display callback, specified in builder
+     */
+    @Nullable
+    public DisplayCallback<T> getDisplayCallback() {
+        return mDisplayCallback;
+    }
+
+    /**
+     * Error callback, specified in builder
+     */
+    @Nullable
+    public ErrorCallback<T> getErrorCallback() {
+        return mErrorCallback;
+    }
+
+    /**
+     * Whether if fade effect is enabled for images that isn't cached in memory
+     */
+    public boolean isFadeEnabled() {
+        return mFadeEnabled;
+    }
+
+    /**
+     * Fade effect duration in milliseconds
+     */
+    public long getFadeDuration() {
+        return mFadeDuration;
     }
 
     /**
