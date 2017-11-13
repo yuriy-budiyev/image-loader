@@ -346,9 +346,14 @@ public final class ImageLoader<T> {
         clearStorageCache();
     }
 
+    void runOnMainThread(@NonNull Runnable action) {
+        mMainThreadHandler.post(action);
+    }
+
     @NonNull
-    Context getContext() {
-        return mContext;
+    @AnyThread
+    public static LoadImageRequest with(@NonNull Context context) {
+        return new LoadImageRequest(context);
     }
 
     /**
