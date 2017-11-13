@@ -129,12 +129,22 @@ public final class LoadImageRequest {
     }
 
     /**
-     * Whether to enable fade effect for images that isn't cached in memory,
+     * Enable fade effect for images that isn't cached in memory,
      * supported on API 19+
      */
     @NonNull
-    public LoadImageRequest fade(boolean enabled) {
-        mFadeEnabled = enabled;
+    public LoadImageRequest fade() {
+        mFadeEnabled = true;
+        return this;
+    }
+
+    /**
+     * Disable fade effect for images that isn't cached in memory,
+     * supported on API 19+
+     */
+    @NonNull
+    public LoadImageRequest noFade() {
+        mFadeEnabled = true;
         return this;
     }
 
