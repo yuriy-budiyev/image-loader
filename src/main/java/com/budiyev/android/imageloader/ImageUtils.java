@@ -509,6 +509,7 @@ public final class ImageUtils {
         private final String mKey;
 
         private RotateTransformation(float angle) {
+            angle = angle % 360f;
             mAngle = angle;
             mKey = "_rotate_" + angle;
         }
