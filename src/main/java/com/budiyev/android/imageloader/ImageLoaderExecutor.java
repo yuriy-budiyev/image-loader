@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit;
 final class ImageLoaderExecutor extends ThreadPoolExecutor {
     public ImageLoaderExecutor(int poolSize) {
         super(poolSize, poolSize, 0L, TimeUnit.NANOSECONDS, new LinkedBlockingQueue<Runnable>(),
-                new ImageLoaderThreadFactory(), new ThreadPoolExecutor.DiscardPolicy());
+                new ImageLoaderThreadFactory(), new DiscardPolicy());
     }
 
     @Override

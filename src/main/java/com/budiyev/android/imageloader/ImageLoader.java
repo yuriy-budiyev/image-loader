@@ -165,7 +165,7 @@ public final class ImageLoader<T> {
         T data = descriptor.getData();
         if (memoryCache != null) {
             if (transformation != null) {
-                image = memoryCache.get(key + transformation.getKey());
+                image = memoryCache.get(key + transformation.getKey(data));
             } else {
                 image = memoryCache.get(key);
             }

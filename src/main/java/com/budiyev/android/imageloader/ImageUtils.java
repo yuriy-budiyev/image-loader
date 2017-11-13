@@ -413,7 +413,7 @@ public final class ImageUtils {
 
         @NonNull
         @Override
-        public String getKey() {
+        public String getKey(@NonNull Object data) {
             return "_invert_colors";
         }
     }
@@ -428,7 +428,7 @@ public final class ImageUtils {
 
         @NonNull
         @Override
-        public String getKey() {
+        public String getKey(@NonNull Object data) {
             return "_gray_scale";
         }
     }
@@ -451,7 +451,7 @@ public final class ImageUtils {
 
         @NonNull
         @Override
-        public String getKey() {
+        public String getKey(@NonNull Object data) {
             return mKey;
         }
     }
@@ -467,7 +467,7 @@ public final class ImageUtils {
 
         @NonNull
         @Override
-        public String getKey() {
+        public String getKey(@NonNull Object data) {
             return "_mirror_horizontally";
         }
     }
@@ -483,7 +483,7 @@ public final class ImageUtils {
 
         @NonNull
         @Override
-        public String getKey() {
+        public String getKey(@NonNull Object data) {
             return "_mirror_vertically";
         }
     }
@@ -506,7 +506,7 @@ public final class ImageUtils {
 
         @NonNull
         @Override
-        public String getKey() {
+        public String getKey(@NonNull Object data) {
             return mKey;
         }
     }
@@ -538,8 +538,44 @@ public final class ImageUtils {
 
         @NonNull
         @Override
-        public String getKey() {
+        public String getKey(@NonNull Object data) {
             return mKey;
+        }
+    }
+
+    private static final class CropCenterTransformation implements BitmapTransformation<Object> {
+        private final int mWidth;
+        private final int mHeight;
+        private final String mKey;
+
+        private CropCenterTransformation(int width, int height) {
+            mWidth = width;
+            mHeight = height;
+            mKey = "_crop_center_" + width + "x" + height;
+        }
+
+        public CropCenterTransformation() {
+            mWidth = -1;
+            mHeight = -1;
+            mKey = "_crop_center_square";
+        }
+
+        @NonNull
+        @Override
+        public Bitmap transform(@NonNull Context context, @NonNull Object data,
+                @NonNull Bitmap bitmap) throws Throwable {
+            if (mWidth > 0 && mHeight > 0) {
+                return cropCenter(bitmap, mWidth, mHeight);
+            } else {
+                int size = Math.min(bitmap.getWidth(), bitmap.getHeight());
+                return cropCenter(bitmap, size, size);
+            }
+        }
+
+        @NonNull
+        @Override
+        public String getKey(@NonNull Object data) {
+            return null;
         }
     }
 }

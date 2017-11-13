@@ -85,7 +85,7 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
             }
             ImageCache memoryCache = getMemoryCache();
             if (memoryCache != null) {
-                memoryCache.put(descriptor.getKey() + bitmapTransformation.getKey(), image);
+                memoryCache.put(descriptor.getKey() + bitmapTransformation.getKey(data), image);
             }
         }
         if (isCancelled() || mView.get() == null) {

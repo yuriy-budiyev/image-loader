@@ -205,7 +205,7 @@ public final class LoadImageRequest {
         } else {
             BitmapTransformation<RequestImpl> transformation;
             if (mTransformations != null) {
-                transformation = new BitmapTransformationImpl(mTransformations);
+                transformation = new BitmapTransformationImpl(mTransformations, source);
             } else {
                 transformation = null;
             }
@@ -427,11 +427,12 @@ public final class LoadImageRequest {
         private final List<BitmapTransformation<Uri>> mTransformations;
         private final String mKey;
 
-        private BitmapTransformationImpl(@NonNull List<BitmapTransformation<Uri>> transformations) {
+        private BitmapTransformationImpl(@NonNull List<BitmapTransformation<Uri>> transformations,
+                @NonNull Uri data) {
             mTransformations = transformations;
             StringBuilder sb = new StringBuilder();
             for (BitmapTransformation<Uri> transformation : transformations) {
-                sb.append(transformation.getKey());
+                sb.append(transformation.getKey(data));
             }
             mKey = sb.toString();
         }
@@ -461,7 +462,7 @@ public final class LoadImageRequest {
 
         @NonNull
         @Override
-        public String getKey() {
+        public String getKey(@NonNull RequestImpl data) {
             return mKey;
         }
     }
