@@ -40,5 +40,6 @@ public interface BitmapProcessor<T> {
      */
     @NonNull
     @WorkerThread
-    Bitmap process(@NonNull Context context, @NonNull T data, @NonNull Bitmap bitmap);
+    Bitmap process(@NonNull Context context, @NonNull T data, @NonNull Bitmap bitmap)
+            throws Throwable;
 }

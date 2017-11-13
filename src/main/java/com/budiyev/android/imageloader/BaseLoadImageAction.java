@@ -129,6 +129,24 @@ abstract class BaseLoadImageAction<T> {
         return mCancelled;
     }
 
+    protected void notifyImageLoaded(@NonNull Context context, @NonNull T data,
+            @NonNull Bitmap image) {
+        LoadCallback<T> loadCallback = mLoadCallback;
+        if (loadCallback != null) {
+            loadCallback.onLoaded(context, data, image);
+        }
+        onImageLoaded(image);
+    }
+
+    protected void notifyError(@NonNull Context context, @NonNull T data,
+            @NonNull Throwable error) {
+        ErrorCallback<T> errorCallback = mErrorCallback;
+        if (errorCallback != null) {
+            errorCallback.onError(context, data, error);
+        }
+        onError(error);
+    }
+
     @WorkerThread
     private void loadImage() {
         while (!mCancelled && mPauseLock.isPaused()) {
@@ -171,23 +189,6 @@ abstract class BaseLoadImageAction<T> {
         if (storageCache != null) {
             storageCache.put(key, image);
         }
-    }
-
-    private void notifyImageLoaded(@NonNull Context context, @NonNull T data,
-            @NonNull Bitmap image) {
-        LoadCallback<T> loadCallback = mLoadCallback;
-        if (loadCallback != null) {
-            loadCallback.onLoaded(context, data, image);
-        }
-        onImageLoaded(image);
-    }
-
-    private void notifyError(@NonNull Context context, @NonNull T data, @NonNull Throwable error) {
-        ErrorCallback<T> errorCallback = mErrorCallback;
-        if (errorCallback != null) {
-            errorCallback.onError(context, data, error);
-        }
-        onError(error);
     }
 
     private final class LoadImageTask implements Callable<Void> {

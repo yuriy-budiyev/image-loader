@@ -23,19 +23,28 @@
  */
 package com.budiyev.android.imageloader;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.widget.ImageView;
 
 public final class LoadImageRequest {
-    private final ImageLoader<LoadImageRequest> mLoader;
+    private static final Lock LOADER_LOCK = new ReentrantLock();
+    private static volatile ImageLoader<RequestImpl> sLoader;
     private final Context mContext;
     private Uri mSource;
+    private ImageView mView;
 
-    LoadImageRequest(@NonNull ImageLoader<LoadImageRequest> loader) {
-        mLoader = loader;
-        mContext = loader.getContext();
+    LoadImageRequest(@NonNull Context context) {
+        mContext = context;
     }
 
     @NonNull
@@ -44,5 +53,73 @@ public final class LoadImageRequest {
         return this;
     }
 
+    @NonNull
+    public LoadImageRequest into(@Nullable ImageView view) {
+        mView = view;
+        return this;
+    }
 
+    @NonNull
+    private static ImageLoader<RequestImpl> getLoader(@NonNull Context context) {
+        ImageLoader<RequestImpl> loader = sLoader;
+        if (loader == null) {
+            LOADER_LOCK.lock();
+            try {
+                loader = sLoader;
+                if (loader == null) {
+                    loader = ImageLoader.builder(context).custom(new BitmapLoaderImpl())
+                            .memoryCache().storageCache().placeholder(new PlaceholderProviderImpl())
+                            .errorDrawable(new ErrorDrawableProviderImpl())
+                            .processor(new BitmapProcessorImpl()).build();
+                    sLoader = loader;
+                }
+            } finally {
+                LOADER_LOCK.unlock();
+            }
+        }
+        return loader;
+    }
+
+    private static final class RequestImpl implements BitmapLoader<RequestImpl> {
+        @Nullable
+        @Override
+        public Bitmap load(@NonNull Context context, @NonNull RequestImpl data) throws Throwable {
+
+            return null;
+        }
+    }
+
+    private static final class BitmapLoaderImpl implements BitmapLoader<RequestImpl> {
+        @Nullable
+        @Override
+        public Bitmap load(@NonNull Context context, @NonNull RequestImpl data) throws Throwable {
+            return null;
+        }
+    }
+
+    private static final class PlaceholderProviderImpl implements PlaceholderProvider<RequestImpl> {
+        @NonNull
+        @Override
+        public Drawable getPlaceholder(@NonNull Context context, @NonNull RequestImpl data) {
+            return new ColorDrawable(Color.TRANSPARENT);
+        }
+    }
+
+    private static final class ErrorDrawableProviderImpl
+            implements ErrorDrawableProvider<RequestImpl> {
+        @NonNull
+        @Override
+        public Drawable getErrorDrawable(@NonNull Context context, @NonNull RequestImpl data) {
+            return new ColorDrawable(Color.TRANSPARENT);
+        }
+    }
+
+    private static final class BitmapProcessorImpl implements BitmapProcessor<RequestImpl> {
+        @NonNull
+        @Override
+        public Bitmap process(@NonNull Context context, @NonNull RequestImpl data,
+                @NonNull Bitmap bitmap) throws Throwable {
+            return bitmap;
+        }
+    }
 }

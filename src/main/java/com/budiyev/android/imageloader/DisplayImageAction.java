@@ -81,7 +81,14 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
         }
         BitmapProcessor<T> bitmapProcessor = mBitmapProcessor;
         if (bitmapProcessor != null) {
-            image = bitmapProcessor.process(getContext(), descriptor.getData(), image);
+            Context context = getContext();
+            T data = descriptor.getData();
+            try {
+                image = bitmapProcessor.process(context, data, image);
+            } catch (Throwable error) {
+                notifyError(context, data, error);
+                return;
+            }
         }
         if (isCancelled() || mView.get() == null) {
             return;
