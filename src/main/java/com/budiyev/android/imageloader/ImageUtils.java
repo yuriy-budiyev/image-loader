@@ -177,7 +177,6 @@ public final class ImageUtils {
      * Rotate image by specified amount of degrees
      *
      * @param rotationAngle Amount of degrees
-     * @return Rotated image
      */
     @NonNull
     @SuppressWarnings("unchecked")
@@ -225,8 +224,6 @@ public final class ImageUtils {
     /**
      * Round image corners with maximum corner radius,
      * for square image will lead to circle result
-     *
-     * @return Image with rounded corners
      */
     @NonNull
     @SuppressWarnings("unchecked")
@@ -282,6 +279,25 @@ public final class ImageUtils {
             cropped.recycle();
         }
         return scaled;
+    }
+
+    /**
+     * Crop center of image in square proportions (1:1)
+     */
+    @NonNull
+    @SuppressWarnings("unchecked")
+    public static <T> BitmapTransformation<T> cropCenter() {
+        return (BitmapTransformation<T>) new CropCenterTransformation();
+    }
+
+    /**
+     * Crop center of image in proportions of {@code resultWidth} and {@code resultHeight}
+     * and, if needed, resize it to {@code resultWidth} x {@code resultHeight} size
+     */
+    @NonNull
+    @SuppressWarnings("unchecked")
+    public static <T> BitmapTransformation<T> cropCenter(int resultWidth, int resultHeight) {
+        return (BitmapTransformation<T>) new CropCenterTransformation(resultWidth, resultHeight);
     }
 
     /**
@@ -575,7 +591,7 @@ public final class ImageUtils {
         @NonNull
         @Override
         public String getKey(@NonNull Object data) {
-            return null;
+            return mKey;
         }
     }
 }
