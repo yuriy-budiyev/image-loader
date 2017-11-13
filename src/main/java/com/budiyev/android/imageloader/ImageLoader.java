@@ -107,6 +107,8 @@ public final class ImageLoader<T> {
      *
      * @param descriptor Source data descriptor
      * @param view       Image view
+     * @see DataDescriptor
+     * @see DataUtils#descriptor(Object)
      */
     @MainThread
     public void load(@NonNull DataDescriptor<T> descriptor, @NonNull ImageView view) {
@@ -120,6 +122,8 @@ public final class ImageLoader<T> {
      * @param descriptor     Source data descriptor
      * @param view           Image view
      * @param transformation Bitmap transformation
+     * @see DataDescriptor
+     * @see DataUtils#descriptor(Object)
      */
     @MainThread
     public void load(@NonNull DataDescriptor<T> descriptor, @NonNull ImageView view,
@@ -134,6 +138,8 @@ public final class ImageLoader<T> {
      * @param descriptor     Source data descriptor
      * @param view           Image view
      * @param transformation Bitmap transformation
+     * @see DataDescriptor
+     * @see DataUtils#descriptor(Object)
      */
     @MainThread
     public void load(@NonNull DataDescriptor<T> descriptor, @NonNull ImageView view,
@@ -155,6 +161,8 @@ public final class ImageLoader<T> {
      * @param displayCallback Display callback
      * @param fadeEnabled     Whether to enable or disable fade effect
      * @param fadeDuration    Duration of fade effect if it's enabled
+     * @see DataDescriptor
+     * @see DataUtils#descriptor(Object)
      */
     @MainThread
     public void load(@NonNull DataDescriptor<T> descriptor, @NonNull ImageView view,
@@ -217,6 +225,8 @@ public final class ImageLoader<T> {
      * Load image from specified {@link DataDescriptor}
      *
      * @param descriptor Source data descriptor
+     * @see DataDescriptor
+     * @see DataUtils#descriptor(Object)
      */
     @AnyThread
     public void load(@NonNull DataDescriptor<T> descriptor) {
@@ -230,6 +240,8 @@ public final class ImageLoader<T> {
      * @param descriptor    Source data descriptor
      * @param loadCallback  Load callback
      * @param errorCallback Error callback
+     * @see DataDescriptor
+     * @see DataUtils#descriptor(Object)
      */
     @AnyThread
     public void load(@NonNull DataDescriptor<T> descriptor, @Nullable LoadCallback<T> loadCallback,
