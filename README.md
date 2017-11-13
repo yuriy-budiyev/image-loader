@@ -14,8 +14,27 @@ dependencies {
     implementation 'com.budiyev.android:image-loader:1.7.4'
 }
 ```
+### Basic usage sample
+Basic implementation automatically cares about memory caching storage caching
+
+```java
+public class MainActivity extends AppCompatActivity {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        ImageView view = findViewById(R.id.image_view);
+
+        ImageLoader.with(this).from("https://some.url/image")
+                .transform(ImageUtils.<Uri>cropCenter()).transform(ImageUtils.<Uri>roundCorners())
+                .into(view).load();
+    }
+}
+```
 
 ### Simple singleton implementation
+You can build your own loader using builder
+
 ```java
 /**
  * Simple image loader that automatically cares about memory and storage caching,
@@ -37,7 +56,7 @@ public final class MyImageLoader {
      */
     @MainThread
     public void load(@NonNull String url, @NonNull ImageView view) {
-        mLoader.load(Uri.parse(url), view);
+        mLoader.load(DataUtils.descriptor(Uri.parse(url)), view);
     }
 
     /**
@@ -74,7 +93,7 @@ public final class MyImageLoader {
     }
 }
 ```
-### Usage sample
+### Implementation usage sample
 ```java
 public class MainActivity extends AppCompatActivity {
     @Override
