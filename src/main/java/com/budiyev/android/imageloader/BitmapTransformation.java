@@ -49,10 +49,8 @@ public interface BitmapTransformation<T> {
 
     /**
      * Unique key that identifies concrete transformation
-     *
-     * @param data Source data
      */
     @NonNull
     @AnyThread
-    String getKey(@NonNull T data);
+    String getKey();
 }

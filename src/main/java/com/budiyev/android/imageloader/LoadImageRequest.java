@@ -58,7 +58,7 @@ public final class LoadImageRequest {
     private DisplayCallback<Uri> mDisplayCallback;
     private ErrorCallback<Uri> mErrorCallback;
     private ImageView mView;
-    private List<BitmapTransformation<Uri>> mProcessors;
+    private List<BitmapTransformation<Uri>> mTransformations;
     private boolean mFadeEnabled = true;
     private long mFadeDuration = 200L;
 
@@ -119,12 +119,12 @@ public final class LoadImageRequest {
      */
     @NonNull
     public LoadImageRequest transform(@NonNull BitmapTransformation<Uri> transformation) {
-        List<BitmapTransformation<Uri>> processors = mProcessors;
-        if (processors == null) {
-            processors = new ArrayList<>();
-            mProcessors = processors;
+        List<BitmapTransformation<Uri>> transformations = mTransformations;
+        if (transformations == null) {
+            transformations = new ArrayList<>();
+            mTransformations = transformations;
         }
-        processors.add(transformation);
+        transformations.add(transformation);
         return this;
     }
 
@@ -199,12 +199,19 @@ public final class LoadImageRequest {
         ImageLoader<RequestImpl> loader = getLoader(mContext);
         DataDescriptorImpl descriptor = new DataDescriptorImpl(
                 new RequestImpl(source, mPlaceholder, mErrorDrawable, mLoadCallback,
-                        mDisplayCallback, mErrorCallback, mProcessors));
+                        mDisplayCallback, mErrorCallback));
         if (view == null) {
             loader.load(descriptor);
         } else {
+            BitmapTransformation<RequestImpl> transformation;
+            if (mTransformations != null) {
+                transformation = new BitmapTransformationImpl(mTransformations);
+            } else {
+                transformation = null;
+            }
             loader.runOnMainThread(
-                    new LoadAction(loader, descriptor, view, mFadeEnabled, mFadeDuration));
+                    new LoadAction(loader, descriptor, transformation, view, mFadeEnabled,
+                            mFadeDuration));
         }
     }
 
@@ -219,7 +226,6 @@ public final class LoadImageRequest {
                     loader = ImageLoader.builder(context).custom(new BitmapLoaderImpl())
                             .memoryCache().storageCache().placeholder(new PlaceholderProviderImpl())
                             .errorDrawable(new ErrorDrawableProviderImpl())
-                            .transform(new BitmapTransformationImpl())
                             .onLoaded(new LoadCallbackImpl()).onError(new ErrorCallbackImpl())
                             .onDisplayed(new DisplayCallbackImpl()).build();
                     context.getApplicationContext()
@@ -236,15 +242,18 @@ public final class LoadImageRequest {
     private static final class LoadAction implements Runnable {
         private final ImageLoader<RequestImpl> mLoader;
         private final DataDescriptor<RequestImpl> mDescriptor;
+        private final BitmapTransformation<RequestImpl> mTransformation;
         private final ImageView mView;
         private final boolean mFadeEnabled;
         private final long mFadeDuration;
 
         private LoadAction(@NonNull ImageLoader<RequestImpl> loader,
-                @NonNull DataDescriptor<RequestImpl> descriptor, @NonNull ImageView view,
+                @NonNull DataDescriptor<RequestImpl> descriptor,
+                @Nullable BitmapTransformation<RequestImpl> transformation, @NonNull ImageView view,
                 boolean fadeEnabled, long fadeDuration) {
             mLoader = loader;
             mDescriptor = descriptor;
+            mTransformation = transformation;
             mView = view;
             mFadeEnabled = fadeEnabled;
             mFadeDuration = fadeDuration;
@@ -253,7 +262,9 @@ public final class LoadImageRequest {
         @Override
         @MainThread
         public void run() {
-            mLoader.load(mDescriptor, mView, mFadeEnabled, mFadeDuration);
+            mLoader.load(mDescriptor, mView, mTransformation, mLoader.getLoadCallback(),
+                    mLoader.getErrorCallback(), mLoader.getDisplayCallback(), mFadeEnabled,
+                    mFadeDuration);
         }
     }
 
@@ -289,15 +300,12 @@ public final class LoadImageRequest {
         private final LoadCallback<Uri> mLoadCallback;
         private final DisplayCallback<Uri> mDisplayCallback;
         private final ErrorCallback<Uri> mErrorCallback;
-        private final List<BitmapTransformation<Uri>> mProcessors;
-        private final String mTransformationKey;
 
 
         private RequestImpl(@NonNull Uri source, @Nullable Drawable placeholder,
                 @Nullable Drawable errorDrawable, @Nullable LoadCallback<Uri> loadCallback,
                 @Nullable DisplayCallback<Uri> displayCallback,
-                @Nullable ErrorCallback<Uri> errorCallback,
-                @Nullable List<BitmapTransformation<Uri>> processors) {
+                @Nullable ErrorCallback<Uri> errorCallback) {
             mSource = source;
             mKey = DataUtils.generateSHA256(source.toString());
             mPlaceholder = placeholder;
@@ -305,26 +313,16 @@ public final class LoadImageRequest {
             mLoadCallback = loadCallback;
             mDisplayCallback = displayCallback;
             mErrorCallback = errorCallback;
-            mProcessors = processors;
-            if (processors == null) {
-                mTransformationKey = "";
-            } else {
-                StringBuilder keyBuilder = new StringBuilder();
-                for (BitmapTransformation<Uri> processor : processors) {
-                    keyBuilder.append(processor.getKey(source));
-                }
-                mTransformationKey = keyBuilder.toString();
-            }
+        }
+
+        @NonNull
+        public Uri getSource() {
+            return mSource;
         }
 
         @NonNull
         private String getKey() {
             return mKey;
-        }
-
-        @NonNull
-        public String getTransformationKey() {
-            return mTransformationKey;
         }
 
         @Nullable
@@ -354,26 +352,6 @@ public final class LoadImageRequest {
         @Nullable
         private Drawable getErrorDrawable() {
             return mErrorDrawable;
-        }
-
-        @NonNull
-        private Bitmap process(@NonNull Context context, @NonNull Bitmap bitmap) throws Throwable {
-            List<BitmapTransformation<Uri>> processors = mProcessors;
-            if (processors == null) {
-                return bitmap;
-            }
-            boolean first = true;
-            for (BitmapTransformation<Uri> processor : processors) {
-                Bitmap processed = processor.transform(context, mSource, bitmap);
-                if (bitmap != processed) {
-                    if (!first && !bitmap.isRecycled()) {
-                        bitmap.recycle();
-                    }
-                    first = false;
-                }
-                bitmap = processed;
-            }
-            return bitmap;
         }
 
         private void onLoaded(@NonNull Context context, @NonNull Bitmap image) {
@@ -446,17 +424,45 @@ public final class LoadImageRequest {
 
     private static final class BitmapTransformationImpl
             implements BitmapTransformation<RequestImpl> {
-        @NonNull
-        @Override
-        public Bitmap transform(@NonNull Context context, @NonNull RequestImpl data,
-                @NonNull Bitmap bitmap) throws Throwable {
-            return data.process(context, bitmap);
+        private final List<BitmapTransformation<Uri>> mTransformations;
+        private final String mKey;
+
+        private BitmapTransformationImpl(@NonNull List<BitmapTransformation<Uri>> transformations) {
+            mTransformations = transformations;
+            StringBuilder sb = new StringBuilder();
+            for (BitmapTransformation<Uri> transformation : transformations) {
+                sb.append(transformation.getKey());
+            }
+            mKey = sb.toString();
         }
 
         @NonNull
         @Override
-        public String getKey(@NonNull RequestImpl data) {
-            return data.getTransformationKey();
+        public Bitmap transform(@NonNull Context context, @NonNull RequestImpl data,
+                @NonNull Bitmap bitmap) throws Throwable {
+            List<BitmapTransformation<Uri>> transformations = mTransformations;
+            if (transformations == null) {
+                return bitmap;
+            }
+            Uri source = data.getSource();
+            boolean first = true;
+            for (BitmapTransformation<Uri> transformation : transformations) {
+                Bitmap processed = transformation.transform(context, source, bitmap);
+                if (bitmap != processed) {
+                    if (!first && !bitmap.isRecycled()) {
+                        bitmap.recycle();
+                    }
+                    first = false;
+                }
+                bitmap = processed;
+            }
+            return bitmap;
+        }
+
+        @NonNull
+        @Override
+        public String getKey() {
+            return mKey;
         }
     }
 
