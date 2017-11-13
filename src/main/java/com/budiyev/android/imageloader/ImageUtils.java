@@ -282,7 +282,7 @@ public final class ImageUtils {
     }
 
     /**
-     * Crop center of image in square proportions (1:1)
+     * Crop center of image in square proportions (1:1), no resize
      */
     @NonNull
     @SuppressWarnings("unchecked")
@@ -346,6 +346,16 @@ public final class ImageUtils {
     }
 
     /**
+     * Fit image to specified frame ({@code resultWidth} x {@code resultHeight},
+     * image will be scaled if needed
+     */
+    @NonNull
+    @SuppressWarnings("unchecked")
+    public static <T> BitmapTransformation<T> fitCenter(int resultWidth, int resultHeight) {
+        return (BitmapTransformation<T>) new FitCenterTransformation(resultWidth, resultHeight);
+    }
+
+    /**
      * Scale image to fit specified frame ({@code resultWidth} x {@code resultHeight}).
      * If specified {@code resultWidth} and {@code resultHeight} are the same as or smaller than
      * the current width and height of the source image, the source image will be returned.
@@ -358,6 +368,16 @@ public final class ImageUtils {
     @NonNull
     public static Bitmap scaleToFit(@NonNull Bitmap image, int resultWidth, int resultHeight) {
         return scaleToFit(image, resultWidth, resultHeight, false);
+    }
+
+    /**
+     * Scale image to fit specified frame ({@code resultWidth} x {@code resultHeight})
+     */
+    @NonNull
+    @SuppressWarnings("unchecked")
+    public static <T> BitmapTransformation<T> scaleToFit(int resultWidth, int resultHeight) {
+        return (BitmapTransformation<T>) new ScaleToFitTransformation(resultWidth, resultHeight,
+                false);
     }
 
     /**
@@ -406,6 +426,18 @@ public final class ImageUtils {
                 return Bitmap.createScaledBitmap(image, fitWidth, resultHeight, true);
             }
         }
+    }
+
+    /**
+     * Scale image to fit specified frame ({@code resultWidth} x {@code resultHeight}),
+     * upscale image if needed if {@code upscale} set to true
+     */
+    @NonNull
+    @SuppressWarnings("unchecked")
+    public static <T> BitmapTransformation<T> scaleToFit(int resultWidth, int resultHeight,
+            boolean upscale) {
+        return (BitmapTransformation<T>) new ScaleToFitTransformation(resultWidth, resultHeight,
+                upscale);
     }
 
     private static int greatestCommonDivisor(int a, int b) {
