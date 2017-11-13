@@ -299,12 +299,14 @@ public final class LoadImageRequest {
             if (processors == null) {
                 return bitmap;
             }
+            boolean first = true;
             for (BitmapProcessor<Uri> processor : processors) {
                 Bitmap processed = processor.process(context, mSource, bitmap);
-                if (bitmap != processed && !bitmap.isRecycled()) {
+                if (!first && bitmap != processed && !bitmap.isRecycled()) {
                     bitmap.recycle();
                 }
                 bitmap = processed;
+                first = false;
             }
             return bitmap;
         }
