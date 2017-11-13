@@ -113,14 +113,17 @@ public final class ImageLoader<T> {
     }
 
     /**
-     * Load image into view from specified {@link DataDescriptor}
+     * Load image into view from specified {@code data}, using default {@link DataDescriptor},
+     * {@code data}'s toString() method will be used for key generation, any characters allowed
      *
-     * @param descriptor Source data descriptor
-     * @param view       Image view
+     * @param data Source data
+     * @param view Image view
      */
     @MainThread
-    public void load(@NonNull DataDescriptor<T> descriptor, @NonNull ImageView view) {
-        load(descriptor, view, mLoadCallback, mDisplayCallback, mErrorCallback);
+    public void load(@NonNull T data, @NonNull ImageView view, boolean fadeEnabled,
+            long fadeDuration) {
+        load(new StringDataDescriptor<>(data), view, fadeEnabled, fadeDuration, mLoadCallback,
+                mDisplayCallback, mErrorCallback);
     }
 
     /**
@@ -142,6 +145,52 @@ public final class ImageLoader<T> {
     }
 
     /**
+     * Load image into view from specified {@code data}, using default {@link DataDescriptor},
+     * {@code data}'s toString() method will be used for key generation, any characters allowed,
+     * override callbacks, specified in builder
+     *
+     * @param data            Source data
+     * @param view            Image view
+     * @param loadCallback    Load callback
+     * @param displayCallback Display callback
+     * @param errorCallback   Error callback
+     * @param fadeEnabled     Whether to enable or disable fade effect
+     * @param fadeDuration    Duration of fade effect if it's enabled
+     */
+    @MainThread
+    public void load(@NonNull T data, @NonNull ImageView view, boolean fadeEnabled,
+            long fadeDuration, @Nullable LoadCallback<T> loadCallback,
+            @Nullable DisplayCallback<T> displayCallback,
+            @Nullable ErrorCallback<T> errorCallback) {
+        load(new StringDataDescriptor<>(data), view, fadeEnabled, fadeDuration, loadCallback,
+                displayCallback, errorCallback);
+    }
+
+    /**
+     * Load image into view from specified {@link DataDescriptor}
+     *
+     * @param descriptor Source data descriptor
+     * @param view       Image view
+     */
+    @MainThread
+    public void load(@NonNull DataDescriptor<T> descriptor, @NonNull ImageView view) {
+        load(descriptor, view, mLoadCallback, mDisplayCallback, mErrorCallback);
+    }
+
+    /**
+     * Load image into view from specified {@link DataDescriptor}
+     *
+     * @param descriptor Source data descriptor
+     * @param view       Image view
+     */
+    @MainThread
+    public void load(@NonNull DataDescriptor<T> descriptor, @NonNull ImageView view,
+            boolean fadeEnabled, long fadeDuration) {
+        load(descriptor, view, fadeEnabled, fadeDuration, mLoadCallback, mDisplayCallback,
+                mErrorCallback);
+    }
+
+    /**
      * Load image into view from specified {@link DataDescriptor},
      * override callbacks, specified in builder
      *
@@ -154,6 +203,27 @@ public final class ImageLoader<T> {
     @MainThread
     public void load(@NonNull DataDescriptor<T> descriptor, @NonNull ImageView view,
             @Nullable LoadCallback<T> loadCallback, @Nullable DisplayCallback<T> displayCallback,
+            @Nullable ErrorCallback<T> errorCallback) {
+        load(descriptor, view, mFadeEnabled, mFadeDuration, loadCallback, displayCallback,
+                errorCallback);
+    }
+
+    /**
+     * Load image into view from specified {@link DataDescriptor},
+     * override callbacks, specified in builder
+     *
+     * @param descriptor      Source data descriptor
+     * @param view            Image view
+     * @param loadCallback    Load callback
+     * @param displayCallback Display callback
+     * @param errorCallback   Error callback
+     * @param fadeEnabled     Whether to enable or disable fade effect
+     * @param fadeDuration    Duration of fade effect if it's enabled
+     */
+    @MainThread
+    public void load(@NonNull DataDescriptor<T> descriptor, @NonNull ImageView view,
+            boolean fadeEnabled, long fadeDuration, @Nullable LoadCallback<T> loadCallback,
+            @Nullable DisplayCallback<T> displayCallback,
             @Nullable ErrorCallback<T> errorCallback) {
         Bitmap image = null;
         String key = descriptor.getKey();
@@ -198,7 +268,7 @@ public final class ImageLoader<T> {
                 new DisplayImageAction<>(context, descriptor, mBitmapLoader, mPauseLock,
                         mStorageCache, loadCallback, errorCallback, mMainThreadHandler,
                         mBitmapProcessor, memoryCache, displayCallback, view, placeholder,
-                        errorDrawable, mFadeEnabled, mFadeDuration);
+                        errorDrawable, fadeEnabled, fadeDuration);
         view.setImageDrawable(new PlaceholderDrawable(placeholder, action));
         action.execute(mExecutor);
     }

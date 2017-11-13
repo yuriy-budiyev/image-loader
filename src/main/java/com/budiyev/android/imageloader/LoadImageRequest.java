@@ -56,6 +56,8 @@ public final class LoadImageRequest {
     private ErrorCallback<Uri> mErrorCallback;
     private ImageView mView;
     private List<BitmapProcessor<Uri>> mProcessors;
+    private boolean mFadeEnabled = true;
+    private long mFadeDuration = 200L;
 
     LoadImageRequest(@NonNull Context context) {
         mContext = context;
@@ -101,6 +103,28 @@ public final class LoadImageRequest {
             mProcessors = processors;
         }
         processors.add(processor);
+        return this;
+    }
+
+    /**
+     * Whether to enable fade effect for images that isn't cached in memory,
+     * supported on API 19+
+     */
+    @NonNull
+    public LoadImageRequest fade(boolean enabled) {
+        mFadeEnabled = enabled;
+        return this;
+    }
+
+    /**
+     * Whether to enable fade effect for images that isn't cached in memory,
+     * allows to specify fade effect duration,
+     * supported on API 19+
+     */
+    @NonNull
+    public LoadImageRequest fade(boolean enabled, long duration) {
+        mFadeEnabled = enabled;
+        mFadeDuration = duration;
         return this;
     }
 
@@ -157,7 +181,8 @@ public final class LoadImageRequest {
         if (view == null) {
             loader.load(descriptor);
         } else {
-            loader.runOnMainThread(new LoadAction(loader, descriptor, view));
+            loader.runOnMainThread(
+                    new LoadAction(loader, descriptor, view, mFadeEnabled, mFadeDuration));
         }
     }
 
@@ -188,18 +213,23 @@ public final class LoadImageRequest {
         private final ImageLoader<RequestImpl> mLoader;
         private final DataDescriptor<RequestImpl> mDescriptor;
         private final ImageView mView;
+        private final boolean mFadeEnabled;
+        private final long mFadeDuration;
 
         private LoadAction(@NonNull ImageLoader<RequestImpl> loader,
-                @NonNull DataDescriptor<RequestImpl> descriptor, @NonNull ImageView view) {
+                @NonNull DataDescriptor<RequestImpl> descriptor, @NonNull ImageView view,
+                boolean fadeEnabled, long fadeDuration) {
             mLoader = loader;
             mDescriptor = descriptor;
             mView = view;
+            mFadeEnabled = fadeEnabled;
+            mFadeDuration = fadeDuration;
         }
 
         @Override
         @MainThread
         public void run() {
-            mLoader.load(mDescriptor, mView);
+            mLoader.load(mDescriptor, mView, mFadeEnabled, mFadeDuration);
         }
     }
 
