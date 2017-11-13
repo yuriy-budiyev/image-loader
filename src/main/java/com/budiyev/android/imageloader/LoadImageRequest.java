@@ -46,6 +46,9 @@ public final class LoadImageRequest {
     private Uri mSource;
     private Drawable mPlaceholder;
     private Drawable mErrorDrawable;
+    private LoadCallback<Uri> mLoadCallback;
+    private DisplayCallback<Uri> mDisplayCallback;
+    private ErrorCallback<Uri> mErrorCallback;
     private WeakReference<ImageView> mView;
 
     LoadImageRequest(@NonNull Context context) {
@@ -67,6 +70,33 @@ public final class LoadImageRequest {
     @NonNull
     public LoadImageRequest errorDrawable(@Nullable Drawable errorDrawable) {
         mErrorDrawable = errorDrawable;
+        return this;
+    }
+
+    /**
+     * Load callback
+     */
+    @NonNull
+    public LoadImageRequest onLoaded(@Nullable LoadCallback<Uri> callback) {
+        mLoadCallback = callback;
+        return this;
+    }
+
+    /**
+     * Error callback
+     */
+    @NonNull
+    public LoadImageRequest onError(@Nullable ErrorCallback<Uri> callback) {
+        mErrorCallback = callback;
+        return this;
+    }
+
+    /**
+     * Display callback
+     */
+    @NonNull
+    public LoadImageRequest onDisplayed(@Nullable DisplayCallback<Uri> callback) {
+        mDisplayCallback = callback;
         return this;
     }
 
@@ -158,6 +188,13 @@ public final class LoadImageRequest {
         public Bitmap process(@NonNull Context context, @NonNull LoadImageRequest data,
                 @NonNull Bitmap bitmap) throws Throwable {
             return bitmap;
+        }
+    }
+
+    private static final class LoadCallbackImpl implements LoadCallback<LoadImageRequest> {
+        @Override
+        public void onLoaded(@NonNull Context context, @NonNull LoadImageRequest data,
+                @NonNull Bitmap image) {
         }
     }
 }

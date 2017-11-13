@@ -631,20 +631,20 @@ public final class ImageLoader<T> {
         }
 
         /**
-         * Display callback
-         */
-        @NonNull
-        public Builder<T> onDisplayed(@Nullable DisplayCallback<T> callback) {
-            mDisplayCallback = callback;
-            return this;
-        }
-
-        /**
          * Error callback
          */
         @NonNull
         public Builder<T> onError(@Nullable ErrorCallback<T> callback) {
             mErrorCallback = callback;
+            return this;
+        }
+
+        /**
+         * Display callback
+         */
+        @NonNull
+        public Builder<T> onDisplayed(@Nullable DisplayCallback<T> callback) {
+            mDisplayCallback = callback;
             return this;
         }
 
