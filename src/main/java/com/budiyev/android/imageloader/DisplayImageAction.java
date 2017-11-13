@@ -117,7 +117,12 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
                     InternalUtils.getDisplayImageAction(view) != DisplayImageAction.this) {
                 return;
             }
-            view.setImageDrawable(errorDrawable);
+            if (mFadeEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                new FadeDrawable(mPlaceholder, errorDrawable, mFadeDuration, mMainThreadHandler,
+                        null);
+            } else {
+                view.setImageDrawable(errorDrawable);
+            }
         }
     }
 

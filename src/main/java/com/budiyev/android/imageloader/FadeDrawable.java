@@ -73,11 +73,10 @@ final class FadeDrawable extends LayerDrawable {
             case STATE_RUNNING: {
                 mIgnoreInvalidation = true;
                 long elapsed = SystemClock.uptimeMillis() - mStartTime;
-                int startAlpha = mStartAlpha - (int) (mStartAlpha * elapsed / mFadeDuration);
                 int endAlpha = (int) (mEndAlpha * elapsed / mFadeDuration);
                 Drawable startDrawable = getDrawable(START_DRAWABLE);
                 Drawable endDrawable = getDrawable(END_DRAWABLE);
-                boolean done = startAlpha <= 0 || endAlpha >= mEndAlpha;
+                boolean done = endAlpha >= mEndAlpha;
                 if (done) {
                     mFadeState = STATE_DONE;
                     endDrawable.setAlpha(mEndAlpha);
@@ -87,7 +86,9 @@ final class FadeDrawable extends LayerDrawable {
                         mMainThreadHandler.post(new CallbackAction(fadeCallback));
                     }
                 } else {
-                    startDrawable.setAlpha(startAlpha);
+                    startDrawable.setAlpha(
+                            Math.max(mStartAlpha - (int) (mStartAlpha * elapsed / mFadeDuration),
+                                    0));
                     startDrawable.draw(canvas);
                     endDrawable.setAlpha(endAlpha);
                     endDrawable.draw(canvas);
