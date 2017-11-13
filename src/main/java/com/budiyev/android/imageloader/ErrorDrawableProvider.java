@@ -27,6 +27,7 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 /**
  * Error drawable provider, provides a drawable that will be displayed when image,
@@ -40,7 +41,7 @@ public interface ErrorDrawableProvider<T> {
      * @param data    Data
      * @return Placeholder drawable
      */
-    @NonNull
+    @Nullable
     @MainThread
     Drawable getErrorDrawable(@NonNull Context context, @NonNull T data);
 }

@@ -23,11 +23,14 @@
  */
 package com.budiyev.android.imageloader;
 
+import java.io.InputStream;
+import java.lang.ref.WeakReference;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -38,10 +41,12 @@ import android.widget.ImageView;
 
 public final class LoadImageRequest {
     private static final Lock LOADER_LOCK = new ReentrantLock();
-    private static volatile ImageLoader<RequestImpl> sLoader;
+    private static volatile ImageLoader<LoadImageRequest> sLoader;
     private final Context mContext;
     private Uri mSource;
-    private ImageView mView;
+    private Drawable mPlaceholder;
+    private Drawable mErrorDrawable;
+    private WeakReference<ImageView> mView;
 
     LoadImageRequest(@NonNull Context context) {
         mContext = context;
@@ -54,14 +59,54 @@ public final class LoadImageRequest {
     }
 
     @NonNull
-    public LoadImageRequest into(@Nullable ImageView view) {
-        mView = view;
+    public LoadImageRequest placeholder(@Nullable Drawable placeholder) {
+        mPlaceholder = placeholder;
         return this;
     }
 
     @NonNull
-    private static ImageLoader<RequestImpl> getLoader(@NonNull Context context) {
-        ImageLoader<RequestImpl> loader = sLoader;
+    public LoadImageRequest errorDrawable(@Nullable Drawable errorDrawable) {
+        mErrorDrawable = errorDrawable;
+        return this;
+    }
+
+    @NonNull
+    public LoadImageRequest into(@Nullable ImageView view) {
+        mView = new WeakReference<>(view);
+        return this;
+    }
+
+    @Nullable
+    private Bitmap load() throws Throwable {
+        Uri source = mSource;
+        if (source == null) {
+            return null;
+        }
+        InputStream inputStream = null;
+        try {
+            inputStream = InternalUtils.getDataStreamFromUri(mContext, source);
+            if (inputStream == null) {
+                return null;
+            }
+            return BitmapFactory.decodeStream(inputStream);
+        } finally {
+            InternalUtils.close(inputStream);
+        }
+    }
+
+    @NonNull
+    private Drawable getPlaceholder() {
+        Drawable placeholder = mPlaceholder;
+        if (placeholder != null) {
+            return placeholder;
+        } else {
+            return new ColorDrawable(Color.TRANSPARENT);
+        }
+    }
+
+    @NonNull
+    private static ImageLoader<LoadImageRequest> getLoader(@NonNull Context context) {
+        ImageLoader<LoadImageRequest> loader = sLoader;
         if (loader == null) {
             LOADER_LOCK.lock();
             try {
@@ -80,44 +125,37 @@ public final class LoadImageRequest {
         return loader;
     }
 
-    private static final class RequestImpl implements BitmapLoader<RequestImpl> {
+    private static final class BitmapLoaderImpl implements BitmapLoader<LoadImageRequest> {
         @Nullable
         @Override
-        public Bitmap load(@NonNull Context context, @NonNull RequestImpl data) throws Throwable {
-
-            return null;
+        public Bitmap load(@NonNull Context context, @NonNull LoadImageRequest data)
+                throws Throwable {
+            return data.load();
         }
     }
 
-    private static final class BitmapLoaderImpl implements BitmapLoader<RequestImpl> {
-        @Nullable
-        @Override
-        public Bitmap load(@NonNull Context context, @NonNull RequestImpl data) throws Throwable {
-            return null;
-        }
-    }
-
-    private static final class PlaceholderProviderImpl implements PlaceholderProvider<RequestImpl> {
+    private static final class PlaceholderProviderImpl
+            implements PlaceholderProvider<LoadImageRequest> {
         @NonNull
         @Override
-        public Drawable getPlaceholder(@NonNull Context context, @NonNull RequestImpl data) {
-            return new ColorDrawable(Color.TRANSPARENT);
+        public Drawable getPlaceholder(@NonNull Context context, @NonNull LoadImageRequest data) {
+            return data.getPlaceholder();
         }
     }
 
     private static final class ErrorDrawableProviderImpl
-            implements ErrorDrawableProvider<RequestImpl> {
-        @NonNull
+            implements ErrorDrawableProvider<LoadImageRequest> {
+        @Nullable
         @Override
-        public Drawable getErrorDrawable(@NonNull Context context, @NonNull RequestImpl data) {
-            return new ColorDrawable(Color.TRANSPARENT);
+        public Drawable getErrorDrawable(@NonNull Context context, @NonNull LoadImageRequest data) {
+            return null;
         }
     }
 
-    private static final class BitmapProcessorImpl implements BitmapProcessor<RequestImpl> {
+    private static final class BitmapProcessorImpl implements BitmapProcessor<LoadImageRequest> {
         @NonNull
         @Override
-        public Bitmap process(@NonNull Context context, @NonNull RequestImpl data,
+        public Bitmap process(@NonNull Context context, @NonNull LoadImageRequest data,
                 @NonNull Bitmap bitmap) throws Throwable {
             return bitmap;
         }
