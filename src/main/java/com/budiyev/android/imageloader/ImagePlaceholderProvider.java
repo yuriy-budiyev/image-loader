@@ -41,7 +41,7 @@ final class ImagePlaceholderProvider<T> implements PlaceholderProvider<T> {
 
     @NonNull
     @Override
-    public Drawable get(@NonNull Context context, @NonNull T data) {
+    public Drawable getPlaceholder(@NonNull Context context, @NonNull T data) {
         return new BitmapDrawable(mResources, mBitmap);
     }
 }

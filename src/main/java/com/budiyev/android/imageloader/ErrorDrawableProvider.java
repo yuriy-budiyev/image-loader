@@ -29,12 +29,12 @@ import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 
 /**
- * Placeholder provider, provides a drawable that will be displayed while image,
- * associated with {@code data} is loading
+ * Error drawable provider, provides a drawable that will be displayed when image,
+ * associated with {@code data} couldn't be loaded
  */
-public interface PlaceholderProvider<T> {
+public interface ErrorDrawableProvider<T> {
     /**
-     * Get placeholder for data
+     * Get error drawable for data
      *
      * @param context Context
      * @param data    Data
@@ -42,5 +42,5 @@ public interface PlaceholderProvider<T> {
      */
     @NonNull
     @MainThread
-    Drawable getPlaceholder(@NonNull Context context, @NonNull T data);
+    Drawable getErrorDrawable(@NonNull Context context, @NonNull T data);
 }

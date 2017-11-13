@@ -179,7 +179,7 @@ public final class ImageLoader<T> {
             }
             currentAction.cancel();
         }
-        Drawable placeholder = mPlaceholderProvider.get(context, data);
+        Drawable placeholder = mPlaceholderProvider.getPlaceholder(context, data);
         DisplayImageAction<T> action =
                 new DisplayImageAction<>(context, descriptor, mBitmapLoader, mPauseLock,
                         mStorageCache, loadCallback, errorCallback, mMainThreadHandler,
