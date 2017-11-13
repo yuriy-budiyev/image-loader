@@ -453,7 +453,7 @@ public final class ImageUtils {
         private final ColorFilter mColorFilter;
         private final String mKey;
 
-        private ColorFilterTransformation(@NonNull ColorFilter colorFilter, @NonNull String name) {
+        public ColorFilterTransformation(@NonNull ColorFilter colorFilter, @NonNull String name) {
             mColorFilter = colorFilter;
             mKey = "_color_filter_" + name;
         }
@@ -508,7 +508,7 @@ public final class ImageUtils {
         private final float mAngle;
         private final String mKey;
 
-        private RotateTransformation(float angle) {
+        public RotateTransformation(float angle) {
             angle = angle % 360f;
             mAngle = angle;
             mKey = "_rotate_" + angle;
@@ -532,12 +532,12 @@ public final class ImageUtils {
         private final float mRadius;
         private final String mKey;
 
-        private RoundCornersTransformation(float radius) {
+        public RoundCornersTransformation(float radius) {
             mRadius = radius;
             mKey = "_round_corners_" + radius;
         }
 
-        private RoundCornersTransformation() {
+        public RoundCornersTransformation() {
             mRadius = -1f;
             mKey = "_round_corners_max";
         }
@@ -565,7 +565,7 @@ public final class ImageUtils {
         private final int mHeight;
         private final String mKey;
 
-        private CropCenterTransformation(int width, int height) {
+        public CropCenterTransformation(int width, int height) {
             mWidth = width;
             mHeight = height;
             mKey = "_crop_center_" + width + "x" + height;
@@ -587,6 +587,58 @@ public final class ImageUtils {
                 int size = Math.min(bitmap.getWidth(), bitmap.getHeight());
                 return cropCenter(bitmap, size, size);
             }
+        }
+
+        @NonNull
+        @Override
+        public String getKey(@NonNull Object data) {
+            return mKey;
+        }
+    }
+
+    private static final class FitCenterTransformation implements BitmapTransformation<Object> {
+        private final int mWidth;
+        private final int mHeight;
+        private final String mKey;
+
+        public FitCenterTransformation(int width, int height) {
+            mWidth = width;
+            mHeight = height;
+            mKey = "_fit_center_" + width + "x" + height;
+        }
+
+        @NonNull
+        @Override
+        public Bitmap transform(@NonNull Context context, @NonNull Object data,
+                @NonNull Bitmap bitmap) throws Throwable {
+            return fitCenter(bitmap, mWidth, mHeight);
+        }
+
+        @NonNull
+        @Override
+        public String getKey(@NonNull Object data) {
+            return mKey;
+        }
+    }
+
+    private static final class ScaleToFitTransformation implements BitmapTransformation<Object> {
+        private final int mWidth;
+        private final int mHeight;
+        private final boolean mUpscale;
+        private final String mKey;
+
+        public ScaleToFitTransformation(int width, int height, boolean upscale) {
+            mWidth = width;
+            mHeight = height;
+            mUpscale = upscale;
+            mKey = "_fit_center_" + upscale + "_" + width + "x" + height;
+        }
+
+        @NonNull
+        @Override
+        public Bitmap transform(@NonNull Context context, @NonNull Object data,
+                @NonNull Bitmap bitmap) throws Throwable {
+            return scaleToFit(bitmap, mWidth, mHeight, mUpscale);
         }
 
         @NonNull
