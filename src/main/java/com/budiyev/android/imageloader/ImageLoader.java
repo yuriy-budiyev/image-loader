@@ -346,6 +346,11 @@ public final class ImageLoader<T> {
         clearStorageCache();
     }
 
+    @NonNull
+    Context getContext() {
+        return mContext;
+    }
+
     /**
      * Create new image loader builder instance
      */
