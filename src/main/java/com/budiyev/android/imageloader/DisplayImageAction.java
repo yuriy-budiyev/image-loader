@@ -79,13 +79,13 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
             T data = descriptor.getData();
             try {
                 image = bitmapProcessor.process(context, data, image);
-                ImageCache memoryCache = getMemoryCache();
-                if (memoryCache != null) {
-                    memoryCache.put(descriptor.getKey() + bitmapProcessor.getKey(data), image);
-                }
             } catch (Throwable error) {
                 notifyError(context, data, error);
                 return;
+            }
+            ImageCache memoryCache = getMemoryCache();
+            if (memoryCache != null) {
+                memoryCache.put(descriptor.getKey() + bitmapProcessor.getKey(data), image);
             }
         }
         if (isCancelled() || mView.get() == null) {
