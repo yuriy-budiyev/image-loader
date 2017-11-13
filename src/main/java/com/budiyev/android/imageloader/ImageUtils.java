@@ -57,8 +57,9 @@ public final class ImageUtils {
      * Invert image colors
      */
     @NonNull
-    public static BitmapTransformation<?> invertColors() {
-        return new InvertColorsTransformation();
+    @SuppressWarnings("unchecked")
+    public static <T> BitmapTransformation<T> invertColors() {
+        return (BitmapTransformation<T>) new InvertColorsTransformation();
     }
 
     /**
@@ -78,8 +79,9 @@ public final class ImageUtils {
      * Convert image colors to gray-scale
      */
     @NonNull
-    public static BitmapTransformation<?> convertToGrayScale() {
-        return new GrayScaleTransformation();
+    @SuppressWarnings("unchecked")
+    public static <T> BitmapTransformation<T> convertToGrayScale() {
+        return (BitmapTransformation<T>) new GrayScaleTransformation();
     }
 
     /**
@@ -104,12 +106,13 @@ public final class ImageUtils {
      * Color filter
      *
      * @param colorFilter Color filter
-     * @param name        Identifier of this color filter transformation
+     * @param key         Identifier of this color filter transformation
      */
     @NonNull
-    public static BitmapTransformation<?> applyColorFilter(@NonNull ColorFilter colorFilter,
-            @NonNull String name) {
-        return new ColorFilterTransformation(colorFilter, name);
+    @SuppressWarnings("unchecked")
+    public static <T> BitmapTransformation<T> applyColorFilter(@NonNull ColorFilter colorFilter,
+            @NonNull String key) {
+        return (BitmapTransformation<T>) new ColorFilterTransformation(colorFilter, key);
     }
 
     /**
@@ -129,8 +132,9 @@ public final class ImageUtils {
      * Mirror image horizontally
      */
     @NonNull
-    public static BitmapTransformation<?> mirrorHorizontally() {
-        return new MirrorHorizontallyTransformation();
+    @SuppressWarnings("unchecked")
+    public static <T> BitmapTransformation<T> mirrorHorizontally() {
+        return (BitmapTransformation<T>) new MirrorHorizontallyTransformation();
     }
 
     /**
@@ -150,8 +154,9 @@ public final class ImageUtils {
      * Mirror image vertically
      */
     @NonNull
-    public static BitmapTransformation<?> mirrorVertically() {
-        return new MirrorVerticallyTransformation();
+    @SuppressWarnings("unchecked")
+    public static <T> BitmapTransformation<T> mirrorVertically() {
+        return (BitmapTransformation<T>) new MirrorVerticallyTransformation();
     }
 
     /**
@@ -175,8 +180,9 @@ public final class ImageUtils {
      * @return Rotated image
      */
     @NonNull
-    public static BitmapTransformation<?> rotate(float rotationAngle) {
-        return new RotateTransformation(rotationAngle);
+    @SuppressWarnings("unchecked")
+    public static <T> BitmapTransformation<T> rotate(float rotationAngle) {
+        return (BitmapTransformation<T>) new RotateTransformation(rotationAngle);
     }
 
     /**
@@ -211,8 +217,9 @@ public final class ImageUtils {
      * @return Image with rounded corners
      */
     @NonNull
-    public static BitmapTransformation<?> roundCorners(float cornerRadius) {
-        return new RoundCornersTransformation(cornerRadius);
+    @SuppressWarnings("unchecked")
+    public static <T> BitmapTransformation<T> roundCorners(float cornerRadius) {
+        return (BitmapTransformation<T>) new RoundCornersTransformation(cornerRadius);
     }
 
     /**
@@ -222,8 +229,9 @@ public final class ImageUtils {
      * @return Image with rounded corners
      */
     @NonNull
-    public static BitmapTransformation<?> roundCorners() {
-        return new RoundCornersTransformation();
+    @SuppressWarnings("unchecked")
+    public static <T> BitmapTransformation<T> roundCorners() {
+        return (BitmapTransformation<T>) new RoundCornersTransformation();
     }
 
     /**
