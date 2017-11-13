@@ -47,6 +47,7 @@ import android.widget.ImageView;
 /**
  * Image loader is a universal tool for loading bitmaps efficiently in Android
  *
+ * @see #with(Context)
  * @see Builder
  */
 public final class ImageLoader<T> {
@@ -67,6 +68,7 @@ public final class ImageLoader<T> {
     private final long mFadeDuration;
 
     /**
+     * @see #with(Context)
      * @see Builder
      */
     private ImageLoader(@NonNull Context context, @NonNull BitmapLoader<T> bitmapLoader,
@@ -362,6 +364,9 @@ public final class ImageLoader<T> {
         mMainThreadHandler.post(action);
     }
 
+    /**
+     * @param context Context
+     */
     @NonNull
     @AnyThread
     public static LoadImageRequest with(@NonNull Context context) {

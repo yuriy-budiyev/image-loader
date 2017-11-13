@@ -63,7 +63,7 @@ public final class LoadImageRequest {
     private long mFadeDuration = 200L;
 
     LoadImageRequest(@NonNull Context context) {
-        mContext = context;
+        mContext = context.getApplicationContext();
     }
 
     /**
