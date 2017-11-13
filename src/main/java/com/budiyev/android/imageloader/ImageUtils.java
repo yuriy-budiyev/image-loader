@@ -43,6 +43,127 @@ public final class ImageUtils {
 
     /**
      * Invert image colors
+     */
+    @NonNull
+    @SuppressWarnings("unchecked")
+    public static <T> BitmapTransformation<T> invertColors() {
+        return (BitmapTransformation<T>) new InvertColorsTransformation();
+    }
+
+    /**
+     * Convert image colors to gray-scale
+     */
+    @NonNull
+    @SuppressWarnings("unchecked")
+    public static <T> BitmapTransformation<T> convertToGrayScale() {
+        return (BitmapTransformation<T>) new GrayScaleTransformation();
+    }
+
+    /**
+     * Mirror image horizontally
+     */
+    @NonNull
+    @SuppressWarnings("unchecked")
+    public static <T> BitmapTransformation<T> mirrorHorizontally() {
+        return (BitmapTransformation<T>) new MirrorHorizontallyTransformation();
+    }
+
+    /**
+     * Mirror image vertically
+     */
+    @NonNull
+    @SuppressWarnings("unchecked")
+    public static <T> BitmapTransformation<T> mirrorVertically() {
+        return (BitmapTransformation<T>) new MirrorVerticallyTransformation();
+    }
+
+    /**
+     * Rotate image by specified amount of degrees
+     *
+     * @param rotationAngle Amount of degrees
+     */
+    @NonNull
+    @SuppressWarnings("unchecked")
+    public static <T> BitmapTransformation<T> rotate(float rotationAngle) {
+        return (BitmapTransformation<T>) new RotateTransformation(rotationAngle);
+    }
+
+    /**
+     * Round image corners with maximum corner radius,
+     * for square image, will lead to circle result
+     */
+    @NonNull
+    @SuppressWarnings("unchecked")
+    public static <T> BitmapTransformation<T> roundCorners() {
+        return (BitmapTransformation<T>) new RoundCornersTransformation();
+    }
+
+    /**
+     * Round image corners with specified corner radius
+     *
+     * @param cornerRadius Corner radius
+     * @return Image with rounded corners
+     */
+    @NonNull
+    @SuppressWarnings("unchecked")
+    public static <T> BitmapTransformation<T> roundCorners(float cornerRadius) {
+        return (BitmapTransformation<T>) new RoundCornersTransformation(cornerRadius);
+    }
+
+    /**
+     * Crop center of image in square proportions (1:1), no resize
+     */
+    @NonNull
+    @SuppressWarnings("unchecked")
+    public static <T> BitmapTransformation<T> cropCenter() {
+        return (BitmapTransformation<T>) new CropCenterTransformation();
+    }
+
+    /**
+     * Crop center of image in proportions of {@code resultWidth} and {@code resultHeight}
+     * and, if needed, resize it to {@code resultWidth} x {@code resultHeight} size
+     */
+    @NonNull
+    @SuppressWarnings("unchecked")
+    public static <T> BitmapTransformation<T> cropCenter(int resultWidth, int resultHeight) {
+        return (BitmapTransformation<T>) new CropCenterTransformation(resultWidth, resultHeight);
+    }
+
+
+    /**
+     * Fit image to specified frame ({@code resultWidth} x {@code resultHeight},
+     * image will be scaled if needed
+     */
+    @NonNull
+    @SuppressWarnings("unchecked")
+    public static <T> BitmapTransformation<T> fitCenter(int resultWidth, int resultHeight) {
+        return (BitmapTransformation<T>) new FitCenterTransformation(resultWidth, resultHeight);
+    }
+
+    /**
+     * Scale image to fit specified frame ({@code resultWidth} x {@code resultHeight})
+     */
+    @NonNull
+    @SuppressWarnings("unchecked")
+    public static <T> BitmapTransformation<T> scaleToFit(int resultWidth, int resultHeight) {
+        return (BitmapTransformation<T>) new ScaleToFitTransformation(resultWidth, resultHeight,
+                false);
+    }
+
+    /**
+     * Scale image to fit specified frame ({@code resultWidth} x {@code resultHeight}),
+     * upscale image if needed if {@code upscale} set to true
+     */
+    @NonNull
+    @SuppressWarnings("unchecked")
+    public static <T> BitmapTransformation<T> scaleToFit(int resultWidth, int resultHeight,
+            boolean upscale) {
+        return (BitmapTransformation<T>) new ScaleToFitTransformation(resultWidth, resultHeight,
+                upscale);
+    }
+
+    /**
+     * Invert image colors
      *
      * @param image Source image
      * @return Inverted image
@@ -51,15 +172,6 @@ public final class ImageUtils {
     public static Bitmap invertColors(@NonNull Bitmap image) {
         return applyColorFilter(image, new ColorMatrixColorFilter(
                 new float[] {-1, 0, 0, 0, 255, 0, -1, 0, 0, 255, 0, 0, -1, 0, 255, 0, 0, 0, 1, 0}));
-    }
-
-    /**
-     * Invert image colors
-     */
-    @NonNull
-    @SuppressWarnings("unchecked")
-    public static <T> BitmapTransformation<T> invertColors() {
-        return (BitmapTransformation<T>) new InvertColorsTransformation();
     }
 
     /**
@@ -73,15 +185,6 @@ public final class ImageUtils {
         ColorMatrix colorMatrix = new ColorMatrix();
         colorMatrix.setSaturation(0);
         return applyColorFilter(image, new ColorMatrixColorFilter(colorMatrix));
-    }
-
-    /**
-     * Convert image colors to gray-scale
-     */
-    @NonNull
-    @SuppressWarnings("unchecked")
-    public static <T> BitmapTransformation<T> convertToGrayScale() {
-        return (BitmapTransformation<T>) new GrayScaleTransformation();
     }
 
     /**
@@ -103,19 +206,6 @@ public final class ImageUtils {
     }
 
     /**
-     * Color filter
-     *
-     * @param colorFilter Color filter
-     * @param key         Identifier of this color filter transformation
-     */
-    @NonNull
-    @SuppressWarnings("unchecked")
-    public static <T> BitmapTransformation<T> applyColorFilter(@NonNull ColorFilter colorFilter,
-            @NonNull String key) {
-        return (BitmapTransformation<T>) new ColorFilterTransformation(colorFilter, key);
-    }
-
-    /**
      * Mirror image horizontally
      *
      * @param image Source image
@@ -126,15 +216,6 @@ public final class ImageUtils {
         Matrix matrix = new Matrix();
         matrix.setScale(-1, 1);
         return Bitmap.createBitmap(image, 0, 0, image.getWidth(), image.getHeight(), matrix, true);
-    }
-
-    /**
-     * Mirror image horizontally
-     */
-    @NonNull
-    @SuppressWarnings("unchecked")
-    public static <T> BitmapTransformation<T> mirrorHorizontally() {
-        return (BitmapTransformation<T>) new MirrorHorizontallyTransformation();
     }
 
     /**
@@ -151,15 +232,6 @@ public final class ImageUtils {
     }
 
     /**
-     * Mirror image vertically
-     */
-    @NonNull
-    @SuppressWarnings("unchecked")
-    public static <T> BitmapTransformation<T> mirrorVertically() {
-        return (BitmapTransformation<T>) new MirrorVerticallyTransformation();
-    }
-
-    /**
      * Rotate image by specified amount of degrees
      *
      * @param image         Source image
@@ -171,17 +243,6 @@ public final class ImageUtils {
         Matrix matrix = new Matrix();
         matrix.setRotate(rotationAngle);
         return Bitmap.createBitmap(image, 0, 0, image.getWidth(), image.getHeight(), matrix, true);
-    }
-
-    /**
-     * Rotate image by specified amount of degrees
-     *
-     * @param rotationAngle Amount of degrees
-     */
-    @NonNull
-    @SuppressWarnings("unchecked")
-    public static <T> BitmapTransformation<T> rotate(float rotationAngle) {
-        return (BitmapTransformation<T>) new RotateTransformation(rotationAngle);
     }
 
     /**
@@ -207,28 +268,6 @@ public final class ImageUtils {
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(image, rect, rect, paint);
         return bitmap;
-    }
-
-    /**
-     * Round image corners with specified corner radius
-     *
-     * @param cornerRadius Corner radius
-     * @return Image with rounded corners
-     */
-    @NonNull
-    @SuppressWarnings("unchecked")
-    public static <T> BitmapTransformation<T> roundCorners(float cornerRadius) {
-        return (BitmapTransformation<T>) new RoundCornersTransformation(cornerRadius);
-    }
-
-    /**
-     * Round image corners with maximum corner radius,
-     * for square image will lead to circle result
-     */
-    @NonNull
-    @SuppressWarnings("unchecked")
-    public static <T> BitmapTransformation<T> roundCorners() {
-        return (BitmapTransformation<T>) new RoundCornersTransformation();
     }
 
     /**
@@ -282,25 +321,6 @@ public final class ImageUtils {
     }
 
     /**
-     * Crop center of image in square proportions (1:1), no resize
-     */
-    @NonNull
-    @SuppressWarnings("unchecked")
-    public static <T> BitmapTransformation<T> cropCenter() {
-        return (BitmapTransformation<T>) new CropCenterTransformation();
-    }
-
-    /**
-     * Crop center of image in proportions of {@code resultWidth} and {@code resultHeight}
-     * and, if needed, resize it to {@code resultWidth} x {@code resultHeight} size
-     */
-    @NonNull
-    @SuppressWarnings("unchecked")
-    public static <T> BitmapTransformation<T> cropCenter(int resultWidth, int resultHeight) {
-        return (BitmapTransformation<T>) new CropCenterTransformation(resultWidth, resultHeight);
-    }
-
-    /**
      * Fit image to specified frame ({@code resultWidth} x {@code resultHeight},
      * image will be scaled if needed.
      * If specified {@code resultWidth} and {@code resultHeight} are the same as the current
@@ -346,16 +366,6 @@ public final class ImageUtils {
     }
 
     /**
-     * Fit image to specified frame ({@code resultWidth} x {@code resultHeight},
-     * image will be scaled if needed
-     */
-    @NonNull
-    @SuppressWarnings("unchecked")
-    public static <T> BitmapTransformation<T> fitCenter(int resultWidth, int resultHeight) {
-        return (BitmapTransformation<T>) new FitCenterTransformation(resultWidth, resultHeight);
-    }
-
-    /**
      * Scale image to fit specified frame ({@code resultWidth} x {@code resultHeight}).
      * If specified {@code resultWidth} and {@code resultHeight} are the same as or smaller than
      * the current width and height of the source image, the source image will be returned.
@@ -368,16 +378,6 @@ public final class ImageUtils {
     @NonNull
     public static Bitmap scaleToFit(@NonNull Bitmap image, int resultWidth, int resultHeight) {
         return scaleToFit(image, resultWidth, resultHeight, false);
-    }
-
-    /**
-     * Scale image to fit specified frame ({@code resultWidth} x {@code resultHeight})
-     */
-    @NonNull
-    @SuppressWarnings("unchecked")
-    public static <T> BitmapTransformation<T> scaleToFit(int resultWidth, int resultHeight) {
-        return (BitmapTransformation<T>) new ScaleToFitTransformation(resultWidth, resultHeight,
-                false);
     }
 
     /**
@@ -428,18 +428,6 @@ public final class ImageUtils {
         }
     }
 
-    /**
-     * Scale image to fit specified frame ({@code resultWidth} x {@code resultHeight}),
-     * upscale image if needed if {@code upscale} set to true
-     */
-    @NonNull
-    @SuppressWarnings("unchecked")
-    public static <T> BitmapTransformation<T> scaleToFit(int resultWidth, int resultHeight,
-            boolean upscale) {
-        return (BitmapTransformation<T>) new ScaleToFitTransformation(resultWidth, resultHeight,
-                upscale);
-    }
-
     private static int greatestCommonDivisor(int a, int b) {
         while (a > 0 && b > 0) {
             if (a > b) {
@@ -478,29 +466,6 @@ public final class ImageUtils {
         @Override
         public String getKey(@NonNull Object data) {
             return "_gray_scale";
-        }
-    }
-
-    private static final class ColorFilterTransformation implements BitmapTransformation<Object> {
-        private final ColorFilter mColorFilter;
-        private final String mKey;
-
-        public ColorFilterTransformation(@NonNull ColorFilter colorFilter, @NonNull String name) {
-            mColorFilter = colorFilter;
-            mKey = "_color_filter_" + name;
-        }
-
-        @NonNull
-        @Override
-        public Bitmap transform(@NonNull Context context, @NonNull Object data,
-                @NonNull Bitmap bitmap) throws Throwable {
-            return applyColorFilter(bitmap, mColorFilter);
-        }
-
-        @NonNull
-        @Override
-        public String getKey(@NonNull Object data) {
-            return mKey;
         }
     }
 
