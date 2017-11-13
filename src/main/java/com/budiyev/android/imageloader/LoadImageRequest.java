@@ -93,6 +93,7 @@ public final class LoadImageRequest {
     /**
      * Add bitmap processor
      *
+     * @see ImageUtils
      * @see BitmapProcessor
      */
     @NonNull
