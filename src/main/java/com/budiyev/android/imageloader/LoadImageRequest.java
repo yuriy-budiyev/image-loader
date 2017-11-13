@@ -30,7 +30,9 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import android.annotation.SuppressLint;
+import android.content.ComponentCallbacks2;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -166,7 +168,7 @@ public final class LoadImageRequest {
     }
 
     /**
-     * Lad image
+     * Load image
      */
     @AnyThread
     public void load() {
@@ -201,6 +203,8 @@ public final class LoadImageRequest {
                             .processor(new BitmapProcessorImpl()).onLoaded(new LoadCallbackImpl())
                             .onError(new ErrorCallbackImpl()).onDisplayed(new DisplayCallbackImpl())
                             .build();
+                    context.getApplicationContext()
+                            .registerComponentCallbacks(new ComponentCallbacksImpl());
                     sLoader = loader;
                 }
             } finally {
@@ -231,6 +235,30 @@ public final class LoadImageRequest {
         @MainThread
         public void run() {
             mLoader.load(mDescriptor, mView, mFadeEnabled, mFadeDuration);
+        }
+    }
+
+    private static final class ComponentCallbacksImpl implements ComponentCallbacks2 {
+        @Override
+        public void onTrimMemory(int level) {
+            if (level >= TRIM_MEMORY_BACKGROUND) {
+                ImageLoader<RequestImpl> loader = sLoader;
+                if (loader != null) {
+                    loader.clearMemoryCache();
+                }
+            }
+        }
+
+        @Override
+        public void onConfigurationChanged(Configuration newConfig) {
+        }
+
+        @Override
+        public void onLowMemory() {
+            ImageLoader<RequestImpl> loader = sLoader;
+            if (loader != null) {
+                loader.clearMemoryCache();
+            }
         }
     }
 
