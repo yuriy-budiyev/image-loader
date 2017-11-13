@@ -39,7 +39,6 @@ import android.widget.ImageView;
 final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
     private final Handler mMainThreadHandler;
     private final BitmapProcessor<T> mBitmapProcessor;
-    private final ImageCache mMemoryCache;
     private final DisplayCallback<T> mDisplayCallback;
     private final WeakReference<ImageView> mView;
     private final Drawable mPlaceholder;
@@ -55,11 +54,10 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
             @Nullable DisplayCallback<T> displayCallback, @NonNull ImageView view,
             @NonNull Drawable placeholder, @Nullable Drawable errorDrawable, boolean fadeEnabled,
             long fadeDuration) {
-        super(context, descriptor, bitmapLoader, pauseLock, storageCache, loadCallback,
+        super(context, descriptor, bitmapLoader, pauseLock, memoryCache, storageCache, loadCallback,
                 errorCallback);
         mMainThreadHandler = mainThreadHandler;
         mBitmapProcessor = bitmapProcessor;
-        mMemoryCache = memoryCache;
         mDisplayCallback = displayCallback;
         mView = new WeakReference<>(view);
         mPlaceholder = placeholder;
@@ -75,10 +73,6 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
     @Override
     protected void onImageLoaded(@NonNull Bitmap image) {
         DataDescriptor<T> descriptor = getDescriptor();
-        ImageCache memoryImageCache = mMemoryCache;
-        if (memoryImageCache != null) {
-            memoryImageCache.put(descriptor.getKey(), image);
-        }
         BitmapProcessor<T> bitmapProcessor = mBitmapProcessor;
         if (bitmapProcessor != null) {
             Context context = getContext();

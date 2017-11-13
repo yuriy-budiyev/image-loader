@@ -39,6 +39,7 @@ abstract class BaseLoadImageAction<T> {
     private final DataDescriptor<T> mDescriptor;
     private final BitmapLoader<T> mBitmapLoader;
     private final PauseLock mPauseLock;
+    private final ImageCache mMemoryCache;
     private final ImageCache mStorageCache;
     private final LoadCallback<T> mLoadCallback;
     private final ErrorCallback<T> mErrorCallback;
@@ -48,12 +49,13 @@ abstract class BaseLoadImageAction<T> {
 
     protected BaseLoadImageAction(@NonNull Context context, @NonNull DataDescriptor<T> descriptor,
             @NonNull BitmapLoader<T> bitmapLoader, @NonNull PauseLock pauseLock,
-            @Nullable ImageCache storageCache, @Nullable LoadCallback<T> loadCallback,
-            @Nullable ErrorCallback<T> errorCallback) {
+            @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache,
+            @Nullable LoadCallback<T> loadCallback, @Nullable ErrorCallback<T> errorCallback) {
         mContext = context;
         mDescriptor = descriptor;
         mBitmapLoader = bitmapLoader;
         mPauseLock = pauseLock;
+        mMemoryCache = memoryCache;
         mStorageCache = storageCache;
         mLoadCallback = loadCallback;
         mErrorCallback = errorCallback;
@@ -157,14 +159,22 @@ abstract class BaseLoadImageAction<T> {
         if (mCancelled) {
             return;
         }
-        Bitmap image = null;
-        ImageCache storageCache = mStorageCache;
+        Context context = mContext;
         String key = mDescriptor.getKey();
         T data = mDescriptor.getData();
+        Bitmap image = null;
+        ImageCache memoryCache = mMemoryCache;
+        if (memoryCache != null) {
+            image = memoryCache.get(key);
+        }
+        if (image != null) {
+            notifyImageLoaded(context, data, image);
+            return;
+        }
+        ImageCache storageCache = mStorageCache;
         if (storageCache != null) {
             image = storageCache.get(key);
         }
-        Context context = mContext;
         if (image != null) {
             notifyImageLoaded(context, data, image);
             return;
@@ -181,6 +191,9 @@ abstract class BaseLoadImageAction<T> {
         }
         if (mCancelled) {
             return;
+        }
+        if (memoryCache != null) {
+            memoryCache.put(key, image);
         }
         notifyImageLoaded(context, data, image);
         if (mCancelled) {

@@ -230,7 +230,8 @@ public final class ImageLoader<T> {
         Bitmap image = null;
         String key = descriptor.getKey();
         ImageCache memoryCache = mMemoryCache;
-        if (memoryCache != null) {
+        BitmapProcessor<T> bitmapProcessor = mBitmapProcessor;
+        if (memoryCache != null && bitmapProcessor == null) {
             image = memoryCache.get(key);
         }
         Context context = mContext;
@@ -269,7 +270,7 @@ public final class ImageLoader<T> {
         DisplayImageAction<T> action =
                 new DisplayImageAction<>(context, descriptor, mBitmapLoader, mPauseLock,
                         mStorageCache, loadCallback, errorCallback, mMainThreadHandler,
-                        mBitmapProcessor, memoryCache, displayCallback, view, placeholder,
+                        bitmapProcessor, memoryCache, displayCallback, view, placeholder,
                         errorDrawable, fadeEnabled, fadeDuration);
         view.setImageDrawable(new PlaceholderDrawable(placeholder, action));
         action.execute(mExecutor);
@@ -304,8 +305,7 @@ public final class ImageLoader<T> {
     }
 
     /**
-     * Load image from specified {@link DataDescriptor},
-     * memory cache is not used
+     * Load image from specified {@link DataDescriptor}
      *
      * @param descriptor Source data descriptor
      */
@@ -316,8 +316,7 @@ public final class ImageLoader<T> {
 
     /**
      * Load image from specified {@link DataDescriptor},
-     * override callbacks, specified in builder,
-     * memory cache is not used
+     * override callbacks, specified in builder
      *
      * @param descriptor    Source data descriptor
      * @param loadCallback  Load callback
@@ -326,8 +325,8 @@ public final class ImageLoader<T> {
     @AnyThread
     public void load(@NonNull DataDescriptor<T> descriptor, @Nullable LoadCallback<T> loadCallback,
             @Nullable ErrorCallback<T> errorCallback) {
-        new LoadImageAction<>(mContext, descriptor, mBitmapLoader, mPauseLock, mStorageCache,
-                loadCallback, errorCallback).execute(mExecutor);
+        new LoadImageAction<>(mContext, descriptor, mBitmapLoader, mPauseLock, mMemoryCache,
+                mStorageCache, loadCallback, errorCallback).execute(mExecutor);
     }
 
     /**
