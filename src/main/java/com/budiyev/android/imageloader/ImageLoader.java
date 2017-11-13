@@ -108,8 +108,8 @@ public final class ImageLoader<T> {
      */
     @MainThread
     public void load(@NonNull T data, @NonNull ImageView view) {
-        load(new StringDataDescriptor<>(data), view, mLoadCallback, mDisplayCallback,
-                mErrorCallback);
+        load(new StringDataDescriptor<>(data), view, mFadeEnabled, mFadeDuration, mLoadCallback,
+                mDisplayCallback, mErrorCallback);
     }
 
     /**
@@ -141,7 +141,8 @@ public final class ImageLoader<T> {
     public void load(@NonNull T data, @NonNull ImageView view,
             @Nullable LoadCallback<T> loadCallback, @Nullable DisplayCallback<T> displayCallback,
             @Nullable ErrorCallback<T> errorCallback) {
-        load(new StringDataDescriptor<>(data), view, loadCallback, displayCallback, errorCallback);
+        load(new StringDataDescriptor<>(data), view, mFadeEnabled, mFadeDuration, loadCallback,
+                displayCallback, errorCallback);
     }
 
     /**
@@ -174,7 +175,8 @@ public final class ImageLoader<T> {
      */
     @MainThread
     public void load(@NonNull DataDescriptor<T> descriptor, @NonNull ImageView view) {
-        load(descriptor, view, mLoadCallback, mDisplayCallback, mErrorCallback);
+        load(descriptor, view, mFadeEnabled, mFadeDuration, mLoadCallback, mDisplayCallback,
+                mErrorCallback);
     }
 
     /**
