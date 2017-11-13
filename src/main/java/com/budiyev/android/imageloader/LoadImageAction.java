@@ -39,11 +39,16 @@ final class LoadImageAction<T> extends BaseLoadImageAction<T> {
 
     @Override
     protected void onImageLoaded(@NonNull Bitmap image) {
-        //Do nothing
+        // Do nothing
+    }
+
+    @Override
+    protected void onError(@NonNull Throwable error) {
+        // Do nothing
     }
 
     @Override
     protected void onCancelled() {
-        //Do nothing
+        // Do nothing
     }
 }

@@ -23,13 +23,12 @@
  */
 package com.budiyev.android.imageloader;
 
-import android.net.Uri;
 import android.support.annotation.NonNull;
 
 public final class LoadImageRequest {
-    private final ImageLoader<Uri> mLoader;
+    private final ImageLoader<LoadImageRequest> mLoader;
 
-    LoadImageRequest(@NonNull ImageLoader<Uri> loader) {
+    LoadImageRequest(@NonNull ImageLoader<LoadImageRequest> loader) {
         mLoader = loader;
     }
 }

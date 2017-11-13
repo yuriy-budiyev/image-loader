@@ -62,6 +62,9 @@ abstract class BaseLoadImageAction<T> {
     @WorkerThread
     protected abstract void onImageLoaded(@NonNull Bitmap image);
 
+    @WorkerThread
+    protected abstract void onError(@NonNull Throwable error);
+
     @AnyThread
     protected abstract void onCancelled();
 
@@ -151,17 +154,11 @@ abstract class BaseLoadImageAction<T> {
         try {
             image = mBitmapLoader.load(context, data);
         } catch (Throwable error) {
-            ErrorCallback<T> errorCallback = mErrorCallback;
-            if (errorCallback != null) {
-                errorCallback.onError(context, data, error);
-            }
+            notifyError(context, data, error);
             return;
         }
         if (image == null) {
-            ErrorCallback<T> errorCallback = mErrorCallback;
-            if (errorCallback != null) {
-                errorCallback.onError(context, data, new ImageNotLoadedException());
-            }
+            notifyError(context, data, new ImageNotLoadedException());
             return;
         }
         if (mCancelled) {
@@ -183,6 +180,14 @@ abstract class BaseLoadImageAction<T> {
             loadCallback.onLoaded(context, data, image);
         }
         onImageLoaded(image);
+    }
+
+    private void notifyError(@NonNull Context context, @NonNull T data, @NonNull Throwable error) {
+        ErrorCallback<T> errorCallback = mErrorCallback;
+        if (errorCallback != null) {
+            errorCallback.onError(context, data, error);
+        }
+        onError(error);
     }
 
     private final class LoadImageTask implements Callable<Void> {

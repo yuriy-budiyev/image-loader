@@ -43,6 +43,7 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
     private final DisplayCallback<T> mDisplayCallback;
     private final WeakReference<ImageView> mView;
     private final Drawable mPlaceholder;
+    private final Drawable mErrorDrawable;
     private final boolean mFadeEnabled;
     private final long mFadeDuration;
 
@@ -52,7 +53,8 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
             @Nullable ErrorCallback<T> errorCallback, @NonNull Handler mainThreadHandler,
             @Nullable BitmapProcessor<T> bitmapProcessor, @Nullable ImageCache memoryCache,
             @Nullable DisplayCallback<T> displayCallback, @NonNull ImageView view,
-            @NonNull Drawable placeholder, boolean fadeEnabled, long fadeDuration) {
+            @NonNull Drawable placeholder, @Nullable Drawable errorDrawable, boolean fadeEnabled,
+            long fadeDuration) {
         super(context, descriptor, bitmapLoader, pauseLock, storageCache, loadCallback,
                 errorCallback);
         mMainThreadHandler = mainThreadHandler;
@@ -61,6 +63,7 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
         mDisplayCallback = displayCallback;
         mView = new WeakReference<>(view);
         mPlaceholder = placeholder;
+        mErrorDrawable = errorDrawable;
         mFadeEnabled = fadeEnabled;
         mFadeDuration = fadeDuration;
     }
@@ -87,8 +90,28 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
     }
 
     @Override
+    protected void onError(@NonNull Throwable error) {
+        if (mErrorDrawable != null || !isCancelled()) {
+            mMainThreadHandler.post(new SetErrorDrawableAction());
+        }
+    }
+
+    @Override
     protected void onCancelled() {
         mView.clear();
+    }
+
+    private final class SetErrorDrawableAction implements Runnable {
+        @Override
+        public void run() {
+            Drawable errorDrawable = mErrorDrawable;
+            ImageView view = mView.get();
+            if (isCancelled() || errorDrawable == null || view == null ||
+                    InternalUtils.getDisplayImageAction(view) != DisplayImageAction.this) {
+                return;
+            }
+            view.setImageDrawable(errorDrawable);
+        }
     }
 
     private final class SetImageAction implements Runnable {

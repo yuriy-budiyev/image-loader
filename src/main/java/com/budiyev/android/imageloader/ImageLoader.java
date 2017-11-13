@@ -32,6 +32,8 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Handler;
@@ -56,6 +58,7 @@ public final class ImageLoader<T> {
     private final ImageCache mMemoryCache;
     private final ImageCache mStorageCache;
     private final PlaceholderProvider<T> mPlaceholderProvider;
+    private final ErrorDrawableProvider<T> mErrorDrawableProvider;
     private final ExecutorService mExecutor;
     private final LoadCallback<T> mLoadCallback;
     private final DisplayCallback<T> mDisplayCallback;
@@ -69,6 +72,7 @@ public final class ImageLoader<T> {
     private ImageLoader(@NonNull Context context, @NonNull BitmapLoader<T> bitmapLoader,
             @Nullable BitmapProcessor<T> bitmapProcessor, @Nullable ImageCache memoryCache,
             @Nullable ImageCache storageCache, @Nullable PlaceholderProvider<T> placeholderProvider,
+            @Nullable ErrorDrawableProvider<T> errorDrawableProvider,
             @Nullable ExecutorService executor, @Nullable LoadCallback<T> loadCallback,
             @Nullable DisplayCallback<T> displayCallback, @Nullable ErrorCallback<T> errorCallback,
             boolean fadeEnabled, long fadeDuration) {
@@ -78,14 +82,11 @@ public final class ImageLoader<T> {
         mBitmapProcessor = bitmapProcessor;
         mMemoryCache = memoryCache;
         mStorageCache = storageCache;
+        mErrorDrawableProvider = errorDrawableProvider;
         mLoadCallback = loadCallback;
         mDisplayCallback = displayCallback;
         mErrorCallback = errorCallback;
-        if (placeholderProvider != null) {
-            mPlaceholderProvider = placeholderProvider;
-        } else {
-            mPlaceholderProvider = new EmptyPlaceholderProvider<>();
-        }
+        mPlaceholderProvider = placeholderProvider;
         if (executor != null) {
             mExecutor = executor;
         } else {
@@ -179,12 +180,25 @@ public final class ImageLoader<T> {
             }
             currentAction.cancel();
         }
-        Drawable placeholder = mPlaceholderProvider.getPlaceholder(context, data);
+        Drawable placeholder;
+        PlaceholderProvider<T> placeholderProvider = mPlaceholderProvider;
+        if (placeholderProvider != null) {
+            placeholder = placeholderProvider.getPlaceholder(context, data);
+        } else {
+            placeholder = new ColorDrawable(Color.TRANSPARENT);
+        }
+        Drawable errorDrawable;
+        ErrorDrawableProvider<T> errorDrawableProvider = mErrorDrawableProvider;
+        if (errorDrawableProvider != null) {
+            errorDrawable = errorDrawableProvider.getErrorDrawable(context, data);
+        } else {
+            errorDrawable = null;
+        }
         DisplayImageAction<T> action =
                 new DisplayImageAction<>(context, descriptor, mBitmapLoader, mPauseLock,
                         mStorageCache, loadCallback, errorCallback, mMainThreadHandler,
                         mBitmapProcessor, memoryCache, displayCallback, view, placeholder,
-                        mFadeEnabled, mFadeDuration);
+                        errorDrawable, mFadeEnabled, mFadeDuration);
         view.setImageDrawable(new PlaceholderDrawable(placeholder, action));
         action.execute(mExecutor);
     }
@@ -412,6 +426,7 @@ public final class ImageLoader<T> {
         private ImageCache mMemoryCache;
         private ImageCache mStorageCache;
         private PlaceholderProvider<T> mPlaceholderProvider;
+        private ErrorDrawableProvider<T> mErrorDrawableProvider;
         private ExecutorService mExecutor;
         private LoadCallback<T> mLoadCallback;
         private DisplayCallback<T> mDisplayCallback;
@@ -553,6 +568,12 @@ public final class ImageLoader<T> {
             return this;
         }
 
+        @NonNull
+        public Builder<T> errorDrawable(@Nullable ErrorDrawableProvider<T> provider) {
+            mErrorDrawableProvider = provider;
+            return this;
+        }
+
         /**
          * Bitmap processor, processes bitmap before showing it
          *
@@ -628,8 +649,8 @@ public final class ImageLoader<T> {
         @NonNull
         public ImageLoader<T> build() {
             return new ImageLoader<>(mContext, mBitmapLoader, mBitmapProcessor, mMemoryCache,
-                    mStorageCache, mPlaceholderProvider, mExecutor, mLoadCallback, mDisplayCallback,
-                    mErrorCallback, mFadeEnabled, mFadeDuration);
+                    mStorageCache, mPlaceholderProvider, mErrorDrawableProvider, mExecutor,
+                    mLoadCallback, mDisplayCallback, mErrorCallback, mFadeEnabled, mFadeDuration);
         }
     }
 }
