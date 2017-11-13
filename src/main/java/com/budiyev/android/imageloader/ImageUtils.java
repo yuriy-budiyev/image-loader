@@ -23,6 +23,7 @@
  */
 package com.budiyev.android.imageloader;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
@@ -53,6 +54,14 @@ public final class ImageUtils {
     }
 
     /**
+     * Invert image colors
+     */
+    @NonNull
+    public static BitmapTransformation<?> invertColors() {
+        return new InvertColorsTransformation();
+    }
+
+    /**
      * Convert image colors to gray-scale
      *
      * @param image Source image
@@ -63,6 +72,14 @@ public final class ImageUtils {
         ColorMatrix colorMatrix = new ColorMatrix();
         colorMatrix.setSaturation(0);
         return applyColorFilter(image, new ColorMatrixColorFilter(colorMatrix));
+    }
+
+    /**
+     * Convert image colors to gray-scale
+     */
+    @NonNull
+    public static BitmapTransformation<?> convertToGrayScale() {
+        return new GrayScaleTransformation();
     }
 
     /**
@@ -84,6 +101,18 @@ public final class ImageUtils {
     }
 
     /**
+     * Color filter
+     *
+     * @param colorFilter Color filter
+     * @param name        Identifier of this color filter transformation
+     */
+    @NonNull
+    public static BitmapTransformation<?> applyColorFilter(@NonNull ColorFilter colorFilter,
+            @NonNull String name) {
+        return new ColorFilterTransformation(colorFilter, name);
+    }
+
+    /**
      * Mirror image horizontally
      *
      * @param image Source image
@@ -94,6 +123,14 @@ public final class ImageUtils {
         Matrix matrix = new Matrix();
         matrix.setScale(-1, 1);
         return Bitmap.createBitmap(image, 0, 0, image.getWidth(), image.getHeight(), matrix, true);
+    }
+
+    /**
+     * Mirror image horizontally
+     */
+    @NonNull
+    public static BitmapTransformation<?> mirrorHorizontally() {
+        return new MirrorHorizontallyTransformation();
     }
 
     /**
@@ -110,6 +147,14 @@ public final class ImageUtils {
     }
 
     /**
+     * Mirror image vertically
+     */
+    @NonNull
+    public static BitmapTransformation<?> mirrorVertically() {
+        return new MirrorVerticallyTransformation();
+    }
+
+    /**
      * Rotate image by specified amount of degrees
      *
      * @param image         Source image
@@ -121,6 +166,17 @@ public final class ImageUtils {
         Matrix matrix = new Matrix();
         matrix.setRotate(rotationAngle);
         return Bitmap.createBitmap(image, 0, 0, image.getWidth(), image.getHeight(), matrix, true);
+    }
+
+    /**
+     * Rotate image by specified amount of degrees
+     *
+     * @param rotationAngle Amount of degrees
+     * @return Rotated image
+     */
+    @NonNull
+    public static BitmapTransformation<?> rotate(float rotationAngle) {
+        return new RotateTransformation(rotationAngle);
     }
 
     /**
@@ -146,6 +202,28 @@ public final class ImageUtils {
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(image, rect, rect, paint);
         return bitmap;
+    }
+
+    /**
+     * Round image corners with specified corner radius
+     *
+     * @param cornerRadius Corner radius
+     * @return Image with rounded corners
+     */
+    @NonNull
+    public static BitmapTransformation<?> roundCorners(float cornerRadius) {
+        return new RoundCornersTransformation(cornerRadius);
+    }
+
+    /**
+     * Round image corners with maximum corner radius,
+     * for square image will lead to circle result
+     *
+     * @return Image with rounded corners
+     */
+    @NonNull
+    public static BitmapTransformation<?> roundCorners() {
+        return new RoundCornersTransformation();
     }
 
     /**
@@ -315,5 +393,145 @@ public final class ImageUtils {
             }
         }
         return a + b;
+    }
+
+    private static final class InvertColorsTransformation implements BitmapTransformation<Object> {
+        @NonNull
+        @Override
+        public Bitmap transform(@NonNull Context context, @NonNull Object data,
+                @NonNull Bitmap bitmap) throws Throwable {
+            return invertColors(bitmap);
+        }
+
+        @NonNull
+        @Override
+        public String getKey(@NonNull Object data) {
+            return "_invert_colors";
+        }
+    }
+
+    private static final class GrayScaleTransformation implements BitmapTransformation<Object> {
+        @NonNull
+        @Override
+        public Bitmap transform(@NonNull Context context, @NonNull Object data,
+                @NonNull Bitmap bitmap) throws Throwable {
+            return convertToGrayScale(bitmap);
+        }
+
+        @NonNull
+        @Override
+        public String getKey(@NonNull Object data) {
+            return "_gray_scale";
+        }
+    }
+
+    private static final class ColorFilterTransformation implements BitmapTransformation<Object> {
+        private final ColorFilter mColorFilter;
+        private final String mKey;
+
+        private ColorFilterTransformation(@NonNull ColorFilter colorFilter, @NonNull String name) {
+            mColorFilter = colorFilter;
+            mKey = "_color_filter_" + name;
+        }
+
+        @NonNull
+        @Override
+        public Bitmap transform(@NonNull Context context, @NonNull Object data,
+                @NonNull Bitmap bitmap) throws Throwable {
+            return applyColorFilter(bitmap, mColorFilter);
+        }
+
+        @NonNull
+        @Override
+        public String getKey(@NonNull Object data) {
+            return mKey;
+        }
+    }
+
+    private static final class MirrorHorizontallyTransformation
+            implements BitmapTransformation<Object> {
+        @NonNull
+        @Override
+        public Bitmap transform(@NonNull Context context, @NonNull Object data,
+                @NonNull Bitmap bitmap) throws Throwable {
+            return mirrorHorizontally(bitmap);
+        }
+
+        @NonNull
+        @Override
+        public String getKey(@NonNull Object data) {
+            return "_mirror_horizontally";
+        }
+    }
+
+    private static final class MirrorVerticallyTransformation
+            implements BitmapTransformation<Object> {
+        @NonNull
+        @Override
+        public Bitmap transform(@NonNull Context context, @NonNull Object data,
+                @NonNull Bitmap bitmap) throws Throwable {
+            return mirrorVertically(bitmap);
+        }
+
+        @NonNull
+        @Override
+        public String getKey(@NonNull Object data) {
+            return "_mirror_vertically";
+        }
+    }
+
+    private static final class RotateTransformation implements BitmapTransformation<Object> {
+        private final float mAngle;
+        private final String mKey;
+
+        private RotateTransformation(float angle) {
+            mAngle = angle;
+            mKey = "_rotate_" + angle;
+        }
+
+        @NonNull
+        @Override
+        public Bitmap transform(@NonNull Context context, @NonNull Object data,
+                @NonNull Bitmap bitmap) throws Throwable {
+            return rotate(bitmap, mAngle);
+        }
+
+        @NonNull
+        @Override
+        public String getKey(@NonNull Object data) {
+            return mKey;
+        }
+    }
+
+    private static final class RoundCornersTransformation implements BitmapTransformation<Object> {
+        private final float mRadius;
+        private final String mKey;
+
+        private RoundCornersTransformation(float radius) {
+            mRadius = radius;
+            mKey = "_round_corners_" + radius;
+        }
+
+        private RoundCornersTransformation() {
+            mRadius = -1f;
+            mKey = "_round_corners_max";
+        }
+
+        @NonNull
+        @Override
+        public Bitmap transform(@NonNull Context context, @NonNull Object data,
+                @NonNull Bitmap bitmap) throws Throwable {
+            float radius = mRadius;
+            if (radius == -1f) {
+                radius = Math.min(bitmap.getWidth(), bitmap.getHeight()) / 2f;
+            }
+            return roundCorners(bitmap, radius);
+        }
+
+        @NonNull
+        @Override
+        public String getKey(@NonNull Object data) {
+            return mKey;
+        }
     }
 }

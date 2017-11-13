@@ -54,7 +54,7 @@ public final class ImageLoader<T> {
     private final Context mContext;
     private final Handler mMainThreadHandler;
     private final BitmapLoader<T> mBitmapLoader;
-    private final BitmapProcessor<T> mBitmapProcessor;
+    private final BitmapTransformation<T> mBitmapTransformation;
     private final ImageCache mMemoryCache;
     private final ImageCache mStorageCache;
     private final PlaceholderProvider<T> mPlaceholderProvider;
@@ -70,8 +70,9 @@ public final class ImageLoader<T> {
      * @see Builder
      */
     private ImageLoader(@NonNull Context context, @NonNull BitmapLoader<T> bitmapLoader,
-            @Nullable BitmapProcessor<T> bitmapProcessor, @Nullable ImageCache memoryCache,
-            @Nullable ImageCache storageCache, @Nullable PlaceholderProvider<T> placeholderProvider,
+            @Nullable BitmapTransformation<T> bitmapTransformation,
+            @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache,
+            @Nullable PlaceholderProvider<T> placeholderProvider,
             @Nullable ErrorDrawableProvider<T> errorDrawableProvider,
             @Nullable ExecutorService executor, @Nullable LoadCallback<T> loadCallback,
             @Nullable DisplayCallback<T> displayCallback, @Nullable ErrorCallback<T> errorCallback,
@@ -79,7 +80,7 @@ public final class ImageLoader<T> {
         mContext = context;
         mMainThreadHandler = new Handler(context.getMainLooper());
         mBitmapLoader = bitmapLoader;
-        mBitmapProcessor = bitmapProcessor;
+        mBitmapTransformation = bitmapTransformation;
         mMemoryCache = memoryCache;
         mStorageCache = storageCache;
         mErrorDrawableProvider = errorDrawableProvider;
@@ -230,11 +231,11 @@ public final class ImageLoader<T> {
         Bitmap image = null;
         String key = descriptor.getKey();
         ImageCache memoryCache = mMemoryCache;
-        BitmapProcessor<T> bitmapProcessor = mBitmapProcessor;
+        BitmapTransformation<T> bitmapTransformation = mBitmapTransformation;
         T data = descriptor.getData();
         if (memoryCache != null) {
-            if (bitmapProcessor != null) {
-                image = memoryCache.get(key + bitmapProcessor.getKey(data));
+            if (bitmapTransformation != null) {
+                image = memoryCache.get(key + bitmapTransformation.getKey(data));
             } else {
                 image = memoryCache.get(key);
             }
@@ -274,7 +275,7 @@ public final class ImageLoader<T> {
         DisplayImageAction<T> action =
                 new DisplayImageAction<>(context, descriptor, mBitmapLoader, mPauseLock,
                         mStorageCache, loadCallback, errorCallback, mMainThreadHandler,
-                        bitmapProcessor, memoryCache, displayCallback, view, placeholder,
+                        bitmapTransformation, memoryCache, displayCallback, view, placeholder,
                         errorDrawable, fadeEnabled, fadeDuration);
         view.setImageDrawable(new PlaceholderDrawable(placeholder, action));
         action.execute(mExecutor);
@@ -507,7 +508,7 @@ public final class ImageLoader<T> {
     public static final class Builder<T> {
         private final Context mContext;
         private final BitmapLoader<T> mBitmapLoader;
-        private BitmapProcessor<T> mBitmapProcessor;
+        private BitmapTransformation<T> mBitmapTransformation;
         private ImageCache mMemoryCache;
         private ImageCache mStorageCache;
         private PlaceholderProvider<T> mPlaceholderProvider;
@@ -660,13 +661,13 @@ public final class ImageLoader<T> {
         }
 
         /**
-         * Bitmap processor, processes bitmap before showing it
+         * Bitmap transformation, processes bitmap before showing it
          *
-         * @see BitmapProcessor
+         * @see BitmapTransformation
          */
         @NonNull
-        public Builder<T> processor(@Nullable BitmapProcessor<T> processor) {
-            mBitmapProcessor = processor;
+        public Builder<T> transform(@Nullable BitmapTransformation<T> processor) {
+            mBitmapTransformation = processor;
             return this;
         }
 
@@ -733,7 +734,7 @@ public final class ImageLoader<T> {
          */
         @NonNull
         public ImageLoader<T> build() {
-            return new ImageLoader<>(mContext, mBitmapLoader, mBitmapProcessor, mMemoryCache,
+            return new ImageLoader<>(mContext, mBitmapLoader, mBitmapTransformation, mMemoryCache,
                     mStorageCache, mPlaceholderProvider, mErrorDrawableProvider, mExecutor,
                     mLoadCallback, mDisplayCallback, mErrorCallback, mFadeEnabled, mFadeDuration);
         }

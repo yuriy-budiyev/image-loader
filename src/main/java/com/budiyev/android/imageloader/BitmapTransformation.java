@@ -26,14 +26,13 @@ package com.budiyev.android.imageloader;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.annotation.AnyThread;
-import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
 
 /**
  * Bitmap processor
  */
-public interface BitmapProcessor<T> {
+public interface BitmapTransformation<T> {
     /**
      * Process loaded bitmap before displaying
      *
@@ -45,7 +44,7 @@ public interface BitmapProcessor<T> {
      */
     @NonNull
     @WorkerThread
-    Bitmap process(@NonNull Context context, @NonNull T data, @NonNull Bitmap bitmap)
+    Bitmap transform(@NonNull Context context, @NonNull T data, @NonNull Bitmap bitmap)
             throws Throwable;
 
     /**

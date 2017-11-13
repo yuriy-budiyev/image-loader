@@ -35,7 +35,7 @@ import android.widget.ImageView;
 public interface DisplayCallback<T> {
     /**
      * Called when {@code image} displayed on {@code view},
-     * if {@link BitmapProcessor} specified, processed image will be transferred here,
+     * if {@link BitmapTransformation} specified, processed image will be transferred here,
      * if fade effect is on, this method will be called after fade is done
      *
      * @param context Context

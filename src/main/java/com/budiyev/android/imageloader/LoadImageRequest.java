@@ -58,7 +58,7 @@ public final class LoadImageRequest {
     private DisplayCallback<Uri> mDisplayCallback;
     private ErrorCallback<Uri> mErrorCallback;
     private ImageView mView;
-    private List<BitmapProcessor<Uri>> mProcessors;
+    private List<BitmapTransformation<Uri>> mProcessors;
     private boolean mFadeEnabled = true;
     private long mFadeDuration = 200L;
 
@@ -112,19 +112,19 @@ public final class LoadImageRequest {
     }
 
     /**
-     * Add bitmap processor
+     * Add bitmap transformation
      *
      * @see ImageUtils
-     * @see BitmapProcessor
+     * @see BitmapTransformation
      */
     @NonNull
-    public LoadImageRequest process(@NonNull BitmapProcessor<Uri> processor) {
-        List<BitmapProcessor<Uri>> processors = mProcessors;
+    public LoadImageRequest transform(@NonNull BitmapTransformation<Uri> transformation) {
+        List<BitmapTransformation<Uri>> processors = mProcessors;
         if (processors == null) {
             processors = new ArrayList<>();
             mProcessors = processors;
         }
-        processors.add(processor);
+        processors.add(transformation);
         return this;
     }
 
@@ -219,9 +219,9 @@ public final class LoadImageRequest {
                     loader = ImageLoader.builder(context).custom(new BitmapLoaderImpl())
                             .memoryCache().storageCache().placeholder(new PlaceholderProviderImpl())
                             .errorDrawable(new ErrorDrawableProviderImpl())
-                            .processor(new BitmapProcessorImpl()).onLoaded(new LoadCallbackImpl())
-                            .onError(new ErrorCallbackImpl()).onDisplayed(new DisplayCallbackImpl())
-                            .build();
+                            .transform(new BitmapTransformationImpl())
+                            .onLoaded(new LoadCallbackImpl()).onError(new ErrorCallbackImpl())
+                            .onDisplayed(new DisplayCallbackImpl()).build();
                     context.getApplicationContext()
                             .registerComponentCallbacks(new ComponentCallbacksImpl());
                     sLoader = loader;
@@ -289,7 +289,7 @@ public final class LoadImageRequest {
         private final LoadCallback<Uri> mLoadCallback;
         private final DisplayCallback<Uri> mDisplayCallback;
         private final ErrorCallback<Uri> mErrorCallback;
-        private final List<BitmapProcessor<Uri>> mProcessors;
+        private final List<BitmapTransformation<Uri>> mProcessors;
         private final String mTransformationKey;
 
 
@@ -297,7 +297,7 @@ public final class LoadImageRequest {
                 @Nullable Drawable errorDrawable, @Nullable LoadCallback<Uri> loadCallback,
                 @Nullable DisplayCallback<Uri> displayCallback,
                 @Nullable ErrorCallback<Uri> errorCallback,
-                @Nullable List<BitmapProcessor<Uri>> processors) {
+                @Nullable List<BitmapTransformation<Uri>> processors) {
             mSource = source;
             mKey = DataUtils.generateSHA256(source.toString());
             mPlaceholder = placeholder;
@@ -310,7 +310,7 @@ public final class LoadImageRequest {
                 mTransformationKey = "";
             } else {
                 StringBuilder keyBuilder = new StringBuilder();
-                for (BitmapProcessor<Uri> processor : processors) {
+                for (BitmapTransformation<Uri> processor : processors) {
                     keyBuilder.append(processor.getKey(source));
                 }
                 mTransformationKey = keyBuilder.toString();
@@ -358,13 +358,13 @@ public final class LoadImageRequest {
 
         @NonNull
         private Bitmap process(@NonNull Context context, @NonNull Bitmap bitmap) throws Throwable {
-            List<BitmapProcessor<Uri>> processors = mProcessors;
+            List<BitmapTransformation<Uri>> processors = mProcessors;
             if (processors == null) {
                 return bitmap;
             }
             boolean first = true;
-            for (BitmapProcessor<Uri> processor : processors) {
-                Bitmap processed = processor.process(context, mSource, bitmap);
+            for (BitmapTransformation<Uri> processor : processors) {
+                Bitmap processed = processor.transform(context, mSource, bitmap);
                 if (bitmap != processed) {
                     if (!first && !bitmap.isRecycled()) {
                         bitmap.recycle();
@@ -444,10 +444,11 @@ public final class LoadImageRequest {
         }
     }
 
-    private static final class BitmapProcessorImpl implements BitmapProcessor<RequestImpl> {
+    private static final class BitmapTransformationImpl
+            implements BitmapTransformation<RequestImpl> {
         @NonNull
         @Override
-        public Bitmap process(@NonNull Context context, @NonNull RequestImpl data,
+        public Bitmap transform(@NonNull Context context, @NonNull RequestImpl data,
                 @NonNull Bitmap bitmap) throws Throwable {
             return data.process(context, bitmap);
         }

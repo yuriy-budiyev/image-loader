@@ -38,7 +38,7 @@ import android.widget.ImageView;
 
 final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
     private final Handler mMainThreadHandler;
-    private final BitmapProcessor<T> mBitmapProcessor;
+    private final BitmapTransformation<T> mBitmapTransformation;
     private final DisplayCallback<T> mDisplayCallback;
     private final WeakReference<ImageView> mView;
     private final Drawable mPlaceholder;
@@ -50,14 +50,14 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
             @NonNull BitmapLoader<T> bitmapLoader, @NonNull PauseLock pauseLock,
             @Nullable ImageCache storageCache, @Nullable LoadCallback<T> loadCallback,
             @Nullable ErrorCallback<T> errorCallback, @NonNull Handler mainThreadHandler,
-            @Nullable BitmapProcessor<T> bitmapProcessor, @Nullable ImageCache memoryCache,
-            @Nullable DisplayCallback<T> displayCallback, @NonNull ImageView view,
-            @NonNull Drawable placeholder, @Nullable Drawable errorDrawable, boolean fadeEnabled,
-            long fadeDuration) {
+            @Nullable BitmapTransformation<T> bitmapTransformation,
+            @Nullable ImageCache memoryCache, @Nullable DisplayCallback<T> displayCallback,
+            @NonNull ImageView view, @NonNull Drawable placeholder,
+            @Nullable Drawable errorDrawable, boolean fadeEnabled, long fadeDuration) {
         super(context, descriptor, bitmapLoader, pauseLock, memoryCache, storageCache, loadCallback,
                 errorCallback);
         mMainThreadHandler = mainThreadHandler;
-        mBitmapProcessor = bitmapProcessor;
+        mBitmapTransformation = bitmapTransformation;
         mDisplayCallback = displayCallback;
         mView = new WeakReference<>(view);
         mPlaceholder = placeholder;
@@ -73,19 +73,19 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
     @Override
     protected void onImageLoaded(@NonNull Bitmap image) {
         DataDescriptor<T> descriptor = getDescriptor();
-        BitmapProcessor<T> bitmapProcessor = mBitmapProcessor;
-        if (bitmapProcessor != null) {
+        BitmapTransformation<T> bitmapTransformation = mBitmapTransformation;
+        if (bitmapTransformation != null) {
             Context context = getContext();
             T data = descriptor.getData();
             try {
-                image = bitmapProcessor.process(context, data, image);
+                image = bitmapTransformation.transform(context, data, image);
             } catch (Throwable error) {
                 notifyError(context, data, error);
                 return;
             }
             ImageCache memoryCache = getMemoryCache();
             if (memoryCache != null) {
-                memoryCache.put(descriptor.getKey() + bitmapProcessor.getKey(data), image);
+                memoryCache.put(descriptor.getKey() + bitmapTransformation.getKey(data), image);
             }
         }
         if (isCancelled() || mView.get() == null) {
