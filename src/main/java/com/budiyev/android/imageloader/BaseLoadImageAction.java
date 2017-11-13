@@ -113,6 +113,11 @@ abstract class BaseLoadImageAction<T> {
     }
 
     @Nullable
+    public ImageCache getMemoryCache() {
+        return mMemoryCache;
+    }
+
+    @Nullable
     protected final ImageCache getStorageCache() {
         return mStorageCache;
     }

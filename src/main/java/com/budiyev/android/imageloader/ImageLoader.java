@@ -231,11 +231,15 @@ public final class ImageLoader<T> {
         String key = descriptor.getKey();
         ImageCache memoryCache = mMemoryCache;
         BitmapProcessor<T> bitmapProcessor = mBitmapProcessor;
-        if (memoryCache != null && bitmapProcessor == null) {
-            image = memoryCache.get(key);
+        T data = descriptor.getData();
+        if (memoryCache != null) {
+            if (bitmapProcessor != null) {
+                image = memoryCache.get(key + bitmapProcessor.getKey(data));
+            } else {
+                image = memoryCache.get(key);
+            }
         }
         Context context = mContext;
-        T data = descriptor.getData();
         if (image != null) {
             if (loadCallback != null) {
                 loadCallback.onLoaded(context, data, image);

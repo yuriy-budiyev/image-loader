@@ -290,6 +290,7 @@ public final class LoadImageRequest {
         private final DisplayCallback<Uri> mDisplayCallback;
         private final ErrorCallback<Uri> mErrorCallback;
         private final List<BitmapProcessor<Uri>> mProcessors;
+        private final String mTransformationKey;
 
 
         private RequestImpl(@NonNull Uri source, @Nullable Drawable placeholder,
@@ -305,11 +306,25 @@ public final class LoadImageRequest {
             mDisplayCallback = displayCallback;
             mErrorCallback = errorCallback;
             mProcessors = processors;
+            if (processors == null) {
+                mTransformationKey = "";
+            } else {
+                StringBuilder keyBuilder = new StringBuilder();
+                for (BitmapProcessor<Uri> processor : processors) {
+                    keyBuilder.append(processor.getKey(source));
+                }
+                mTransformationKey = keyBuilder.toString();
+            }
         }
 
         @NonNull
         private String getKey() {
             return mKey;
+        }
+
+        @NonNull
+        public String getTransformationKey() {
+            return mTransformationKey;
         }
 
         @Nullable
@@ -435,6 +450,12 @@ public final class LoadImageRequest {
         public Bitmap process(@NonNull Context context, @NonNull RequestImpl data,
                 @NonNull Bitmap bitmap) throws Throwable {
             return data.process(context, bitmap);
+        }
+
+        @NonNull
+        @Override
+        public String getKey(@NonNull RequestImpl data) {
+            return data.getTransformationKey();
         }
     }
 

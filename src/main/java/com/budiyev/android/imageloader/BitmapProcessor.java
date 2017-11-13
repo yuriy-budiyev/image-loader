@@ -25,6 +25,8 @@ package com.budiyev.android.imageloader;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.support.annotation.AnyThread;
+import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
 
@@ -45,4 +47,13 @@ public interface BitmapProcessor<T> {
     @WorkerThread
     Bitmap process(@NonNull Context context, @NonNull T data, @NonNull Bitmap bitmap)
             throws Throwable;
+
+    /**
+     * Unique key that identifies concrete transformation
+     *
+     * @param data Source data
+     */
+    @NonNull
+    @AnyThread
+    String getKey(@NonNull T data);
 }
