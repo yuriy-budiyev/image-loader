@@ -23,6 +23,7 @@
  */
 package com.budiyev.android.imageloader;
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -69,8 +70,26 @@ public final class LoadImageRequest {
      * Source data, if not set, {@link #load()} method will do nothing
      */
     @NonNull
-    public LoadImageRequest from(@Nullable Uri source) {
-        mSource = source;
+    public LoadImageRequest from(@Nullable Uri uri) {
+        mSource = uri;
+        return this;
+    }
+
+    /**
+     * Source data, if not set, {@link #load()} method will do nothing
+     */
+    @NonNull
+    public LoadImageRequest from(@NonNull String uri) {
+        mSource = Uri.parse(uri);
+        return this;
+    }
+
+    /**
+     * Source data, if not set, {@link #load()} method will do nothing
+     */
+    @NonNull
+    public LoadImageRequest from(@NonNull File file) {
+        mSource = Uri.fromFile(file);
         return this;
     }
 
