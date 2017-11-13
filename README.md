@@ -25,9 +25,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ImageView view = findViewById(R.id.image_view);
 
-        ImageLoader.with(this).from("https://some.url/image")
-                .transform(ImageUtils.<Uri>cropCenter()).transform(ImageUtils.<Uri>roundCorners())
-                .into(view).load();
+        ImageLoader.with(this).from("https://some.url/image").into(view).load();
     }
 }
 ```
