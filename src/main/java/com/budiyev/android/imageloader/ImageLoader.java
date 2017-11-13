@@ -365,15 +365,10 @@ public final class ImageLoader<T> {
     }
 
     /**
-     * Create new image load request, supports custom parameters for each request,
-     * supports transformations
+     * Create new image load request
      *
      * @param context Context
-     * @see LoadImageRequest#from(Uri)
-     * @see LoadImageRequest#from(File)
-     * @see LoadImageRequest#from(String)
-     * @see LoadImageRequest#into(ImageView)
-     * @see LoadImageRequest#load()
+     * @see LoadImageRequest
      */
     @NonNull
     @AnyThread
