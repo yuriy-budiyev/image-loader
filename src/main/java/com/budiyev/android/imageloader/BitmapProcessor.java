@@ -28,6 +28,9 @@ import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
 
+/**
+ * Bitmap processor
+ */
 public interface BitmapProcessor<T> {
     /**
      * Process loaded bitmap before displaying

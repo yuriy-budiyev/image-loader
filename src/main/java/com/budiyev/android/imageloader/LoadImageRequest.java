@@ -61,24 +61,38 @@ public final class LoadImageRequest {
         mContext = context;
     }
 
+    /**
+     * Source data, if not set, {@link #load()} method will do nothing
+     */
     @NonNull
     public LoadImageRequest from(@Nullable Uri source) {
         mSource = source;
         return this;
     }
 
+    /**
+     * Placeholder
+     */
     @NonNull
     public LoadImageRequest placeholder(@Nullable Drawable placeholder) {
         mPlaceholder = placeholder;
         return this;
     }
 
+    /**
+     * Error drawable, that will be displayed when image, couldn't be loaded
+     */
     @NonNull
     public LoadImageRequest errorDrawable(@Nullable Drawable errorDrawable) {
         mErrorDrawable = errorDrawable;
         return this;
     }
 
+    /**
+     * Add bitmap processor
+     *
+     * @see BitmapProcessor
+     */
     @NonNull
     public LoadImageRequest process(@NonNull BitmapProcessor<Uri> processor) {
         List<BitmapProcessor<Uri>> processors = mProcessors;
@@ -117,12 +131,18 @@ public final class LoadImageRequest {
         return this;
     }
 
+    /**
+     * Target view in which image will be loaded
+     */
     @NonNull
     public LoadImageRequest into(@Nullable ImageView view) {
         mView = view;
         return this;
     }
 
+    /**
+     * Lad image
+     */
     @AnyThread
     public void load() {
         Uri source = mSource;
