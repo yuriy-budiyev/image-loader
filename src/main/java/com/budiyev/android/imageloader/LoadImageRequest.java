@@ -83,7 +83,7 @@ public final class LoadImageRequest {
     }
 
     /**
-     * Required size of image
+     * Required size of image, size of loaded image will be less or equal to required size
      */
     @NonNull
     public LoadImageRequest size(@Px int requiredWidth, @Px int requiredHeight) {
