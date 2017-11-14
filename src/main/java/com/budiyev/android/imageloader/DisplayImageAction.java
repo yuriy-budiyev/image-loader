@@ -80,7 +80,7 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
             try {
                 image = bitmapTransformation.transform(context, data, image);
             } catch (Throwable error) {
-                notifyError(context, data, error);
+                processError(context, data, error);
                 return;
             }
             ImageCache memoryCache = getMemoryCache();

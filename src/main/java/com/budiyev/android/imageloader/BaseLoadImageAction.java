@@ -136,8 +136,10 @@ abstract class BaseLoadImageAction<T> {
         return mCancelled;
     }
 
-    protected void notifyImageLoaded(@NonNull Context context, @NonNull T data,
-            @NonNull Bitmap image) {
+    protected void processImage(@NonNull Context context, @NonNull T data, @NonNull Bitmap image) {
+        if (mCancelled) {
+            return;
+        }
         LoadCallback<T> loadCallback = mLoadCallback;
         if (loadCallback != null) {
             loadCallback.onLoaded(context, data, image);
@@ -145,8 +147,11 @@ abstract class BaseLoadImageAction<T> {
         onImageLoaded(image);
     }
 
-    protected void notifyError(@NonNull Context context, @NonNull T data,
+    protected void processError(@NonNull Context context, @NonNull T data,
             @NonNull Throwable error) {
+        if (mCancelled) {
+            return;
+        }
         ErrorCallback<T> errorCallback = mErrorCallback;
         if (errorCallback != null) {
             errorCallback.onError(context, data, error);
@@ -167,40 +172,49 @@ abstract class BaseLoadImageAction<T> {
         Context context = mContext;
         String key = mDescriptor.getKey();
         T data = mDescriptor.getData();
-        Bitmap image = null;
+        Bitmap image;
+        // Memory cache
         ImageCache memoryCache = mMemoryCache;
         if (memoryCache != null) {
             image = memoryCache.get(key);
+            if (image != null) {
+                processImage(context, data, image);
+                return;
+            }
         }
-        if (image != null) {
-            notifyImageLoaded(context, data, image);
+        if (mCancelled) {
             return;
         }
+        // Storage cache
         ImageCache storageCache = mStorageCache;
         if (storageCache != null) {
             image = storageCache.get(key);
+            if (image != null) {
+                if (memoryCache != null) {
+                    memoryCache.put(key, image);
+                }
+                processImage(context, data, image);
+                return;
+            }
         }
-        if (image != null) {
-            notifyImageLoaded(context, data, image);
+        if (mCancelled) {
             return;
         }
+        // Load new image
         try {
             image = mBitmapLoader.load(context, data);
         } catch (Throwable error) {
-            notifyError(context, data, error);
+            processError(context, data, error);
             return;
         }
         if (image == null) {
-            notifyError(context, data, new ImageNotLoadedException());
-            return;
-        }
-        if (mCancelled) {
+            processError(context, data, new ImageNotLoadedException());
             return;
         }
         if (memoryCache != null) {
             memoryCache.put(key, image);
         }
-        notifyImageLoaded(context, data, image);
+        processImage(context, data, image);
         if (mCancelled) {
             return;
         }
