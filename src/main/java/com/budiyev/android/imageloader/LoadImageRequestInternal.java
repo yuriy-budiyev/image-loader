@@ -246,8 +246,7 @@ final class LoadImageRequestInternal {
         public Bitmap load(@NonNull Context context) throws Throwable {
             if (isSampled()) {
                 return DataUtils
-                        .loadSampledBitmapFromUri(context, mUri, mRequiredWidth, mRequiredHeight,
-                                true);
+                        .loadSampledBitmapFromUri(context, mUri, mRequiredWidth, mRequiredHeight);
             } else {
                 InputStream inputStream = null;
                 try {

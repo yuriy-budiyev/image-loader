@@ -81,19 +81,16 @@ public final class DataUtils {
     /**
      * Load sampled bitmap from uri
      *
-     * @param context                   Context
-     * @param uri                       Uri
-     * @param requiredWidth             Required width
-     * @param requiredHeight            Required height
-     * @param ignoreTotalNumberOfPixels Ignore total number of pixels
-     *                                  (requiredWidth * requiredHeight)
+     * @param context        Context
+     * @param uri            Uri
+     * @param requiredWidth  Required width
+     * @param requiredHeight Required height
      * @return Loaded bitmap or {@code null}
      */
     @Nullable
     @WorkerThread
     public static Bitmap loadSampledBitmapFromUri(@NonNull Context context, @NonNull Uri uri,
-            int requiredWidth, int requiredHeight, boolean ignoreTotalNumberOfPixels)
-            throws IOException {
+            int requiredWidth, int requiredHeight) throws IOException {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         InputStream inputStream = null;
@@ -106,10 +103,8 @@ public final class DataUtils {
         } finally {
             InternalUtils.close(inputStream);
         }
+        calculateSampleSize(options, requiredWidth, requiredHeight);
         options.inJustDecodeBounds = false;
-        options.inSampleSize =
-                calculateSampleSize(options.outWidth, options.outHeight, requiredWidth,
-                        requiredHeight, ignoreTotalNumberOfPixels);
         inputStream = null;
         try {
             inputStream = InternalUtils.getDataStreamFromUri(context, uri);
@@ -125,17 +120,15 @@ public final class DataUtils {
     /**
      * Load sampled bitmap from file
      *
-     * @param file                      File
-     * @param requiredWidth             Required width
-     * @param requiredHeight            Required height
-     * @param ignoreTotalNumberOfPixels Ignore total number of pixels
-     *                                  (requiredWidth * requiredHeight)
+     * @param file           File
+     * @param requiredWidth  Required width
+     * @param requiredHeight Required height
      * @return Loaded bitmap or {@code null}
      */
     @Nullable
     @WorkerThread
     public static Bitmap loadSampledBitmapFromFile(@NonNull File file, int requiredWidth,
-            int requiredHeight, boolean ignoreTotalNumberOfPixels) throws IOException {
+            int requiredHeight) throws IOException {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         InputStream inputStream = null;
@@ -145,10 +138,8 @@ public final class DataUtils {
         } finally {
             InternalUtils.close(inputStream);
         }
+        calculateSampleSize(options, requiredWidth, requiredHeight);
         options.inJustDecodeBounds = false;
-        options.inSampleSize =
-                calculateSampleSize(options.outWidth, options.outHeight, requiredWidth,
-                        requiredHeight, ignoreTotalNumberOfPixels);
         inputStream = null;
         try {
             inputStream = new FileInputStream(file);
@@ -162,17 +153,15 @@ public final class DataUtils {
     /**
      * Load sampled bitmap from file descriptor
      *
-     * @param fileDescriptor            File descriptor
-     * @param requiredWidth             Required width
-     * @param requiredHeight            Required height
-     * @param ignoreTotalNumberOfPixels Ignore total number of pixels
-     *                                  (requiredWidth * requiredHeight)
+     * @param fileDescriptor File descriptor
+     * @param requiredWidth  Required width
+     * @param requiredHeight Required height
      * @return Loaded bitmap or {@code null}
      */
     @Nullable
     @WorkerThread
     public static Bitmap loadSampledBitmapFromFileDescriptor(@NonNull FileDescriptor fileDescriptor,
-            int requiredWidth, int requiredHeight, boolean ignoreTotalNumberOfPixels) {
+            int requiredWidth, int requiredHeight) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         InputStream inputStream = null;
@@ -182,10 +171,8 @@ public final class DataUtils {
         } finally {
             InternalUtils.close(inputStream);
         }
+        calculateSampleSize(options, requiredWidth, requiredHeight);
         options.inJustDecodeBounds = false;
-        options.inSampleSize =
-                calculateSampleSize(options.outWidth, options.outHeight, requiredWidth,
-                        requiredHeight, ignoreTotalNumberOfPixels);
         inputStream = null;
         try {
             inputStream = new FileInputStream(fileDescriptor);
@@ -198,18 +185,16 @@ public final class DataUtils {
     /**
      * Load sampled bitmap from resource
      *
-     * @param resources                 Resources
-     * @param resourceId                Resource id
-     * @param requiredWidth             Required width
-     * @param requiredHeight            Required height
-     * @param ignoreTotalNumberOfPixels Ignore total number of pixels
-     *                                  (requiredWidth * requiredHeight)
+     * @param resources      Resources
+     * @param resourceId     Resource id
+     * @param requiredWidth  Required width
+     * @param requiredHeight Required height
      * @return Loaded bitmap or {@code null}
      */
     @Nullable
     @WorkerThread
     public static Bitmap loadSampledBitmapFromResource(@NonNull Resources resources, int resourceId,
-            int requiredWidth, int requiredHeight, boolean ignoreTotalNumberOfPixels) {
+            int requiredWidth, int requiredHeight) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         TypedValue typedValue = new TypedValue();
         options.inJustDecodeBounds = true;
@@ -226,10 +211,8 @@ public final class DataUtils {
         } finally {
             InternalUtils.close(inputStream);
         }
+        calculateSampleSize(options, requiredWidth, requiredHeight);
         options.inJustDecodeBounds = false;
-        options.inSampleSize =
-                calculateSampleSize(options.outWidth, options.outHeight, requiredWidth,
-                        requiredHeight, ignoreTotalNumberOfPixels);
         inputStream = null;
         try {
             inputStream = resources.openRawResource(resourceId, typedValue);
@@ -242,47 +225,33 @@ public final class DataUtils {
     /**
      * Load sampled bitmap from byte array
      *
-     * @param byteArray                 Byte array
-     * @param requiredWidth             Required width
-     * @param requiredHeight            Required height
-     * @param ignoreTotalNumberOfPixels Ignore total number of pixels
-     *                                  (requiredWidth * requiredHeight)
+     * @param byteArray      Byte array
+     * @param requiredWidth  Required width
+     * @param requiredHeight Required height
      * @return Loaded bitmap or {@code null}
      */
     @Nullable
     @WorkerThread
     public static Bitmap loadSampledBitmapFromByteArray(@NonNull byte[] byteArray,
-            int requiredWidth, int requiredHeight, boolean ignoreTotalNumberOfPixels) {
+            int requiredWidth, int requiredHeight) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length, options);
-        options.inSampleSize =
-                calculateSampleSize(options.outWidth, options.outHeight, requiredWidth,
-                        requiredHeight, ignoreTotalNumberOfPixels);
+        calculateSampleSize(options, requiredWidth, requiredHeight);
         options.inJustDecodeBounds = false;
         return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length, options);
     }
 
-    private static int calculateSampleSize(int sourceWidth, int sourceHeight, int requiredWidth,
-            int requiredHeight, boolean ignoreTotalNumberOfPixels) {
+    private static void calculateSampleSize(@NonNull BitmapFactory.Options options,
+            int requiredWidth, int requiredHeight) {
         int sampleSize = 1;
-        if (sourceWidth > requiredWidth || sourceHeight > requiredHeight) {
-            int halfWidth = sourceWidth / 2;
-            int halfHeight = sourceHeight / 2;
-            while ((halfWidth / sampleSize) > requiredWidth &&
-                    (halfHeight / sampleSize) > requiredHeight) {
-                sampleSize *= 2;
-            }
-            if (ignoreTotalNumberOfPixels) {
-                return sampleSize;
-            }
-            int totalPixels = (sourceWidth * sourceHeight) / (sampleSize * sampleSize);
-            int totalRequiredPixels = requiredWidth * requiredHeight;
-            while (totalPixels > totalRequiredPixels) {
-                sampleSize *= 2;
-                totalPixels /= 4;
-            }
+        int width = options.outWidth;
+        int height = options.outHeight;
+        while (width > requiredWidth || height > requiredHeight) {
+            width /= 2;
+            height /= 2;
+            sampleSize *= 2;
         }
-        return sampleSize;
+        options.inSampleSize = sampleSize;
     }
 }
