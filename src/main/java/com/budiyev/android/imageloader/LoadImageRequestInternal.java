@@ -55,8 +55,9 @@ final class LoadImageRequestInternal {
     private final boolean mFadeEnabled;
     private final long mFadeDuration;
 
-    LoadImageRequestInternal(@NonNull Context context, @NonNull Uri data, @Nullable ImageView view,
-            @Nullable Drawable placeholder, @Nullable Drawable errorDrawable,
+    public LoadImageRequestInternal(@NonNull Context context, @NonNull Uri data,
+            @Nullable ImageView view, @Nullable Drawable placeholder,
+            @Nullable Drawable errorDrawable,
             @Nullable List<BitmapTransformation<Uri>> transformations,
             @Nullable LoadCallback<Uri> loadCallback,
             @Nullable DisplayCallback<Uri> displayCallback,
