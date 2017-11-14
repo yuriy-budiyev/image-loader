@@ -191,7 +191,7 @@ public final class LoadImageRequest {
         if (source == null) {
             return;
         }
-        new LoadImageRequestInternal(mContext, mSource, mView, mPlaceholder, mErrorDrawable,
+        new LoadImageRequestInternal(mContext, source, mView, mPlaceholder, mErrorDrawable,
                 mTransformations, mLoadCallback, mDisplayCallback, mErrorCallback, mFadeEnabled,
                 mFadeDuration).execute();
     }
