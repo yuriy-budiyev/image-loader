@@ -92,16 +92,23 @@ final class LoadImageRequestInternal {
     }
 
     @AnyThread
+    @SuppressLint("WrongThread")
     public void execute() {
         DataDescriptor<Uri> descriptor = DataUtils.descriptor(mData);
         ImageLoader<Uri> loader = getLoader();
         if (mView == null) {
             loader.load(descriptor, mLoadCallback, mErrorCallback);
         } else {
-            loader.runOnMainThread(
-                    new LoadAction(loader, descriptor, mView, mPlaceholder, mErrorDrawable,
-                            mTransformation, mLoadCallback, mDisplayCallback, mErrorCallback,
-                            mFadeEnabled, mFadeDuration));
+            if (Thread.currentThread() == mContext.getMainLooper().getThread()) {
+                loader.load(descriptor, mView, mPlaceholder, mErrorDrawable, mTransformation,
+                        mLoadCallback, mErrorCallback, mDisplayCallback, mFadeEnabled,
+                        mFadeDuration);
+            } else {
+                loader.runOnMainThread(
+                        new LoadAction(loader, descriptor, mView, mPlaceholder, mErrorDrawable,
+                                mTransformation, mLoadCallback, mDisplayCallback, mErrorCallback,
+                                mFadeEnabled, mFadeDuration));
+            }
         }
     }
 
