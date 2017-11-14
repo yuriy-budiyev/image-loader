@@ -247,7 +247,7 @@ public final class DataUtils {
         int sampleSize = 1;
         int width = options.outWidth;
         int height = options.outHeight;
-        int threshold = Math.max(requiredWidth, requiredHeight) / 5;
+        int threshold = Math.max(requiredWidth, requiredHeight) / 4;
         while (width - requiredWidth > threshold || height - requiredHeight > threshold) {
             width /= 2;
             height /= 2;
