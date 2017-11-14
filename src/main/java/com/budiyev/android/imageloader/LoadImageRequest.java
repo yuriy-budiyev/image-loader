@@ -33,6 +33,7 @@ import android.net.Uri;
 import android.support.annotation.AnyThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.Px;
 import android.widget.ImageView;
 
 public final class LoadImageRequest {
@@ -45,6 +46,8 @@ public final class LoadImageRequest {
     private ErrorCallback<Uri> mErrorCallback;
     private ImageView mView;
     private List<BitmapTransformation<Uri>> mTransformations;
+    private int mRequiredWidth = -1;
+    private int mRequiredHeight = -1;
     private boolean mFadeEnabled = true;
     private long mFadeDuration = 200L;
 
@@ -76,6 +79,16 @@ public final class LoadImageRequest {
     @NonNull
     public LoadImageRequest from(@NonNull File file) {
         mSource = Uri.fromFile(file);
+        return this;
+    }
+
+    /**
+     * Required size of image
+     */
+    @NonNull
+    public LoadImageRequest size(@Px int requiredWidth, @Px int requiredHeight) {
+        mRequiredWidth = requiredWidth;
+        mRequiredHeight = requiredHeight;
         return this;
     }
 
@@ -191,8 +204,8 @@ public final class LoadImageRequest {
         if (source == null) {
             return;
         }
-        new LoadImageRequestInternal(mContext, source, mView, mPlaceholder, mErrorDrawable,
-                mTransformations, mLoadCallback, mDisplayCallback, mErrorCallback, mFadeEnabled,
-                mFadeDuration).execute();
+        new LoadImageRequestInternal(mContext, source, mRequiredWidth, mRequiredHeight, mView,
+                mPlaceholder, mErrorDrawable, mTransformations, mLoadCallback, mDisplayCallback,
+                mErrorCallback, mFadeEnabled, mFadeDuration).execute();
     }
 }

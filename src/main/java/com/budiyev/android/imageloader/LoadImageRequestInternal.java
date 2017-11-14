@@ -23,6 +23,7 @@
  */
 package com.budiyev.android.imageloader;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -31,6 +32,8 @@ import android.annotation.SuppressLint;
 import android.content.ComponentCallbacks2;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.annotation.AnyThread;
@@ -42,28 +45,28 @@ import android.widget.ImageView;
 final class LoadImageRequestInternal {
     private static final Lock LOADER_LOCK = new ReentrantLock();
     @SuppressLint("StaticFieldLeak")
-    private static volatile ImageLoader<Uri> sLoader;
+    private static volatile ImageLoader<Data> sLoader;
     private final Context mContext;
-    private final Uri mData;
+    private final Data mData;
     private final ImageView mView;
-    private final PlaceholderProvider<Uri> mPlaceholder;
-    private final ErrorDrawableProvider<Uri> mErrorDrawable;
-    private final BitmapTransformation<Uri> mTransformation;
-    private final LoadCallback<Uri> mLoadCallback;
-    private final DisplayCallback<Uri> mDisplayCallback;
-    private final ErrorCallback<Uri> mErrorCallback;
+    private final PlaceholderProvider<Data> mPlaceholder;
+    private final ErrorDrawableProvider<Data> mErrorDrawable;
+    private final BitmapTransformation<Data> mTransformation;
+    private final LoadCallback<Data> mLoadCallback;
+    private final DisplayCallback<Data> mDisplayCallback;
+    private final ErrorCallback<Data> mErrorCallback;
     private final boolean mFadeEnabled;
     private final long mFadeDuration;
 
-    public LoadImageRequestInternal(@NonNull Context context, @NonNull Uri data,
-            @Nullable ImageView view, @Nullable Drawable placeholder,
+    public LoadImageRequestInternal(@NonNull Context context, @NonNull Uri data, int requiredWidth,
+            int requiredHeight, @Nullable ImageView view, @Nullable Drawable placeholder,
             @Nullable Drawable errorDrawable,
             @Nullable List<BitmapTransformation<Uri>> transformations,
             @Nullable LoadCallback<Uri> loadCallback,
             @Nullable DisplayCallback<Uri> displayCallback,
             @Nullable ErrorCallback<Uri> errorCallback, boolean fadeEnabled, long fadeDuration) {
         mContext = context.getApplicationContext();
-        mData = data;
+        mData = new Data(data, requiredWidth, requiredHeight);
         mView = view;
         if (placeholder != null) {
             mPlaceholder = new PlaceholderWrapper(placeholder);
@@ -76,25 +79,33 @@ final class LoadImageRequestInternal {
             mErrorDrawable = null;
         }
         if (transformations != null && !transformations.isEmpty()) {
-            if (transformations.size() == 1) {
-                mTransformation = transformations.get(0);
-            } else {
-                mTransformation = new BitmapTransformationGroup<>(transformations);
-            }
+            mTransformation = new BitmapTransformationWrapper(transformations);
         } else {
             mTransformation = null;
         }
-        mLoadCallback = loadCallback;
-        mDisplayCallback = displayCallback;
-        mErrorCallback = errorCallback;
+        if (loadCallback != null) {
+            mLoadCallback = new LoadCallbackWrapper(loadCallback);
+        } else {
+            mLoadCallback = null;
+        }
+        if (displayCallback != null) {
+            mDisplayCallback = new DisplayCallbackWrapper(displayCallback);
+        } else {
+            mDisplayCallback = null;
+        }
+        if (errorCallback != null) {
+            mErrorCallback = new ErrorCallbackWrapper(errorCallback);
+        } else {
+            mErrorCallback = null;
+        }
         mFadeEnabled = fadeEnabled;
         mFadeDuration = fadeDuration;
     }
 
     @AnyThread
     public void execute() {
-        DataDescriptor<Uri> descriptor = DataUtils.descriptor(mData);
-        ImageLoader<Uri> loader = getLoader();
+        DataDescriptor<Data> descriptor = new RequestDataDescriptor(mData);
+        ImageLoader<Data> loader = getLoader();
         if (mView == null) {
             loader.load(descriptor, mLoadCallback, mErrorCallback);
         } else {
@@ -106,25 +117,26 @@ final class LoadImageRequestInternal {
     }
 
     private static final class LoadAction implements Runnable {
-        private final ImageLoader<Uri> mLoader;
-        private final DataDescriptor<Uri> mDescriptor;
+        private final ImageLoader<Data> mLoader;
+        private final DataDescriptor<Data> mDescriptor;
         private final ImageView mView;
-        private final PlaceholderProvider<Uri> mPlaceholder;
-        private final ErrorDrawableProvider<Uri> mErrorDrawable;
-        private final BitmapTransformation<Uri> mTransformation;
-        private final LoadCallback<Uri> mLoadCallback;
-        private final DisplayCallback<Uri> mDisplayCallback;
-        private final ErrorCallback<Uri> mErrorCallback;
+        private final PlaceholderProvider<Data> mPlaceholder;
+        private final ErrorDrawableProvider<Data> mErrorDrawable;
+        private final BitmapTransformation<Data> mTransformation;
+        private final LoadCallback<Data> mLoadCallback;
+        private final DisplayCallback<Data> mDisplayCallback;
+        private final ErrorCallback<Data> mErrorCallback;
         private final boolean mFadeEnabled;
         private final long mFadeDuration;
 
-        public LoadAction(@NonNull ImageLoader<Uri> loader, @NonNull DataDescriptor<Uri> descriptor,
-                @NonNull ImageView view, @Nullable PlaceholderProvider<Uri> placeholder,
-                @Nullable ErrorDrawableProvider<Uri> errorDrawable,
-                @Nullable BitmapTransformation<Uri> transformation,
-                @Nullable LoadCallback<Uri> loadCallback,
-                @Nullable DisplayCallback<Uri> displayCallback,
-                @Nullable ErrorCallback<Uri> errorCallback, boolean fadeEnabled,
+        public LoadAction(@NonNull ImageLoader<Data> loader,
+                @NonNull DataDescriptor<Data> descriptor, @NonNull ImageView view,
+                @Nullable PlaceholderProvider<Data> placeholder,
+                @Nullable ErrorDrawableProvider<Data> errorDrawable,
+                @Nullable BitmapTransformation<Data> transformation,
+                @Nullable LoadCallback<Data> loadCallback,
+                @Nullable DisplayCallback<Data> displayCallback,
+                @Nullable ErrorCallback<Data> errorCallback, boolean fadeEnabled,
                 long fadeDuration) {
             mLoader = loader;
             mDescriptor = descriptor;
@@ -148,15 +160,15 @@ final class LoadImageRequestInternal {
     }
 
     @NonNull
-    private ImageLoader<Uri> getLoader() {
-        ImageLoader<Uri> loader = sLoader;
+    private ImageLoader<Data> getLoader() {
+        ImageLoader<Data> loader = sLoader;
         if (loader == null) {
             LOADER_LOCK.lock();
             try {
                 loader = sLoader;
                 if (loader == null) {
-                    loader = ImageLoader.builder(mContext).uri().memoryCache().storageCache()
-                            .build();
+                    loader = ImageLoader.builder(mContext).custom(new RequestBitmapLoader())
+                            .memoryCache().storageCache().build();
                     mContext.registerComponentCallbacks(new ClearMemoryCacheCallbacks());
                     sLoader = loader;
                 }
@@ -191,7 +203,7 @@ final class LoadImageRequestInternal {
         }
     }
 
-    private static final class PlaceholderWrapper implements PlaceholderProvider<Uri> {
+    private static final class PlaceholderWrapper implements PlaceholderProvider<Data> {
         private final Drawable mDrawable;
 
         public PlaceholderWrapper(@NonNull Drawable drawable) {
@@ -200,12 +212,12 @@ final class LoadImageRequestInternal {
 
         @NonNull
         @Override
-        public Drawable getPlaceholder(@NonNull Context context, @NonNull Uri data) {
+        public Drawable getPlaceholder(@NonNull Context context, @NonNull Data data) {
             return mDrawable;
         }
     }
 
-    private static final class ErrorDrawableWrapper implements ErrorDrawableProvider<Uri> {
+    private static final class ErrorDrawableWrapper implements ErrorDrawableProvider<Data> {
         private final Drawable mDrawable;
 
         public ErrorDrawableWrapper(@NonNull Drawable drawable) {
@@ -214,8 +226,173 @@ final class LoadImageRequestInternal {
 
         @NonNull
         @Override
-        public Drawable getErrorDrawable(@NonNull Context context, @NonNull Uri data) {
+        public Drawable getErrorDrawable(@NonNull Context context, @NonNull Data data) {
             return mDrawable;
+        }
+    }
+
+    private static final class Data {
+        private final Uri mUri;
+        private final int mRequiredWidth;
+        private final int mRequiredHeight;
+
+        public Data(@NonNull Uri uri, int requiredWidth, int requiredHeight) {
+            mUri = uri;
+            mRequiredWidth = requiredWidth;
+            mRequiredHeight = requiredHeight;
+        }
+
+        @Nullable
+        public Bitmap load(@NonNull Context context) throws Throwable {
+            if (isSampled()) {
+                return DataUtils
+                        .loadSampledBitmapFromUri(context, mUri, mRequiredWidth, mRequiredHeight,
+                                true);
+            } else {
+                InputStream inputStream = null;
+                try {
+                    inputStream = InternalUtils.getDataStreamFromUri(context, mUri);
+                    if (inputStream == null) {
+                        return null;
+                    }
+                    return BitmapFactory.decodeStream(inputStream);
+                } finally {
+                    InternalUtils.close(inputStream);
+                }
+            }
+        }
+
+        public boolean isSampled() {
+            return mRequiredWidth > 0 && mRequiredHeight > 0;
+        }
+
+        public int getRequiredWidth() {
+            return mRequiredWidth;
+        }
+
+        public int getRequiredHeight() {
+            return mRequiredHeight;
+        }
+
+        @NonNull
+        public Uri getUri() {
+            return mUri;
+        }
+    }
+
+    private static final class RequestDataDescriptor implements DataDescriptor<Data> {
+        private final Data mData;
+        private final String mKey;
+
+        private RequestDataDescriptor(@NonNull Data data) {
+            mData = data;
+            String key = DataUtils.generateSHA256(data.getUri().toString());
+            if (data.isSampled()) {
+                key += "_sampled" + data.getRequiredWidth() + "x" + data.getRequiredHeight();
+            }
+            mKey = key;
+        }
+
+        @NonNull
+        @Override
+        public Data getData() {
+            return mData;
+        }
+
+        @NonNull
+        @Override
+        public String getKey() {
+            return mKey;
+        }
+    }
+
+    private static final class RequestBitmapLoader implements BitmapLoader<Data> {
+        @Nullable
+        @Override
+        public Bitmap load(@NonNull Context context, @NonNull Data data) throws Throwable {
+            return data.load(context);
+        }
+    }
+
+    private static final class BitmapTransformationWrapper implements BitmapTransformation<Data> {
+        private final List<BitmapTransformation<Uri>> mTransformations;
+        private final String mKey;
+
+        public BitmapTransformationWrapper(
+                @NonNull List<BitmapTransformation<Uri>> transformations) {
+            mTransformations = transformations;
+            StringBuilder sb = new StringBuilder();
+            for (BitmapTransformation<Uri> t : transformations) {
+                sb.append(t.getKey());
+            }
+            mKey = sb.toString();
+        }
+
+
+        @NonNull
+        @Override
+        public Bitmap transform(@NonNull Context context, @NonNull Data data,
+                @NonNull Bitmap bitmap) throws Throwable {
+            Uri dataUri = data.getUri();
+            boolean first = true;
+            for (BitmapTransformation<Uri> transformation : mTransformations) {
+                Bitmap processed = transformation.transform(context, dataUri, bitmap);
+                if (bitmap != processed) {
+                    if (!first && !bitmap.isRecycled()) {
+                        bitmap.recycle();
+                    }
+                    first = false;
+                }
+                bitmap = processed;
+            }
+            return bitmap;
+        }
+
+        @NonNull
+        @Override
+        public String getKey() {
+            return mKey;
+        }
+    }
+
+    private static final class LoadCallbackWrapper implements LoadCallback<Data> {
+        private final LoadCallback<Uri> mCallback;
+
+        public LoadCallbackWrapper(@NonNull LoadCallback<Uri> callback) {
+            mCallback = callback;
+        }
+
+        @Override
+        public void onLoaded(@NonNull Context context, @NonNull Data data, @NonNull Bitmap image) {
+            mCallback.onLoaded(context, data.getUri(), image);
+        }
+    }
+
+    private static final class ErrorCallbackWrapper implements ErrorCallback<Data> {
+        private final ErrorCallback<Uri> mCallback;
+
+        private ErrorCallbackWrapper(@NonNull ErrorCallback<Uri> callback) {
+            mCallback = callback;
+        }
+
+        @Override
+        public void onError(@NonNull Context context, @NonNull Data data,
+                @NonNull Throwable error) {
+            mCallback.onError(context, data.getUri(), error);
+        }
+    }
+
+    private static final class DisplayCallbackWrapper implements DisplayCallback<Data> {
+        private final DisplayCallback<Uri> mCallback;
+
+        private DisplayCallbackWrapper(@NonNull DisplayCallback<Uri> callback) {
+            mCallback = callback;
+        }
+
+        @Override
+        public void onDisplayed(@NonNull Context context, @NonNull Data data, @NonNull Bitmap image,
+                @NonNull ImageView view) {
+            mCallback.onDisplayed(context, data.getUri(), image, view);
         }
     }
 }
