@@ -23,34 +23,46 @@
  */
 package com.budiyev.android.imageloader;
 
+import java.util.List;
+
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.support.annotation.AnyThread;
 import android.support.annotation.NonNull;
-import android.support.annotation.WorkerThread;
 
-/**
- * Bitmap processor
- */
-public interface BitmapTransformation<T> {
-    /**
-     * Process loaded bitmap before displaying
-     *
-     * @param context Context
-     * @param data    Source data
-     * @param bitmap  Bitmap, loaded from source data
-     * @return Processed bitmap
-     * @see ImageUtils
-     */
-    @NonNull
-    @WorkerThread
-    Bitmap transform(@NonNull Context context, @NonNull T data, @NonNull Bitmap bitmap)
-            throws Throwable;
+final class BitmapTransformationGroup<T> implements BitmapTransformation<T> {
+    private final List<BitmapTransformation<T>> mTransformations;
+    private final String mKey;
 
-    /**
-     * Unique key that identifies concrete transformation
-     */
+    public BitmapTransformationGroup(@NonNull List<BitmapTransformation<T>> transformations) {
+        mTransformations = transformations;
+        StringBuilder sb = new StringBuilder();
+        for (BitmapTransformation<T> t : transformations) {
+            sb.append(t.getKey());
+        }
+        mKey = sb.toString();
+    }
+
     @NonNull
-    @AnyThread
-    String getKey();
+    @Override
+    public Bitmap transform(@NonNull Context context, @NonNull T data, @NonNull Bitmap bitmap)
+            throws Throwable {
+        boolean first = true;
+        for (BitmapTransformation<T> transformation : mTransformations) {
+            Bitmap processed = transformation.transform(context, data, bitmap);
+            if (bitmap != processed) {
+                if (!first && !bitmap.isRecycled()) {
+                    bitmap.recycle();
+                }
+                first = false;
+            }
+            bitmap = processed;
+        }
+        return bitmap;
+    }
+
+    @NonNull
+    @Override
+    public String getKey() {
+        return mKey;
+    }
 }

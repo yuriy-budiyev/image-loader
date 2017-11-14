@@ -449,7 +449,7 @@ public final class ImageUtils {
 
         @NonNull
         @Override
-        public String getKey(@NonNull Object data) {
+        public String getKey() {
             return "_invert_colors";
         }
     }
@@ -464,7 +464,7 @@ public final class ImageUtils {
 
         @NonNull
         @Override
-        public String getKey(@NonNull Object data) {
+        public String getKey() {
             return "_gray_scale";
         }
     }
@@ -480,7 +480,7 @@ public final class ImageUtils {
 
         @NonNull
         @Override
-        public String getKey(@NonNull Object data) {
+        public String getKey() {
             return "_mirror_horizontally";
         }
     }
@@ -496,7 +496,7 @@ public final class ImageUtils {
 
         @NonNull
         @Override
-        public String getKey(@NonNull Object data) {
+        public String getKey() {
             return "_mirror_vertically";
         }
     }
@@ -520,7 +520,7 @@ public final class ImageUtils {
 
         @NonNull
         @Override
-        public String getKey(@NonNull Object data) {
+        public String getKey() {
             return mKey;
         }
     }
@@ -552,7 +552,7 @@ public final class ImageUtils {
 
         @NonNull
         @Override
-        public String getKey(@NonNull Object data) {
+        public String getKey() {
             return mKey;
         }
     }
@@ -588,7 +588,7 @@ public final class ImageUtils {
 
         @NonNull
         @Override
-        public String getKey(@NonNull Object data) {
+        public String getKey() {
             return mKey;
         }
     }
@@ -613,7 +613,7 @@ public final class ImageUtils {
 
         @NonNull
         @Override
-        public String getKey(@NonNull Object data) {
+        public String getKey() {
             return mKey;
         }
     }
@@ -640,7 +640,7 @@ public final class ImageUtils {
 
         @NonNull
         @Override
-        public String getKey(@NonNull Object data) {
+        public String getKey() {
             return mKey;
         }
     }

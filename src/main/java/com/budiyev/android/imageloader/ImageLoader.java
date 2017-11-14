@@ -112,8 +112,8 @@ public final class ImageLoader<T> {
      */
     @MainThread
     public void load(@NonNull DataDescriptor<T> descriptor, @NonNull ImageView view) {
-        load(descriptor, view, mBitmapTransformation, mLoadCallback, mErrorCallback,
-                mDisplayCallback, mFadeEnabled, mFadeDuration);
+        load(descriptor, view, mPlaceholderProvider, mErrorDrawableProvider, mBitmapTransformation,
+                mLoadCallback, mErrorCallback, mDisplayCallback, mFadeEnabled, mFadeDuration);
     }
 
     /**
@@ -127,9 +127,11 @@ public final class ImageLoader<T> {
      */
     @MainThread
     public void load(@NonNull DataDescriptor<T> descriptor, @NonNull ImageView view,
+            @Nullable PlaceholderProvider<T> placeholderProvider,
+            @Nullable ErrorDrawableProvider<T> errorDrawableProvider,
             @Nullable BitmapTransformation<T> transformation) {
-        load(descriptor, view, transformation, mLoadCallback, mErrorCallback, mDisplayCallback,
-                mFadeEnabled, mFadeDuration);
+        load(descriptor, view, placeholderProvider, errorDrawableProvider, transformation,
+                mLoadCallback, mErrorCallback, mDisplayCallback, mFadeEnabled, mFadeDuration);
     }
 
     /**
@@ -143,11 +145,13 @@ public final class ImageLoader<T> {
      */
     @MainThread
     public void load(@NonNull DataDescriptor<T> descriptor, @NonNull ImageView view,
+            @Nullable PlaceholderProvider<T> placeholderProvider,
+            @Nullable ErrorDrawableProvider<T> errorDrawableProvider,
             @Nullable BitmapTransformation<T> transformation,
             @Nullable LoadCallback<T> loadCallback, @Nullable ErrorCallback<T> errorCallback,
             @Nullable DisplayCallback<T> displayCallback) {
-        load(descriptor, view, transformation, loadCallback, errorCallback, displayCallback,
-                mFadeEnabled, mFadeDuration);
+        load(descriptor, view, placeholderProvider, errorDrawableProvider, transformation,
+                loadCallback, errorCallback, displayCallback, mFadeEnabled, mFadeDuration);
     }
 
     /**
@@ -166,20 +170,22 @@ public final class ImageLoader<T> {
      */
     @MainThread
     public void load(@NonNull DataDescriptor<T> descriptor, @NonNull ImageView view,
+            @Nullable PlaceholderProvider<T> placeholderProvider,
+            @Nullable ErrorDrawableProvider<T> errorDrawableProvider,
             @Nullable BitmapTransformation<T> transformation,
             @Nullable LoadCallback<T> loadCallback, @Nullable ErrorCallback<T> errorCallback,
             @Nullable DisplayCallback<T> displayCallback, boolean fadeEnabled, long fadeDuration) {
         Bitmap image = null;
         String key = descriptor.getKey();
         ImageCache memoryCache = mMemoryCache;
-        T data = descriptor.getData();
         if (memoryCache != null) {
             if (transformation != null) {
-                image = memoryCache.get(key + transformation.getKey(data));
+                image = memoryCache.get(key + transformation.getKey());
             } else {
                 image = memoryCache.get(key);
             }
         }
+        T data = descriptor.getData();
         Context context = mContext;
         if (image != null) {
             if (loadCallback != null) {
@@ -199,14 +205,12 @@ public final class ImageLoader<T> {
             currentAction.cancel();
         }
         Drawable placeholder;
-        PlaceholderProvider<T> placeholderProvider = mPlaceholderProvider;
         if (placeholderProvider != null) {
             placeholder = placeholderProvider.getPlaceholder(context, data);
         } else {
             placeholder = new ColorDrawable(Color.TRANSPARENT);
         }
         Drawable errorDrawable;
-        ErrorDrawableProvider<T> errorDrawableProvider = mErrorDrawableProvider;
         if (errorDrawableProvider != null) {
             errorDrawable = errorDrawableProvider.getErrorDrawable(context, data);
         } else {
@@ -278,68 +282,6 @@ public final class ImageLoader<T> {
      */
     public void setPauseLoading(boolean paused) {
         mPauseLock.setPaused(paused);
-    }
-
-    /**
-     * Bitmap transformation, specified in builder
-     */
-    @Nullable
-    public BitmapTransformation<T> getBitmapTransformation() {
-        return mBitmapTransformation;
-    }
-
-    /**
-     * Placeholder provider, specified in builder
-     */
-    @Nullable
-    public PlaceholderProvider<T> getPlaceholderProvider() {
-        return mPlaceholderProvider;
-    }
-
-    /**
-     * Error drawable provider, specified in builder
-     */
-    @Nullable
-    public ErrorDrawableProvider<T> getErrorDrawableProvider() {
-        return mErrorDrawableProvider;
-    }
-
-    /**
-     * Load callback, specified in builder
-     */
-    @Nullable
-    public LoadCallback<T> getLoadCallback() {
-        return mLoadCallback;
-    }
-
-    /**
-     * Display callback, specified in builder
-     */
-    @Nullable
-    public DisplayCallback<T> getDisplayCallback() {
-        return mDisplayCallback;
-    }
-
-    /**
-     * Error callback, specified in builder
-     */
-    @Nullable
-    public ErrorCallback<T> getErrorCallback() {
-        return mErrorCallback;
-    }
-
-    /**
-     * Whether if fade effect is enabled for images that isn't cached in memory
-     */
-    public boolean isFadeEnabled() {
-        return mFadeEnabled;
-    }
-
-    /**
-     * Fade effect duration in milliseconds
-     */
-    public long getFadeDuration() {
-        return mFadeDuration;
     }
 
     /**
