@@ -203,34 +203,6 @@ final class LoadImageRequestInternal {
         }
     }
 
-    private static final class PlaceholderWrapper implements PlaceholderProvider<Data> {
-        private final Drawable mDrawable;
-
-        public PlaceholderWrapper(@NonNull Drawable drawable) {
-            mDrawable = drawable;
-        }
-
-        @NonNull
-        @Override
-        public Drawable getPlaceholder(@NonNull Context context, @NonNull Data data) {
-            return mDrawable;
-        }
-    }
-
-    private static final class ErrorDrawableWrapper implements ErrorDrawableProvider<Data> {
-        private final Drawable mDrawable;
-
-        public ErrorDrawableWrapper(@NonNull Drawable drawable) {
-            mDrawable = drawable;
-        }
-
-        @NonNull
-        @Override
-        public Drawable getErrorDrawable(@NonNull Context context, @NonNull Data data) {
-            return mDrawable;
-        }
-    }
-
     private static final class Data {
         private final Uri mUri;
         private final int mRequiredWidth;
@@ -283,7 +255,7 @@ final class LoadImageRequestInternal {
         private final Data mData;
         private final String mKey;
 
-        private RequestDataDescriptor(@NonNull Data data) {
+        public RequestDataDescriptor(@NonNull Data data) {
             mData = data;
             String key = DataUtils.generateSHA256(data.getUri().toString());
             if (data.isSampled()) {
@@ -354,6 +326,34 @@ final class LoadImageRequestInternal {
         }
     }
 
+    private static final class PlaceholderWrapper implements PlaceholderProvider<Data> {
+        private final Drawable mDrawable;
+
+        public PlaceholderWrapper(@NonNull Drawable drawable) {
+            mDrawable = drawable;
+        }
+
+        @NonNull
+        @Override
+        public Drawable getPlaceholder(@NonNull Context context, @NonNull Data data) {
+            return mDrawable;
+        }
+    }
+
+    private static final class ErrorDrawableWrapper implements ErrorDrawableProvider<Data> {
+        private final Drawable mDrawable;
+
+        public ErrorDrawableWrapper(@NonNull Drawable drawable) {
+            mDrawable = drawable;
+        }
+
+        @NonNull
+        @Override
+        public Drawable getErrorDrawable(@NonNull Context context, @NonNull Data data) {
+            return mDrawable;
+        }
+    }
+
     private static final class LoadCallbackWrapper implements LoadCallback<Data> {
         private final LoadCallback<Uri> mCallback;
 
@@ -370,7 +370,7 @@ final class LoadImageRequestInternal {
     private static final class ErrorCallbackWrapper implements ErrorCallback<Data> {
         private final ErrorCallback<Uri> mCallback;
 
-        private ErrorCallbackWrapper(@NonNull ErrorCallback<Uri> callback) {
+        public ErrorCallbackWrapper(@NonNull ErrorCallback<Uri> callback) {
             mCallback = callback;
         }
 
@@ -384,7 +384,7 @@ final class LoadImageRequestInternal {
     private static final class DisplayCallbackWrapper implements DisplayCallback<Data> {
         private final DisplayCallback<Uri> mCallback;
 
-        private DisplayCallbackWrapper(@NonNull DisplayCallback<Uri> callback) {
+        public DisplayCallbackWrapper(@NonNull DisplayCallback<Uri> callback) {
             mCallback = callback;
         }
 
