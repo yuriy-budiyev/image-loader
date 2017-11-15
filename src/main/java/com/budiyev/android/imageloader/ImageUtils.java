@@ -43,6 +43,8 @@ public final class ImageUtils {
 
     /**
      * Invert image colors
+     *
+     * @see BitmapTransformation
      */
     @NonNull
     @SuppressWarnings("unchecked")
@@ -52,6 +54,8 @@ public final class ImageUtils {
 
     /**
      * Convert image colors to gray-scale
+     *
+     * @see BitmapTransformation
      */
     @NonNull
     @SuppressWarnings("unchecked")
@@ -61,6 +65,8 @@ public final class ImageUtils {
 
     /**
      * Mirror image horizontally
+     *
+     * @see BitmapTransformation
      */
     @NonNull
     @SuppressWarnings("unchecked")
@@ -70,6 +76,8 @@ public final class ImageUtils {
 
     /**
      * Mirror image vertically
+     *
+     * @see BitmapTransformation
      */
     @NonNull
     @SuppressWarnings("unchecked")
@@ -81,6 +89,7 @@ public final class ImageUtils {
      * Rotate image by specified amount of degrees
      *
      * @param rotationAngle Amount of degrees
+     * @see BitmapTransformation
      */
     @NonNull
     @SuppressWarnings("unchecked")
@@ -91,6 +100,8 @@ public final class ImageUtils {
     /**
      * Round image corners with maximum corner radius,
      * for square image, will lead to circle result
+     *
+     * @see BitmapTransformation
      */
     @NonNull
     @SuppressWarnings("unchecked")
@@ -103,6 +114,7 @@ public final class ImageUtils {
      *
      * @param cornerRadius Corner radius
      * @return Image with rounded corners
+     * @see BitmapTransformation
      */
     @NonNull
     @SuppressWarnings("unchecked")
@@ -112,6 +124,8 @@ public final class ImageUtils {
 
     /**
      * Crop center of image in square proportions (1:1), no resize
+     *
+     * @see BitmapTransformation
      */
     @NonNull
     @SuppressWarnings("unchecked")
@@ -122,6 +136,8 @@ public final class ImageUtils {
     /**
      * Crop center of image in proportions of {@code resultWidth} and {@code resultHeight}
      * and, if needed, resize it to {@code resultWidth} x {@code resultHeight} size
+     *
+     * @see BitmapTransformation
      */
     @NonNull
     @SuppressWarnings("unchecked")
@@ -133,6 +149,8 @@ public final class ImageUtils {
     /**
      * Fit image to specified frame ({@code resultWidth} x {@code resultHeight},
      * image will be scaled if needed
+     *
+     * @see BitmapTransformation
      */
     @NonNull
     @SuppressWarnings("unchecked")
@@ -142,6 +160,8 @@ public final class ImageUtils {
 
     /**
      * Scale image to fit specified frame ({@code resultWidth} x {@code resultHeight})
+     *
+     * @see BitmapTransformation
      */
     @NonNull
     @SuppressWarnings("unchecked")
@@ -153,6 +173,8 @@ public final class ImageUtils {
     /**
      * Scale image to fit specified frame ({@code resultWidth} x {@code resultHeight}),
      * upscale image if needed if {@code upscale} set to true
+     *
+     * @see BitmapTransformation
      */
     @NonNull
     @SuppressWarnings("unchecked")
