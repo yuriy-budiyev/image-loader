@@ -119,38 +119,19 @@ public final class ImageLoader<T> {
     /**
      * Load image into view from specified {@link DataDescriptor}
      *
-     * @param descriptor     Source data descriptor
-     * @param view           Image view
-     * @param transformation Bitmap transformation
+     * @param descriptor      Source data descriptor
+     * @param view            Image view
+     * @param loadCallback    Load callback
+     * @param errorCallback   Error callback
+     * @param displayCallback Display callback
      * @see DataDescriptor
      * @see DataUtils#descriptor(Object)
      */
     @MainThread
     public void load(@NonNull DataDescriptor<T> descriptor, @NonNull ImageView view,
-            @Nullable PlaceholderProvider<T> placeholderProvider,
-            @Nullable ErrorDrawableProvider<T> errorDrawableProvider,
-            @Nullable BitmapTransformation<T> transformation) {
-        load(descriptor, view, placeholderProvider, errorDrawableProvider, transformation,
-                mLoadCallback, mErrorCallback, mDisplayCallback, mFadeEnabled, mFadeDuration);
-    }
-
-    /**
-     * Load image into view from specified {@link DataDescriptor}
-     *
-     * @param descriptor     Source data descriptor
-     * @param view           Image view
-     * @param transformation Bitmap transformation
-     * @see DataDescriptor
-     * @see DataUtils#descriptor(Object)
-     */
-    @MainThread
-    public void load(@NonNull DataDescriptor<T> descriptor, @NonNull ImageView view,
-            @Nullable PlaceholderProvider<T> placeholderProvider,
-            @Nullable ErrorDrawableProvider<T> errorDrawableProvider,
-            @Nullable BitmapTransformation<T> transformation,
             @Nullable LoadCallback<T> loadCallback, @Nullable ErrorCallback<T> errorCallback,
             @Nullable DisplayCallback<T> displayCallback) {
-        load(descriptor, view, placeholderProvider, errorDrawableProvider, transformation,
+        load(descriptor, view, mPlaceholderProvider, mErrorDrawableProvider, mBitmapTransformation,
                 loadCallback, errorCallback, displayCallback, mFadeEnabled, mFadeDuration);
     }
 
