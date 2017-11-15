@@ -11,11 +11,11 @@ Almost unlimited customization.
 ### Usage
 ```gradle
 dependencies {
-    implementation 'com.budiyev.android:image-loader:1.8.2'
+    implementation 'com.budiyev.android:image-loader:1.8.3'
 }
 ```
 ### Basic usage sample
-Basic implementation automatically cares about memory caching storage caching
+Basic implementation automatically cares about memory and storage caching
 
 ```java
 public class MainActivity extends AppCompatActivity {
