@@ -266,6 +266,13 @@ public final class ImageLoader<T> {
     }
 
     /**
+     * Set all loading tasks to finish before any loading actions started
+     */
+    public void setInterruptLoadingEarly(boolean interrupt) {
+        mPauseLock.setInterruptEarly(interrupt);
+    }
+
+    /**
      * Clear memory cache;
      * for better memory management when one singleton loader instance used across the app,
      * this method should be called in {@link Application#onTrimMemory(int)}

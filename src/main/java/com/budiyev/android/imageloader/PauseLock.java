@@ -31,6 +31,7 @@ final class PauseLock {
     private final Lock mLock = new ReentrantLock();
     private final Condition mCondition = mLock.newCondition();
     private volatile boolean mPaused;
+    private volatile boolean mInterruptEarly;
 
     public boolean isPaused() {
         return mPaused;
@@ -45,6 +46,17 @@ final class PauseLock {
             }
         } finally {
             mLock.unlock();
+        }
+    }
+
+    public boolean shouldInterruptEarly() {
+        return mInterruptEarly;
+    }
+
+    public void setInterruptEarly(boolean interrupt) {
+        mInterruptEarly = interrupt;
+        if (interrupt) {
+            setPaused(false);
         }
     }
 

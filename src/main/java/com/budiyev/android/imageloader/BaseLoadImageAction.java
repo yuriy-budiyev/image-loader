@@ -113,7 +113,7 @@ abstract class BaseLoadImageAction<T> {
     }
 
     @Nullable
-    public ImageCache getMemoryCache() {
+    protected final ImageCache getMemoryCache() {
         return mMemoryCache;
     }
 
@@ -161,12 +161,12 @@ abstract class BaseLoadImageAction<T> {
 
     @WorkerThread
     private void loadImage() {
-        while (!mCancelled && mPauseLock.isPaused()) {
+        while (!mCancelled && !mPauseLock.shouldInterruptEarly() && mPauseLock.isPaused()) {
             if (mPauseLock.await()) {
                 return;
             }
         }
-        if (mCancelled) {
+        if (mCancelled || mPauseLock.shouldInterruptEarly()) {
             return;
         }
         Context context = mContext;
