@@ -45,6 +45,7 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
     private final Drawable mErrorDrawable;
     private final boolean mFadeEnabled;
     private final long mFadeDuration;
+    private final int mCornerRadius;
 
     protected DisplayImageAction(@NonNull Context context, @NonNull DataDescriptor<T> descriptor,
             @NonNull BitmapLoader<T> bitmapLoader, @NonNull PauseLock pauseLock,
@@ -53,7 +54,8 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
             @Nullable BitmapTransformation<T> bitmapTransformation,
             @Nullable ImageCache memoryCache, @Nullable DisplayCallback<T> displayCallback,
             @NonNull ImageView view, @NonNull Drawable placeholder,
-            @Nullable Drawable errorDrawable, boolean fadeEnabled, long fadeDuration) {
+            @Nullable Drawable errorDrawable, boolean fadeEnabled, long fadeDuration,
+            int cornerRadius) {
         super(context, descriptor, bitmapLoader, pauseLock, memoryCache, storageCache, loadCallback,
                 errorCallback);
         mMainThreadHandler = mainThreadHandler;
@@ -64,6 +66,7 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
         mErrorDrawable = errorDrawable;
         mFadeEnabled = fadeEnabled;
         mFadeDuration = fadeDuration;
+        mCornerRadius = cornerRadius;
     }
 
     public boolean hasSameDescriptor(@NonNull String descriptorKey) {
@@ -146,13 +149,20 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
             Context context = getContext();
             T data = getDescriptor().getData();
             DisplayCallback<T> displayCallback = mDisplayCallback;
+            int cornerRadius = mCornerRadius;
             if (mFadeEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                view.setImageDrawable(new FadeDrawable(mPlaceholder,
+                view.setImageDrawable(new FadeDrawable(mPlaceholder, cornerRadius > 0 ?
+                        new RoundedDrawable(context.getResources(), image, cornerRadius) :
                         new BitmapDrawable(context.getResources(), image), mFadeDuration,
                         mMainThreadHandler, displayCallback == null ? null :
                         new FadeCallback<>(context, displayCallback, data, image, view)));
             } else {
-                view.setImageBitmap(image);
+                if (cornerRadius > 0) {
+                    view.setImageDrawable(
+                            new RoundedDrawable(context.getResources(), image, cornerRadius));
+                } else {
+                    view.setImageBitmap(image);
+                }
                 if (displayCallback != null) {
                     displayCallback.onDisplayed(context, data, image, view);
                 }

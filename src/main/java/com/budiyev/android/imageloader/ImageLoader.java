@@ -201,7 +201,7 @@ public final class ImageLoader<T> {
                 new DisplayImageAction<>(context, descriptor, mBitmapLoader, mPauseLock,
                         mStorageCache, loadCallback, errorCallback, mMainThreadHandler,
                         transformation, memoryCache, displayCallback, view, placeholder,
-                        errorDrawable, fadeEnabled, fadeDuration);
+                        errorDrawable, fadeEnabled, fadeDuration, cornerRadius);
         view.setImageDrawable(new PlaceholderDrawable(placeholder, action));
         action.execute(mExecutor);
     }
