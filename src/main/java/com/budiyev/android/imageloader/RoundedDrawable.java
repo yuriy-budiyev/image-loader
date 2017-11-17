@@ -52,6 +52,7 @@ final class RoundedDrawable extends Drawable {
     public RoundedDrawable(@NonNull Resources resources, @NonNull Bitmap bitmap,
             float cornerRadius) {
         mShader = new BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
+        mPaint.setShader(mShader);
         mBitmap = bitmap;
         int density = resources.getDisplayMetrics().densityDpi;
         mWidth = bitmap.getScaledWidth(density);
