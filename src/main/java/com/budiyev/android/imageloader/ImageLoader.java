@@ -177,7 +177,12 @@ public final class ImageLoader<T> {
             if (loadCallback != null) {
                 loadCallback.onLoaded(context, data, image);
             }
-            view.setImageBitmap(image);
+            if (cornerRadius > 0 || cornerRadius == RoundedDrawable.MAX_RADIUS) {
+                view.setImageDrawable(
+                        new RoundedDrawable(context.getResources(), image, cornerRadius));
+            } else {
+                view.setImageBitmap(image);
+            }
             if (displayCallback != null) {
                 displayCallback.onDisplayed(context, data, image, view);
             }
