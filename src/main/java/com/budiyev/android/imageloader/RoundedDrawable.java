@@ -87,8 +87,8 @@ final class RoundedDrawable extends Drawable {
 
     @Override
     public int getOpacity() {
-        return mBitmap.hasAlpha() || mPaint.getAlpha() < 255 || mCornerRadius > 0.5f ?
-                PixelFormat.TRANSLUCENT : PixelFormat.OPAQUE;
+        return mBitmap.hasAlpha() || mPaint.getAlpha() < 255 || mCornerRadius > 0.5f ||
+                mCornerRadius == MAX_RADIUS ? PixelFormat.TRANSLUCENT : PixelFormat.OPAQUE;
     }
 
     @Override
