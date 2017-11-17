@@ -11,7 +11,7 @@ Almost unlimited customization.
 ### Usage
 ```gradle
 dependencies {
-    implementation 'com.budiyev.android:image-loader:1.8.3'
+    implementation 'com.budiyev.android:image-loader:1.8.4'
 }
 ```
 ### Basic usage sample
