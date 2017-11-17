@@ -57,6 +57,7 @@ final class LoadImageRequestInternal {
     private final ErrorCallback<Data> mErrorCallback;
     private final boolean mFadeEnabled;
     private final long mFadeDuration;
+    private final float mCornerRadius;
 
     public LoadImageRequestInternal(@NonNull Context context, @NonNull Uri data, int requiredWidth,
             int requiredHeight, @Nullable ImageView view, @Nullable Drawable placeholder,
@@ -64,7 +65,8 @@ final class LoadImageRequestInternal {
             @Nullable List<BitmapTransformation<Uri>> transformations,
             @Nullable LoadCallback<Uri> loadCallback,
             @Nullable DisplayCallback<Uri> displayCallback,
-            @Nullable ErrorCallback<Uri> errorCallback, boolean fadeEnabled, long fadeDuration) {
+            @Nullable ErrorCallback<Uri> errorCallback, boolean fadeEnabled, long fadeDuration,
+            float cornerRadius) {
         mContext = context.getApplicationContext();
         mData = new Data(data, requiredWidth, requiredHeight);
         mView = view;
@@ -100,6 +102,7 @@ final class LoadImageRequestInternal {
         }
         mFadeEnabled = fadeEnabled;
         mFadeDuration = fadeDuration;
+        mCornerRadius = cornerRadius;
     }
 
     @AnyThread
@@ -112,7 +115,7 @@ final class LoadImageRequestInternal {
             loader.runOnMainThread(
                     new LoadAction(loader, descriptor, mView, mPlaceholder, mErrorDrawable,
                             mTransformation, mLoadCallback, mDisplayCallback, mErrorCallback,
-                            mFadeEnabled, mFadeDuration));
+                            mFadeEnabled, mFadeDuration, mCornerRadius));
         }
     }
 
@@ -128,6 +131,7 @@ final class LoadImageRequestInternal {
         private final ErrorCallback<Data> mErrorCallback;
         private final boolean mFadeEnabled;
         private final long mFadeDuration;
+        private final float mCornerRadius;
 
         public LoadAction(@NonNull ImageLoader<Data> loader,
                 @NonNull DataDescriptor<Data> descriptor, @NonNull ImageView view,
@@ -136,8 +140,8 @@ final class LoadImageRequestInternal {
                 @Nullable BitmapTransformation<Data> transformation,
                 @Nullable LoadCallback<Data> loadCallback,
                 @Nullable DisplayCallback<Data> displayCallback,
-                @Nullable ErrorCallback<Data> errorCallback, boolean fadeEnabled,
-                long fadeDuration) {
+                @Nullable ErrorCallback<Data> errorCallback, boolean fadeEnabled, long fadeDuration,
+                float cornerRadius) {
             mLoader = loader;
             mDescriptor = descriptor;
             mView = view;
@@ -149,13 +153,15 @@ final class LoadImageRequestInternal {
             mErrorCallback = errorCallback;
             mFadeEnabled = fadeEnabled;
             mFadeDuration = fadeDuration;
+            mCornerRadius = cornerRadius;
         }
 
         @Override
         @MainThread
         public void run() {
             mLoader.load(mDescriptor, mView, mPlaceholder, mErrorDrawable, mTransformation,
-                    mLoadCallback, mErrorCallback, mDisplayCallback, mFadeEnabled, mFadeDuration);
+                    mLoadCallback, mErrorCallback, mDisplayCallback, mFadeEnabled, mFadeDuration,
+                    mCornerRadius);
         }
     }
 
@@ -298,7 +304,6 @@ final class LoadImageRequestInternal {
             }
             mKey = sb.toString();
         }
-
 
         @NonNull
         @Override

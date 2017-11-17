@@ -66,6 +66,7 @@ public final class ImageLoader<T> {
     private final ErrorCallback<T> mErrorCallback;
     private final boolean mFadeEnabled;
     private final long mFadeDuration;
+    private final float mCornerRadius;
 
     /**
      * @see #with(Context)
@@ -78,7 +79,7 @@ public final class ImageLoader<T> {
             @Nullable ErrorDrawableProvider<T> errorDrawableProvider,
             @Nullable ExecutorService executor, @Nullable LoadCallback<T> loadCallback,
             @Nullable DisplayCallback<T> displayCallback, @Nullable ErrorCallback<T> errorCallback,
-            boolean fadeEnabled, long fadeDuration) {
+            boolean fadeEnabled, long fadeDuration, float cornerRadius) {
         mContext = context;
         mMainThreadHandler = new Handler(context.getMainLooper());
         mBitmapLoader = bitmapLoader;
@@ -90,6 +91,7 @@ public final class ImageLoader<T> {
         mDisplayCallback = displayCallback;
         mErrorCallback = errorCallback;
         mPlaceholderProvider = placeholderProvider;
+        mCornerRadius = cornerRadius;
         if (executor != null) {
             mExecutor = executor;
         } else {
@@ -113,7 +115,8 @@ public final class ImageLoader<T> {
     @MainThread
     public void load(@NonNull DataDescriptor<T> descriptor, @NonNull ImageView view) {
         load(descriptor, view, mPlaceholderProvider, mErrorDrawableProvider, mBitmapTransformation,
-                mLoadCallback, mErrorCallback, mDisplayCallback, mFadeEnabled, mFadeDuration);
+                mLoadCallback, mErrorCallback, mDisplayCallback, mFadeEnabled, mFadeDuration,
+                mCornerRadius);
     }
 
     /**
@@ -132,7 +135,8 @@ public final class ImageLoader<T> {
             @Nullable LoadCallback<T> loadCallback, @Nullable ErrorCallback<T> errorCallback,
             @Nullable DisplayCallback<T> displayCallback) {
         load(descriptor, view, mPlaceholderProvider, mErrorDrawableProvider, mBitmapTransformation,
-                loadCallback, errorCallback, displayCallback, mFadeEnabled, mFadeDuration);
+                loadCallback, errorCallback, displayCallback, mFadeEnabled, mFadeDuration,
+                mCornerRadius);
     }
 
     /**
@@ -155,7 +159,8 @@ public final class ImageLoader<T> {
             @Nullable ErrorDrawableProvider<T> errorDrawableProvider,
             @Nullable BitmapTransformation<T> transformation,
             @Nullable LoadCallback<T> loadCallback, @Nullable ErrorCallback<T> errorCallback,
-            @Nullable DisplayCallback<T> displayCallback, boolean fadeEnabled, long fadeDuration) {
+            @Nullable DisplayCallback<T> displayCallback, boolean fadeEnabled, long fadeDuration,
+            float cornerRadius) {
         Bitmap image = null;
         String key = descriptor.getKey();
         ImageCache memoryCache = mMemoryCache;
@@ -405,6 +410,7 @@ public final class ImageLoader<T> {
         private ErrorCallback<T> mErrorCallback;
         private boolean mFadeEnabled = true;
         private long mFadeDuration = 200L;
+        private float mCornerRadius;
 
         private Builder(@NonNull Context context, @NonNull BitmapLoader<T> bitmapLoader) {
             mContext = context;
@@ -580,6 +586,25 @@ public final class ImageLoader<T> {
         }
 
         /**
+         * Display images with rounded corners using  maximum corner radius,
+         * for square images, will lead to circle result
+         */
+        @NonNull
+        public Builder<T> roundCorners() {
+            mCornerRadius = RoundedDrawable.MAX_RADIUS;
+            return this;
+        }
+
+        /**
+         * Display images with rounded corners using specified corner radius
+         */
+        @NonNull
+        public Builder<T> roundCorners(float cornerRadius) {
+            mCornerRadius = cornerRadius;
+            return this;
+        }
+
+        /**
          * Custom executor
          */
         @NonNull
@@ -622,7 +647,8 @@ public final class ImageLoader<T> {
         public ImageLoader<T> build() {
             return new ImageLoader<>(mContext, mBitmapLoader, mBitmapTransformation, mMemoryCache,
                     mStorageCache, mPlaceholderProvider, mErrorDrawableProvider, mExecutor,
-                    mLoadCallback, mDisplayCallback, mErrorCallback, mFadeEnabled, mFadeDuration);
+                    mLoadCallback, mDisplayCallback, mErrorCallback, mFadeEnabled, mFadeDuration,
+                    mCornerRadius);
         }
     }
 }

@@ -50,6 +50,7 @@ public final class LoadImageRequest {
     private int mRequiredHeight = -1;
     private boolean mFadeEnabled = true;
     private long mFadeDuration = 200L;
+    private float mCornerRadius;
 
     LoadImageRequest(@NonNull Context context) {
         mContext = context.getApplicationContext();
@@ -89,6 +90,25 @@ public final class LoadImageRequest {
     public LoadImageRequest size(@Px int requiredWidth, @Px int requiredHeight) {
         mRequiredWidth = requiredWidth;
         mRequiredHeight = requiredHeight;
+        return this;
+    }
+
+    /**
+     * Display image with rounded corners using maximum corner radius,
+     * for square image, will lead to circle result
+     */
+    @NonNull
+    public LoadImageRequest roundCorners() {
+        mCornerRadius = RoundedDrawable.MAX_RADIUS;
+        return this;
+    }
+
+    /**
+     * Display image with rounded corners using specified corner radius
+     */
+    @NonNull
+    public LoadImageRequest roundCorners(float cornerRadius) {
+        mCornerRadius = cornerRadius;
         return this;
     }
 
@@ -206,6 +226,6 @@ public final class LoadImageRequest {
         }
         new LoadImageRequestInternal(mContext, source, mRequiredWidth, mRequiredHeight, mView,
                 mPlaceholder, mErrorDrawable, mTransformations, mLoadCallback, mDisplayCallback,
-                mErrorCallback, mFadeEnabled, mFadeDuration).execute();
+                mErrorCallback, mFadeEnabled, mFadeDuration, mCornerRadius).execute();
     }
 }

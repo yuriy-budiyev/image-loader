@@ -37,9 +37,9 @@ import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.Px;
 
-public class RoundedDrawable extends Drawable {
+final class RoundedDrawable extends Drawable {
+    public static final float MAX_RADIUS = -1f;
     private final Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
     private final RectF mDrawRect = new RectF();
     private final Matrix mShaderMatrix = new Matrix();
@@ -50,7 +50,7 @@ public class RoundedDrawable extends Drawable {
     private final int mHeight;
 
     public RoundedDrawable(@NonNull Resources resources, @NonNull Bitmap bitmap,
-            @Px int cornerRadius) {
+            float cornerRadius) {
         mShader = new BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
         mBitmap = bitmap;
         int density = resources.getDisplayMetrics().densityDpi;
@@ -61,7 +61,15 @@ public class RoundedDrawable extends Drawable {
 
     @Override
     public void draw(@NonNull Canvas canvas) {
-        canvas.drawRoundRect(mDrawRect, mCornerRadius, mCornerRadius, mPaint);
+        float cornerRadius = mCornerRadius;
+        if (cornerRadius > 0.5f) {
+            canvas.drawRoundRect(mDrawRect, cornerRadius, cornerRadius, mPaint);
+        } else if (cornerRadius == MAX_RADIUS) {
+            cornerRadius = Math.min(mDrawRect.width(), mDrawRect.height()) / 2f;
+            canvas.drawRoundRect(mDrawRect, cornerRadius, cornerRadius, mPaint);
+        } else {
+            canvas.drawRect(mDrawRect, mPaint);
+        }
     }
 
     @Override
@@ -78,7 +86,7 @@ public class RoundedDrawable extends Drawable {
 
     @Override
     public int getOpacity() {
-        return mBitmap.hasAlpha() || mPaint.getAlpha() < 255 || mCornerRadius > 0 ?
+        return mBitmap.hasAlpha() || mPaint.getAlpha() < 255 || mCornerRadius > 0.5f ?
                 PixelFormat.TRANSLUCENT : PixelFormat.OPAQUE;
     }
 
