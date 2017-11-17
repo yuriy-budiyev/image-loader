@@ -150,14 +150,15 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
             T data = getDescriptor().getData();
             DisplayCallback<T> displayCallback = mDisplayCallback;
             float cornerRadius = mCornerRadius;
+            boolean roundCorners = cornerRadius > 0 || cornerRadius == RoundedDrawable.MAX_RADIUS;
             if (mFadeEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                view.setImageDrawable(new FadeDrawable(mPlaceholder, cornerRadius > 0 ?
+                view.setImageDrawable(new FadeDrawable(mPlaceholder, roundCorners ?
                         new RoundedDrawable(context.getResources(), image, cornerRadius) :
                         new BitmapDrawable(context.getResources(), image), mFadeDuration,
                         mMainThreadHandler, displayCallback == null ? null :
                         new FadeCallback<>(context, displayCallback, data, image, view)));
             } else {
-                if (cornerRadius > 0) {
+                if (roundCorners) {
                     view.setImageDrawable(
                             new RoundedDrawable(context.getResources(), image, cornerRadius));
                 } else {
