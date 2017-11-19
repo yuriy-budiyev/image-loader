@@ -24,10 +24,12 @@
 package com.budiyev.android.imageloader;
 
 import java.io.File;
+import java.io.FileDescriptor;
 import java.util.concurrent.ExecutorService;
 
 import android.app.Application;
 import android.content.Context;
+import android.net.Uri;
 import android.os.Handler;
 import android.support.annotation.AnyThread;
 import android.support.annotation.NonNull;
@@ -76,6 +78,18 @@ public final class ImageLoader {
     public <T> LoadImageRequest<T> request(@NonNull BitmapLoader<T> loader) {
         return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler,
                 mMemoryCache, mStorageCache, loader);
+    }
+
+    /**
+     * Create new load image request
+     *
+     * @return Data type selector instance
+     */
+    @NonNull
+    @AnyThread
+    public DataTypeSelector request() {
+        return new DataTypeSelector(mContext, mExecutor, mPauseLock, mMainThreadHandler,
+                mMemoryCache, mStorageCache);
     }
 
 
@@ -156,6 +170,71 @@ public final class ImageLoader {
     @NonNull
     public static Builder builder(@NonNull Context context) {
         return new Builder(context);
+    }
+
+    public static final class DataTypeSelector {
+        private final Context mContext;
+        private final ExecutorService mExecutor;
+        private final PauseLock mPauseLock;
+        private final Handler mMainThreadHandler;
+        private final ImageCache mMemoryCache;
+        private final ImageCache mStorageCache;
+
+        private DataTypeSelector(@NonNull Context context, @NonNull ExecutorService executor,
+                @NonNull PauseLock pauseLock, @NonNull Handler mainThreadHandler,
+                @NonNull ImageCache memoryCache, @NonNull ImageCache storageCache) {
+            mContext = context;
+            mExecutor = executor;
+            mPauseLock = pauseLock;
+            mMainThreadHandler = mainThreadHandler;
+            mMemoryCache = memoryCache;
+            mStorageCache = storageCache;
+        }
+
+        /**
+         * {@link Uri} image load request
+         */
+        @NonNull
+        public LoadImageRequest<Uri> uri() {
+            return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler,
+                    mMemoryCache, mStorageCache, new UriBitmapLoader());
+        }
+
+        /**
+         * {@link File} image load request
+         */
+        @NonNull
+        public LoadImageRequest<File> file() {
+            return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler,
+                    mMemoryCache, mStorageCache, new FileBitmapLoader());
+        }
+
+        /**
+         * {@link FileDescriptor} image load request
+         */
+        @NonNull
+        public LoadImageRequest<FileDescriptor> fileDescriptor() {
+            return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler,
+                    mMemoryCache, mStorageCache, new FileDescriptorBitmapLoader());
+        }
+
+        /**
+         * Resource image load request
+         */
+        @NonNull
+        public LoadImageRequest<Integer> resource() {
+            return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler,
+                    mMemoryCache, mStorageCache, new ResourceBitmapLoader());
+        }
+
+        /**
+         * Byte array image load request
+         */
+        @NonNull
+        public LoadImageRequest<byte[]> byteArray() {
+            return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler,
+                    mMemoryCache, mStorageCache, new ByteArrayBitmapLoader());
+        }
     }
 
     /**
