@@ -71,6 +71,22 @@ public final class LoadImageRequest<T> {
         mMainThreadHandler = mainThreadHandler;
     }
 
+    /**
+     * Source data,
+     * default {@link DataDescriptor} will be used, {@code data}'s toString() method will be used
+     * for key generation, any characters allowed
+     */
+    @NonNull
+    public LoadImageRequest<T> from(@NonNull T data) {
+        mDescriptor = new StringDataDescriptor<>(data);
+        return this;
+    }
+
+    /**
+     * Source data descriptor
+     *
+     * @see DataDescriptor
+     */
     @NonNull
     public LoadImageRequest<T> from(@Nullable DataDescriptor<T> descriptor) {
         mDescriptor = descriptor;
