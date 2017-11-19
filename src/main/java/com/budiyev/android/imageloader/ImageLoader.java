@@ -64,25 +64,9 @@ public final class ImageLoader {
         }
     }
 
-    /**
-     * Load image into view from specified {@link DataDescriptor}
-     *
-     * @param descriptor      Source data descriptor
-     * @param view            Image view
-     * @param transformation  Bitmap transformation
-     * @param loadCallback    Load callback
-     * @param errorCallback   Error callback
-     * @param displayCallback Display callback
-     * @param fadeEnabled     Whether to enable or disable fade effect
-     * @param fadeDuration    Duration of fade effect if it's enabled
-     * @see DataDescriptor
-     * @see DataUtils#descriptor(Object)
-     */
     /*@MainThread
-    public void load(@NonNull DataDescriptor<T> descriptor, @NonNull ImageView view,
-            @Nullable BitmapTransformation transformation, @Nullable LoadCallback<T> loadCallback,
-            @Nullable ErrorCallback<T> errorCallback, @Nullable DisplayCallback<T> displayCallback,
-            boolean fadeEnabled, long fadeDuration, float cornerRadius) {
+    <T> void load(@NonNull DisplayRequestInternal<T> request) {
+        DataDescriptor<T> descriptor = request.getDescriptor();
         Bitmap image = null;
         String key = descriptor.getKey();
         ImageCache memoryCache = mMemoryCache;
@@ -117,42 +101,18 @@ public final class ImageLoader {
             }
             currentAction.cancel();
         }
-        Drawable placeholder;
-        if (placeholderProvider != null) {
-            placeholder = placeholderProvider.getPlaceholder(context, data);
-        } else {
-            placeholder = new ColorDrawable(Color.TRANSPARENT);
-        }
-        Drawable errorDrawable;
-        if (errorDrawableProvider != null) {
-            errorDrawable = errorDrawableProvider.getErrorDrawable(context, data);
-        } else {
-            errorDrawable = null;
-        }
         DisplayImageAction<T> action =
-                new DisplayImageAction<>(context, descriptor, mBitmapLoader, mPauseLock,
-                        mStorageCache, loadCallback, errorCallback, mMainThreadHandler,
-                        transformation, memoryCache, displayCallback, view, placeholder,
-                        errorDrawable, fadeEnabled, fadeDuration, cornerRadius);
-        view.setImageDrawable(new PlaceholderDrawable(placeholder, action));
+                new DisplayImageAction<>(context, request, mPauseLock, mMainThreadHandler,
+                        memoryCache, mStorageCache);
+        request.getView().get()
+                .setImageDrawable(new PlaceholderDrawable(request.getPlaceholder(), action));
         action.execute(mExecutor);
-    }*/
+    }
 
-    /**
-     * Load image from specified {@link DataDescriptor},
-     * override callbacks, specified in builder
-     *
-     * @param descriptor    Source data descriptor
-     * @param loadCallback  Load callback
-     * @param errorCallback Error callback
-     * @see DataDescriptor
-     * @see DataUtils#descriptor(Object)
-     */
-/*    @AnyThread
-    public void load(@NonNull DataDescriptor<T> descriptor, @Nullable LoadCallback<T> loadCallback,
-            @Nullable ErrorCallback<T> errorCallback) {
-        new LoadImageAction<>(mContext, descriptor, mBitmapLoader, mPauseLock, mMemoryCache,
-                mStorageCache, loadCallback, errorCallback).execute(mExecutor);
+    @AnyThread
+    <T> void load(@NonNull LoadRequestInternal<T> request) {
+        new LoadImageAction<>(mContext, request, mPauseLock, mMemoryCache, mStorageCache)
+                .execute(mExecutor);
     }*/
 
     /**

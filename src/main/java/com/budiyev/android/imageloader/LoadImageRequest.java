@@ -26,14 +26,20 @@ package com.budiyev.android.imageloader;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.support.annotation.AnyThread;
+import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.widget.ImageView;
 
 public final class LoadImageRequest<T> {
+    private final Context mContext;
+    private final PauseLock mPauseLock;
+    private final ImageCache mMemoryCache;
+    private final ImageCache mStorageCache;
     private final BitmapLoader<T> mBitmapLoader;
     private final Handler mMainThreadHandler;
     private DataDescriptor<T> mDescriptor;
@@ -41,14 +47,19 @@ public final class LoadImageRequest<T> {
     private ErrorCallback<T> mErrorCallback;
     private DisplayCallback<T> mDisplayCallback;
     private List<BitmapTransformation> mTransformations;
-    private ImageView mView;
     private Drawable mPlaceholder;
     private Drawable mErrorDrawable;
     private boolean mFadeEnabled;
     private long mFadeDuration;
     private float mCornerRadius;
 
-    LoadImageRequest(@NonNull BitmapLoader<T> bitmapLoader, @NonNull Handler mainThreadHandler) {
+    LoadImageRequest(@NonNull Context context, @NonNull PauseLock pauseLock,
+            @NonNull ImageCache memoryCache, @NonNull ImageCache storageCache,
+            @NonNull BitmapLoader<T> bitmapLoader, @NonNull Handler mainThreadHandler) {
+        mContext = context;
+        mPauseLock = pauseLock;
+        mMemoryCache = memoryCache;
+        mStorageCache = storageCache;
         mBitmapLoader = bitmapLoader;
         mMainThreadHandler = mainThreadHandler;
     }
@@ -172,25 +183,14 @@ public final class LoadImageRequest<T> {
         return this;
     }
 
-    /**
-     * Target view in which image will be loaded
-     */
-    @NonNull
-    public LoadImageRequest<T> into(@Nullable ImageView view) {
-        mView = view;
-        return this;
-    }
 
     @AnyThread
     public void load() {
-
+        
     }
 
-    private static final class LoadAction implements Runnable {
-        @Override
-        public void run() {
+    @MainThread
+    public void load(@Nullable ImageView view) {
 
-        }
     }
-
 }

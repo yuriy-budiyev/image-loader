@@ -23,41 +23,46 @@
  */
 package com.budiyev.android.imageloader;
 
+import java.util.List;
+
+import android.content.Context;
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
-class LoadRequestInternal<T> {
-    private final BitmapLoader<T> mBitmapLoader;
-    private final DataDescriptor<T> mDescriptor;
-    private final LoadCallback<T> mLoadCallback;
-    private final ErrorCallback<T> mErrorCallback;
+final class BitmapTransformationGroup implements BitmapTransformation {
+    private final List<BitmapTransformation> mTransformations;
+    private final String mKey;
 
-    public LoadRequestInternal(@NonNull BitmapLoader<T> bitmapLoader,
-            @NonNull DataDescriptor<T> descriptor, @Nullable LoadCallback<T> loadCallback,
-            @Nullable ErrorCallback<T> errorCallback) {
-        mBitmapLoader = bitmapLoader;
-        mDescriptor = descriptor;
-        mLoadCallback = loadCallback;
-        mErrorCallback = errorCallback;
+    public BitmapTransformationGroup(@NonNull List<BitmapTransformation> transformations) {
+        mTransformations = transformations;
+        StringBuilder sb = new StringBuilder();
+        for (BitmapTransformation t : transformations) {
+            sb.append(t.getKey());
+        }
+        mKey = sb.toString();
+    }
+
+
+    @NonNull
+    @Override
+    public Bitmap transform(@NonNull Context context, @NonNull Bitmap bitmap) throws Throwable {
+        boolean first = true;
+        for (BitmapTransformation t : mTransformations) {
+            Bitmap processed = t.transform(context, bitmap);
+            if (bitmap != processed) {
+                if (!first && !bitmap.isRecycled()) {
+                    bitmap.recycle();
+                }
+                first = false;
+            }
+            bitmap = processed;
+        }
+        return bitmap;
     }
 
     @NonNull
-    public BitmapLoader<T> getBitmapLoader() {
-        return mBitmapLoader;
-    }
-
-    @NonNull
-    public DataDescriptor<T> getDescriptor() {
-        return mDescriptor;
-    }
-
-    @Nullable
-    public LoadCallback<T> getLoadCallback() {
-        return mLoadCallback;
-    }
-
-    @Nullable
-    public ErrorCallback<T> getErrorCallback() {
-        return mErrorCallback;
+    @Override
+    public String getKey() {
+        return mKey;
     }
 }
