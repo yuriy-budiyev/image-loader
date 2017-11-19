@@ -64,57 +64,6 @@ public final class ImageLoader {
         }
     }
 
-    /*@MainThread
-    <T> void load(@NonNull DisplayRequestInternal<T> request) {
-        DataDescriptor<T> descriptor = request.getDescriptor();
-        Bitmap image = null;
-        String key = descriptor.getKey();
-        ImageCache memoryCache = mMemoryCache;
-        if (memoryCache != null) {
-            if (transformation != null) {
-                image = memoryCache.get(key + transformation.getKey());
-            } else {
-                image = memoryCache.get(key);
-            }
-        }
-        T data = descriptor.getData();
-        Context context = mContext;
-        if (image != null) {
-            if (loadCallback != null) {
-                loadCallback.onLoaded(context, data, image);
-            }
-            if (cornerRadius > 0 || cornerRadius == RoundedDrawable.MAX_RADIUS) {
-                view.setImageDrawable(
-                        new RoundedDrawable(context.getResources(), image, cornerRadius));
-            } else {
-                view.setImageBitmap(image);
-            }
-            if (displayCallback != null) {
-                displayCallback.onDisplayed(context, data, image, view);
-            }
-            return;
-        }
-        DisplayImageAction<?> currentAction = InternalUtils.getDisplayImageAction(view);
-        if (currentAction != null) {
-            if (currentAction.hasSameDescriptor(key)) {
-                return;
-            }
-            currentAction.cancel();
-        }
-        DisplayImageAction<T> action =
-                new DisplayImageAction<>(context, request, mPauseLock, mMainThreadHandler,
-                        memoryCache, mStorageCache);
-        request.getView().get()
-                .setImageDrawable(new PlaceholderDrawable(request.getPlaceholder(), action));
-        action.execute(mExecutor);
-    }
-
-    @AnyThread
-    <T> void load(@NonNull LoadRequestInternal<T> request) {
-        new LoadImageAction<>(mContext, request, mPauseLock, mMemoryCache, mStorageCache)
-                .execute(mExecutor);
-    }*/
-
     /**
      * Delete cached image for specified {@link DataDescriptor}
      */

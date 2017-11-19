@@ -48,9 +48,9 @@ abstract class BaseLoadImageAction<T> {
     private volatile boolean mCalled;
 
     protected BaseLoadImageAction(@NonNull Context context, @NonNull DataDescriptor<T> descriptor,
-            @NonNull BitmapLoader<T> bitmapLoader, @NonNull PauseLock pauseLock,
-            @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache,
-            @Nullable LoadCallback<T> loadCallback, @Nullable ErrorCallback<T> errorCallback) {
+            @NonNull BitmapLoader<T> bitmapLoader, @Nullable ImageCache memoryCache,
+            @Nullable ImageCache storageCache, @Nullable LoadCallback<T> loadCallback,
+            @Nullable ErrorCallback<T> errorCallback, @NonNull PauseLock pauseLock) {
         mContext = context;
         mDescriptor = descriptor;
         mBitmapLoader = bitmapLoader;

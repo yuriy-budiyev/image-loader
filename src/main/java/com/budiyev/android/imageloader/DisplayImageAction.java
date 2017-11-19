@@ -47,22 +47,22 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
     private final long mFadeDuration;
     private final float mCornerRadius;
 
-    protected DisplayImageAction(@NonNull Context context, @NonNull DataDescriptor<T> descriptor,
-            @NonNull BitmapLoader<T> bitmapLoader, @NonNull PauseLock pauseLock,
+    public DisplayImageAction(@NonNull Context context, @NonNull DataDescriptor<T> descriptor,
+            @NonNull BitmapLoader<T> bitmapLoader, @Nullable BitmapTransformation transformation,
+            @NonNull Drawable placeholder, @Nullable Drawable errorDrawable,
+            @NonNull ImageView view, @Nullable ImageCache memoryCache,
             @Nullable ImageCache storageCache, @Nullable LoadCallback<T> loadCallback,
-            @Nullable ErrorCallback<T> errorCallback, @NonNull Handler mainThreadHandler,
-            @Nullable BitmapTransformation transformation, @Nullable ImageCache memoryCache,
-            @Nullable DisplayCallback<T> displayCallback, @NonNull ImageView view,
-            @NonNull Drawable placeholder, @Nullable Drawable errorDrawable, boolean fadeEnabled,
+            @Nullable ErrorCallback<T> errorCallback, @Nullable DisplayCallback<T> displayCallback,
+            @NonNull PauseLock pauseLock, @NonNull Handler mainThreadHandler, boolean fadeEnabled,
             long fadeDuration, float cornerRadius) {
-        super(context, descriptor, bitmapLoader, pauseLock, memoryCache, storageCache, loadCallback,
-                errorCallback);
-        mMainThreadHandler = mainThreadHandler;
+        super(context, descriptor, bitmapLoader, memoryCache, storageCache, loadCallback,
+                errorCallback, pauseLock);
         mTransformation = transformation;
         mDisplayCallback = displayCallback;
         mView = new WeakReference<>(view);
         mPlaceholder = placeholder;
         mErrorDrawable = errorDrawable;
+        mMainThreadHandler = mainThreadHandler;
         mFadeEnabled = fadeEnabled;
         mFadeDuration = fadeDuration;
         mCornerRadius = cornerRadius;

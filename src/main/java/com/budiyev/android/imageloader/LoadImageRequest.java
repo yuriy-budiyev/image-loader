@@ -25,8 +25,12 @@ package com.budiyev.android.imageloader;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.support.annotation.AnyThread;
@@ -37,6 +41,7 @@ import android.widget.ImageView;
 
 public final class LoadImageRequest<T> {
     private final Context mContext;
+    private final ExecutorService mExecutor;
     private final PauseLock mPauseLock;
     private final ImageCache mMemoryCache;
     private final ImageCache mStorageCache;
@@ -53,10 +58,12 @@ public final class LoadImageRequest<T> {
     private long mFadeDuration;
     private float mCornerRadius;
 
-    LoadImageRequest(@NonNull Context context, @NonNull PauseLock pauseLock,
-            @NonNull ImageCache memoryCache, @NonNull ImageCache storageCache,
-            @NonNull BitmapLoader<T> bitmapLoader, @NonNull Handler mainThreadHandler) {
+    LoadImageRequest(@NonNull Context context, @NonNull ExecutorService executor,
+            @NonNull PauseLock pauseLock, @NonNull Handler mainThreadHandler,
+            @NonNull BitmapLoader<T> bitmapLoader, @Nullable ImageCache memoryCache,
+            @Nullable ImageCache storageCache) {
         mContext = context;
+        mExecutor = executor;
         mPauseLock = pauseLock;
         mMemoryCache = memoryCache;
         mStorageCache = storageCache;
@@ -186,11 +193,78 @@ public final class LoadImageRequest<T> {
 
     @AnyThread
     public void load() {
-        
+        DataDescriptor<T> descriptor = mDescriptor;
+        if (descriptor == null) {
+            return;
+        }
+        new LoadImageAction<>(mContext, descriptor, mBitmapLoader, mMemoryCache, mStorageCache,
+                mLoadCallback, mErrorCallback, mPauseLock).execute(mExecutor);
     }
 
     @MainThread
-    public void load(@Nullable ImageView view) {
-
+    public void load(@NonNull ImageView view) {
+        DataDescriptor<T> descriptor = mDescriptor;
+        if (descriptor == null) {
+            return;
+        }
+        Bitmap image = null;
+        String key = descriptor.getKey();
+        ImageCache memoryCache = mMemoryCache;
+        List<BitmapTransformation> transformations = mTransformations;
+        BitmapTransformation transformation;
+        if (transformations != null && !transformations.isEmpty()) {
+            if (transformations.size() == 1) {
+                transformation = transformations.get(0);
+            } else {
+                transformation = new BitmapTransformationGroup(transformations);
+            }
+        } else {
+            transformation = null;
+        }
+        if (memoryCache != null) {
+            if (transformation != null) {
+                image = memoryCache.get(key + transformation.getKey());
+            } else {
+                image = memoryCache.get(key);
+            }
+        }
+        T data = descriptor.getData();
+        Context context = mContext;
+        LoadCallback<T> loadCallback = mLoadCallback;
+        DisplayCallback<T> displayCallback = mDisplayCallback;
+        float cornerRadius = mCornerRadius;
+        if (image != null) {
+            if (loadCallback != null) {
+                loadCallback.onLoaded(context, data, image);
+            }
+            if (cornerRadius > 0 || cornerRadius == RoundedDrawable.MAX_RADIUS) {
+                view.setImageDrawable(
+                        new RoundedDrawable(context.getResources(), image, cornerRadius));
+            } else {
+                view.setImageBitmap(image);
+            }
+            if (displayCallback != null) {
+                displayCallback.onDisplayed(context, data, image, view);
+            }
+            return;
+        }
+        DisplayImageAction<?> currentAction = InternalUtils.getDisplayImageAction(view);
+        if (currentAction != null) {
+            if (currentAction.hasSameDescriptor(key)) {
+                return;
+            }
+            currentAction.cancel();
+        }
+        Drawable placeholder = mPlaceholder;
+        if (placeholder == null) {
+            placeholder = new ColorDrawable(Color.TRANSPARENT);
+        }
+        DisplayImageAction<T> action =
+                new DisplayImageAction<>(context, descriptor, mBitmapLoader, transformation,
+                        placeholder, mErrorDrawable, view, memoryCache, mStorageCache, loadCallback,
+                        mErrorCallback, displayCallback, mPauseLock, mMainThreadHandler,
+                        mFadeEnabled, mFadeDuration, cornerRadius);
+        view.setImageDrawable(new PlaceholderDrawable(placeholder, action));
+        action.execute(mExecutor);
     }
 }
