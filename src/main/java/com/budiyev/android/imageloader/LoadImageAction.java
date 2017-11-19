@@ -23,32 +23,218 @@
  */
 package com.budiyev.android.imageloader;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.support.annotation.AnyThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.WorkerThread;
 
-final class LoadImageAction<T> extends BaseLoadImageAction<T> {
-    protected LoadImageAction(@NonNull Context context, @NonNull DataDescriptor<T> descriptor,
+class LoadImageAction<T> {
+    private final Context mContext;
+    private final DataDescriptor<T> mDescriptor;
+    private final BitmapLoader<T> mBitmapLoader;
+    private final PauseLock mPauseLock;
+    private final ImageCache mMemoryCache;
+    private final ImageCache mStorageCache;
+    private final LoadCallback<T> mLoadCallback;
+    private final ErrorCallback<T> mErrorCallback;
+    private volatile Future<?> mFuture;
+    private volatile boolean mCancelled;
+    private volatile boolean mCalled;
+
+    public LoadImageAction(@NonNull Context context, @NonNull DataDescriptor<T> descriptor,
             @NonNull BitmapLoader<T> bitmapLoader, @NonNull PauseLock pauseLock,
             @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache,
             @Nullable LoadCallback<T> loadCallback, @Nullable ErrorCallback<T> errorCallback) {
-        super(context, descriptor, bitmapLoader, pauseLock, memoryCache, storageCache, loadCallback,
-                errorCallback);
+        mContext = context;
+        mDescriptor = descriptor;
+        mBitmapLoader = bitmapLoader;
+        mPauseLock = pauseLock;
+        mMemoryCache = memoryCache;
+        mStorageCache = storageCache;
+        mLoadCallback = loadCallback;
+        mErrorCallback = errorCallback;
     }
 
-    @Override
+    @WorkerThread
     protected void onImageLoaded(@NonNull Bitmap image) {
-        // Do nothing
+        // Default implementation
     }
 
-    @Override
+    @WorkerThread
     protected void onError(@NonNull Throwable error) {
-        // Do nothing
+        // Default implementation
     }
 
-    @Override
+    @AnyThread
     protected void onCancelled() {
-        // Do nothing
+        // Default implementation
+    }
+
+    @AnyThread
+    public final void execute(@NonNull ExecutorService executor) {
+        if (mCalled) {
+            throw new IllegalStateException("Action can be executed only once");
+        }
+        mCalled = true;
+        if (mCancelled) {
+            return;
+        }
+        mFuture = executor.submit(new LoadImageTask());
+    }
+
+    @AnyThread
+    public final void cancel() {
+        mCancelled = true;
+        Future<?> future = mFuture;
+        if (future != null) {
+            future.cancel(false);
+        }
+        onCancelled();
+    }
+
+    @NonNull
+    protected final Context getContext() {
+        return mContext;
+    }
+
+    @NonNull
+    protected final DataDescriptor<T> getDescriptor() {
+        return mDescriptor;
+    }
+
+    @NonNull
+    protected final BitmapLoader<T> getBitmapLoader() {
+        return mBitmapLoader;
+    }
+
+    @NonNull
+    protected final PauseLock getPauseLock() {
+        return mPauseLock;
+    }
+
+    @Nullable
+    protected final ImageCache getMemoryCache() {
+        return mMemoryCache;
+    }
+
+    @Nullable
+    protected final ImageCache getStorageCache() {
+        return mStorageCache;
+    }
+
+    @Nullable
+    protected final LoadCallback<T> getLoadCallback() {
+        return mLoadCallback;
+    }
+
+    @Nullable
+    protected final ErrorCallback<T> getErrorCallback() {
+        return mErrorCallback;
+    }
+
+    protected final boolean isCancelled() {
+        return mCancelled;
+    }
+
+    protected void processImage(@NonNull Context context, @NonNull T data, @NonNull Bitmap image) {
+        if (mCancelled) {
+            return;
+        }
+        LoadCallback<T> loadCallback = mLoadCallback;
+        if (loadCallback != null) {
+            loadCallback.onLoaded(context, data, image);
+        }
+        onImageLoaded(image);
+    }
+
+    protected void processError(@NonNull Context context, @NonNull T data,
+            @NonNull Throwable error) {
+        if (mCancelled) {
+            return;
+        }
+        ErrorCallback<T> errorCallback = mErrorCallback;
+        if (errorCallback != null) {
+            errorCallback.onError(context, data, error);
+        }
+        onError(error);
+    }
+
+    @WorkerThread
+    private void loadImage() {
+        while (!mCancelled && !mPauseLock.shouldInterruptEarly() && mPauseLock.isPaused()) {
+            if (mPauseLock.await()) {
+                return;
+            }
+        }
+        if (mCancelled || mPauseLock.shouldInterruptEarly()) {
+            return;
+        }
+        Context context = mContext;
+        String key = mDescriptor.getKey();
+        T data = mDescriptor.getData();
+        Bitmap image;
+        // Memory cache
+        ImageCache memoryCache = mMemoryCache;
+        if (memoryCache != null) {
+            image = memoryCache.get(key);
+            if (image != null) {
+                processImage(context, data, image);
+                return;
+            }
+        }
+        if (mCancelled) {
+            return;
+        }
+        // Storage cache
+        ImageCache storageCache = mStorageCache;
+        if (storageCache != null) {
+            image = storageCache.get(key);
+            if (image != null) {
+                if (memoryCache != null) {
+                    memoryCache.put(key, image);
+                }
+                processImage(context, data, image);
+                return;
+            }
+        }
+        if (mCancelled) {
+            return;
+        }
+        // Load new image
+        try {
+            image = mBitmapLoader.load(context, data);
+        } catch (Throwable error) {
+            processError(context, data, error);
+            return;
+        }
+        if (image == null) {
+            processError(context, data, new ImageNotLoadedException());
+            return;
+        }
+        if (memoryCache != null) {
+            memoryCache.put(key, image);
+        }
+        processImage(context, data, image);
+        if (mCancelled) {
+            return;
+        }
+        if (storageCache != null) {
+            storageCache.put(key, image);
+        }
+    }
+
+    private final class LoadImageTask implements Callable<Void> {
+        @Override
+        public Void call() throws Exception {
+            loadImage();
+            mFuture = null;
+            return null;
+        }
     }
 }

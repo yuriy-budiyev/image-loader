@@ -36,7 +36,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.widget.ImageView;
 
-final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
+class DisplayImageAction<T> extends LoadImageAction<T> {
     private final Handler mMainThreadHandler;
     private final BitmapTransformation mBitmapTransformation;
     private final DisplayCallback<T> mDisplayCallback;
@@ -47,15 +47,14 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
     private final long mFadeDuration;
     private final float mCornerRadius;
 
-    protected DisplayImageAction(@NonNull Context context, @NonNull DataDescriptor<T> descriptor,
+    public DisplayImageAction(@NonNull Context context, @NonNull DataDescriptor<T> descriptor,
             @NonNull BitmapLoader<T> bitmapLoader, @NonNull PauseLock pauseLock,
             @Nullable ImageCache storageCache, @Nullable LoadCallback<T> loadCallback,
             @Nullable ErrorCallback<T> errorCallback, @NonNull Handler mainThreadHandler,
-            @Nullable BitmapTransformation bitmapTransformation,
-            @Nullable ImageCache memoryCache, @Nullable DisplayCallback<T> displayCallback,
-            @NonNull ImageView view, @NonNull Drawable placeholder,
-            @Nullable Drawable errorDrawable, boolean fadeEnabled, long fadeDuration,
-            float cornerRadius) {
+            @Nullable BitmapTransformation bitmapTransformation, @Nullable ImageCache memoryCache,
+            @Nullable DisplayCallback<T> displayCallback, @NonNull ImageView view,
+            @NonNull Drawable placeholder, @Nullable Drawable errorDrawable, boolean fadeEnabled,
+            long fadeDuration, float cornerRadius) {
         super(context, descriptor, bitmapLoader, pauseLock, memoryCache, storageCache, loadCallback,
                 errorCallback);
         mMainThreadHandler = mainThreadHandler;

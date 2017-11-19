@@ -27,13 +27,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.graphics.drawable.Drawable;
+import android.os.Handler;
+import android.support.annotation.AnyThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.widget.ImageView;
 
 public final class LoadImageRequest<T> {
+    private final BitmapLoader<T> mBitmapLoader;
+    private final Handler mMainThreadHandler;
     private DataDescriptor<T> mDescriptor;
-    private BitmapLoader<T> mBitmapLoader;
     private LoadCallback<T> mLoadCallback;
     private ErrorCallback<T> mErrorCallback;
     private DisplayCallback<T> mDisplayCallback;
@@ -45,7 +48,9 @@ public final class LoadImageRequest<T> {
     private long mFadeDuration;
     private float mCornerRadius;
 
-    LoadImageRequest() {
+    LoadImageRequest(@NonNull BitmapLoader<T> bitmapLoader, @NonNull Handler mainThreadHandler) {
+        mBitmapLoader = bitmapLoader;
+        mMainThreadHandler = mainThreadHandler;
     }
 
     @NonNull
@@ -124,18 +129,18 @@ public final class LoadImageRequest<T> {
      */
     @NonNull
     public LoadImageRequest<T> noFade() {
-        mFadeEnabled = true;
+        mFadeEnabled = false;
         return this;
     }
 
     /**
-     * Whether to enable fade effect for images that isn't cached in memory,
+     * Enable fade effect for images that isn't cached in memory,
      * allows to specify fade effect duration,
      * supported on API 19+
      */
     @NonNull
-    public LoadImageRequest<T> fade(boolean enabled, long duration) {
-        mFadeEnabled = enabled;
+    public LoadImageRequest<T> fade(long duration) {
+        mFadeEnabled = true;
         mFadeDuration = duration;
         return this;
     }
@@ -175,4 +180,17 @@ public final class LoadImageRequest<T> {
         mView = view;
         return this;
     }
+
+    @AnyThread
+    public void load() {
+
+    }
+
+    private static final class LoadAction implements Runnable {
+        @Override
+        public void run() {
+
+        }
+    }
+
 }
