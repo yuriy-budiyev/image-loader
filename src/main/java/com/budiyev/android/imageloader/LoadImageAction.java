@@ -34,9 +34,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 
-class LoadImageAction<T, R extends LoadRequestInternal<T>> {
+class LoadImageAction<T, LoadRequest extends LoadRequestInternal<T>> {
     private final Context mContext;
-    private final R mRequest;
+    private final LoadRequest mRequest;
     private final PauseLock mPauseLock;
     private final ImageCache mMemoryCache;
     private final ImageCache mStorageCache;
@@ -44,7 +44,7 @@ class LoadImageAction<T, R extends LoadRequestInternal<T>> {
     private volatile boolean mCancelled;
     private volatile boolean mCalled;
 
-    public LoadImageAction(@NonNull Context context, @NonNull R request,
+    public LoadImageAction(@NonNull Context context, @NonNull LoadRequest request,
             @NonNull PauseLock pauseLock, @Nullable ImageCache memoryCache,
             @Nullable ImageCache storageCache) {
         mContext = context;
@@ -97,7 +97,7 @@ class LoadImageAction<T, R extends LoadRequestInternal<T>> {
     }
 
     @NonNull
-    public R getRequest() {
+    public LoadRequest getRequest() {
         return mRequest;
     }
 
@@ -154,8 +154,9 @@ class LoadImageAction<T, R extends LoadRequestInternal<T>> {
             return;
         }
         Context context = mContext;
-        String key = mRequest.getDescriptor().getKey();
-        T data = mRequest.getDescriptor().getData();
+        LoadRequest request = mRequest;
+        String key = request.getDescriptor().getKey();
+        T data = request.getDescriptor().getData();
         Bitmap image;
         // Memory cache
         ImageCache memoryCache = mMemoryCache;
@@ -186,7 +187,7 @@ class LoadImageAction<T, R extends LoadRequestInternal<T>> {
         }
         // Load new image
         try {
-            image = mRequest.getBitmapLoader().load(context, data);
+            image = request.getBitmapLoader().load(context, data);
         } catch (Throwable error) {
             processError(context, data, error);
             return;
