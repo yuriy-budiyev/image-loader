@@ -48,8 +48,8 @@ public final class ImageUtils {
      */
     @NonNull
     @SuppressWarnings("unchecked")
-    public static <T> BitmapTransformation<T> invertColors() {
-        return (BitmapTransformation<T>) new InvertColorsTransformation();
+    public static BitmapTransformation invertColors() {
+        return new InvertColorsTransformation();
     }
 
     /**
@@ -59,8 +59,8 @@ public final class ImageUtils {
      */
     @NonNull
     @SuppressWarnings("unchecked")
-    public static <T> BitmapTransformation<T> convertToGrayScale() {
-        return (BitmapTransformation<T>) new GrayScaleTransformation();
+    public static BitmapTransformation convertToGrayScale() {
+        return new GrayScaleTransformation();
     }
 
     /**
@@ -70,8 +70,8 @@ public final class ImageUtils {
      */
     @NonNull
     @SuppressWarnings("unchecked")
-    public static <T> BitmapTransformation<T> mirrorHorizontally() {
-        return (BitmapTransformation<T>) new MirrorHorizontallyTransformation();
+    public static BitmapTransformation mirrorHorizontally() {
+        return new MirrorHorizontallyTransformation();
     }
 
     /**
@@ -81,8 +81,8 @@ public final class ImageUtils {
      */
     @NonNull
     @SuppressWarnings("unchecked")
-    public static <T> BitmapTransformation<T> mirrorVertically() {
-        return (BitmapTransformation<T>) new MirrorVerticallyTransformation();
+    public static BitmapTransformation mirrorVertically() {
+        return new MirrorVerticallyTransformation();
     }
 
     /**
@@ -93,8 +93,8 @@ public final class ImageUtils {
      */
     @NonNull
     @SuppressWarnings("unchecked")
-    public static <T> BitmapTransformation<T> rotate(float rotationAngle) {
-        return (BitmapTransformation<T>) new RotateTransformation(rotationAngle);
+    public static BitmapTransformation rotate(float rotationAngle) {
+        return new RotateTransformation(rotationAngle);
     }
 
     /**
@@ -105,8 +105,8 @@ public final class ImageUtils {
      */
     @NonNull
     @SuppressWarnings("unchecked")
-    public static <T> BitmapTransformation<T> roundCorners() {
-        return (BitmapTransformation<T>) new RoundCornersTransformation();
+    public static BitmapTransformation roundCorners() {
+        return new RoundCornersTransformation();
     }
 
     /**
@@ -118,8 +118,8 @@ public final class ImageUtils {
      */
     @NonNull
     @SuppressWarnings("unchecked")
-    public static <T> BitmapTransformation<T> roundCorners(float cornerRadius) {
-        return (BitmapTransformation<T>) new RoundCornersTransformation(cornerRadius);
+    public static BitmapTransformation roundCorners(float cornerRadius) {
+        return new RoundCornersTransformation(cornerRadius);
     }
 
     /**
@@ -129,8 +129,8 @@ public final class ImageUtils {
      */
     @NonNull
     @SuppressWarnings("unchecked")
-    public static <T> BitmapTransformation<T> cropCenter() {
-        return (BitmapTransformation<T>) new CropCenterTransformation();
+    public static BitmapTransformation cropCenter() {
+        return new CropCenterTransformation();
     }
 
     /**
@@ -141,8 +141,8 @@ public final class ImageUtils {
      */
     @NonNull
     @SuppressWarnings("unchecked")
-    public static <T> BitmapTransformation<T> cropCenter(int resultWidth, int resultHeight) {
-        return (BitmapTransformation<T>) new CropCenterTransformation(resultWidth, resultHeight);
+    public static BitmapTransformation cropCenter(int resultWidth, int resultHeight) {
+        return new CropCenterTransformation(resultWidth, resultHeight);
     }
 
 
@@ -154,8 +154,8 @@ public final class ImageUtils {
      */
     @NonNull
     @SuppressWarnings("unchecked")
-    public static <T> BitmapTransformation<T> fitCenter(int resultWidth, int resultHeight) {
-        return (BitmapTransformation<T>) new FitCenterTransformation(resultWidth, resultHeight);
+    public static BitmapTransformation fitCenter(int resultWidth, int resultHeight) {
+        return new FitCenterTransformation(resultWidth, resultHeight);
     }
 
     /**
@@ -165,9 +165,8 @@ public final class ImageUtils {
      */
     @NonNull
     @SuppressWarnings("unchecked")
-    public static <T> BitmapTransformation<T> scaleToFit(int resultWidth, int resultHeight) {
-        return (BitmapTransformation<T>) new ScaleToFitTransformation(resultWidth, resultHeight,
-                false);
+    public static BitmapTransformation scaleToFit(int resultWidth, int resultHeight) {
+        return new ScaleToFitTransformation(resultWidth, resultHeight, false);
     }
 
     /**
@@ -178,10 +177,9 @@ public final class ImageUtils {
      */
     @NonNull
     @SuppressWarnings("unchecked")
-    public static <T> BitmapTransformation<T> scaleToFit(int resultWidth, int resultHeight,
+    public static BitmapTransformation scaleToFit(int resultWidth, int resultHeight,
             boolean upscale) {
-        return (BitmapTransformation<T>) new ScaleToFitTransformation(resultWidth, resultHeight,
-                upscale);
+        return new ScaleToFitTransformation(resultWidth, resultHeight, upscale);
     }
 
     /**
@@ -461,11 +459,10 @@ public final class ImageUtils {
         return a + b;
     }
 
-    private static final class InvertColorsTransformation implements BitmapTransformation<Object> {
+    private static final class InvertColorsTransformation implements BitmapTransformation {
         @NonNull
         @Override
-        public Bitmap transform(@NonNull Context context, @NonNull Object data,
-                @NonNull Bitmap bitmap) throws Throwable {
+        public Bitmap transform(@NonNull Context context, @NonNull Bitmap bitmap) throws Throwable {
             return invertColors(bitmap);
         }
 
@@ -476,11 +473,10 @@ public final class ImageUtils {
         }
     }
 
-    private static final class GrayScaleTransformation implements BitmapTransformation<Object> {
+    private static final class GrayScaleTransformation implements BitmapTransformation {
         @NonNull
         @Override
-        public Bitmap transform(@NonNull Context context, @NonNull Object data,
-                @NonNull Bitmap bitmap) throws Throwable {
+        public Bitmap transform(@NonNull Context context, @NonNull Bitmap bitmap) throws Throwable {
             return convertToGrayScale(bitmap);
         }
 
@@ -491,12 +487,10 @@ public final class ImageUtils {
         }
     }
 
-    private static final class MirrorHorizontallyTransformation
-            implements BitmapTransformation<Object> {
+    private static final class MirrorHorizontallyTransformation implements BitmapTransformation {
         @NonNull
         @Override
-        public Bitmap transform(@NonNull Context context, @NonNull Object data,
-                @NonNull Bitmap bitmap) throws Throwable {
+        public Bitmap transform(@NonNull Context context, @NonNull Bitmap bitmap) throws Throwable {
             return mirrorHorizontally(bitmap);
         }
 
@@ -507,12 +501,10 @@ public final class ImageUtils {
         }
     }
 
-    private static final class MirrorVerticallyTransformation
-            implements BitmapTransformation<Object> {
+    private static final class MirrorVerticallyTransformation implements BitmapTransformation {
         @NonNull
         @Override
-        public Bitmap transform(@NonNull Context context, @NonNull Object data,
-                @NonNull Bitmap bitmap) throws Throwable {
+        public Bitmap transform(@NonNull Context context, @NonNull Bitmap bitmap) throws Throwable {
             return mirrorVertically(bitmap);
         }
 
@@ -523,7 +515,7 @@ public final class ImageUtils {
         }
     }
 
-    private static final class RotateTransformation implements BitmapTransformation<Object> {
+    private static final class RotateTransformation implements BitmapTransformation {
         private final float mAngle;
         private final String mKey;
 
@@ -535,8 +527,7 @@ public final class ImageUtils {
 
         @NonNull
         @Override
-        public Bitmap transform(@NonNull Context context, @NonNull Object data,
-                @NonNull Bitmap bitmap) throws Throwable {
+        public Bitmap transform(@NonNull Context context, @NonNull Bitmap bitmap) throws Throwable {
             return rotate(bitmap, mAngle);
         }
 
@@ -547,7 +538,7 @@ public final class ImageUtils {
         }
     }
 
-    private static final class RoundCornersTransformation implements BitmapTransformation<Object> {
+    private static final class RoundCornersTransformation implements BitmapTransformation {
         private final float mRadius;
         private final String mKey;
 
@@ -563,8 +554,7 @@ public final class ImageUtils {
 
         @NonNull
         @Override
-        public Bitmap transform(@NonNull Context context, @NonNull Object data,
-                @NonNull Bitmap bitmap) throws Throwable {
+        public Bitmap transform(@NonNull Context context, @NonNull Bitmap bitmap) throws Throwable {
             float radius = mRadius;
             if (radius == -1f) {
                 radius = Math.min(bitmap.getWidth(), bitmap.getHeight()) / 2f;
@@ -579,7 +569,7 @@ public final class ImageUtils {
         }
     }
 
-    private static final class CropCenterTransformation implements BitmapTransformation<Object> {
+    private static final class CropCenterTransformation implements BitmapTransformation {
         private final int mWidth;
         private final int mHeight;
         private final String mKey;
@@ -598,8 +588,7 @@ public final class ImageUtils {
 
         @NonNull
         @Override
-        public Bitmap transform(@NonNull Context context, @NonNull Object data,
-                @NonNull Bitmap bitmap) throws Throwable {
+        public Bitmap transform(@NonNull Context context, @NonNull Bitmap bitmap) throws Throwable {
             if (mWidth > 0 && mHeight > 0) {
                 return cropCenter(bitmap, mWidth, mHeight);
             } else {
@@ -615,7 +604,7 @@ public final class ImageUtils {
         }
     }
 
-    private static final class FitCenterTransformation implements BitmapTransformation<Object> {
+    private static final class FitCenterTransformation implements BitmapTransformation {
         private final int mWidth;
         private final int mHeight;
         private final String mKey;
@@ -628,8 +617,7 @@ public final class ImageUtils {
 
         @NonNull
         @Override
-        public Bitmap transform(@NonNull Context context, @NonNull Object data,
-                @NonNull Bitmap bitmap) throws Throwable {
+        public Bitmap transform(@NonNull Context context, @NonNull Bitmap bitmap) throws Throwable {
             return fitCenter(bitmap, mWidth, mHeight);
         }
 
@@ -640,7 +628,7 @@ public final class ImageUtils {
         }
     }
 
-    private static final class ScaleToFitTransformation implements BitmapTransformation<Object> {
+    private static final class ScaleToFitTransformation implements BitmapTransformation {
         private final int mWidth;
         private final int mHeight;
         private final boolean mUpscale;
@@ -655,8 +643,7 @@ public final class ImageUtils {
 
         @NonNull
         @Override
-        public Bitmap transform(@NonNull Context context, @NonNull Object data,
-                @NonNull Bitmap bitmap) throws Throwable {
+        public Bitmap transform(@NonNull Context context, @NonNull Bitmap bitmap) throws Throwable {
             return scaleToFit(bitmap, mWidth, mHeight, mUpscale);
         }
 

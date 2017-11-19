@@ -38,7 +38,7 @@ import android.widget.ImageView;
 
 final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
     private final Handler mMainThreadHandler;
-    private final BitmapTransformation<T> mBitmapTransformation;
+    private final BitmapTransformation mBitmapTransformation;
     private final DisplayCallback<T> mDisplayCallback;
     private final WeakReference<ImageView> mView;
     private final Drawable mPlaceholder;
@@ -51,7 +51,7 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
             @NonNull BitmapLoader<T> bitmapLoader, @NonNull PauseLock pauseLock,
             @Nullable ImageCache storageCache, @Nullable LoadCallback<T> loadCallback,
             @Nullable ErrorCallback<T> errorCallback, @NonNull Handler mainThreadHandler,
-            @Nullable BitmapTransformation<T> bitmapTransformation,
+            @Nullable BitmapTransformation bitmapTransformation,
             @Nullable ImageCache memoryCache, @Nullable DisplayCallback<T> displayCallback,
             @NonNull ImageView view, @NonNull Drawable placeholder,
             @Nullable Drawable errorDrawable, boolean fadeEnabled, long fadeDuration,
@@ -76,12 +76,12 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
     @Override
     protected void onImageLoaded(@NonNull Bitmap image) {
         DataDescriptor<T> descriptor = getDescriptor();
-        BitmapTransformation<T> bitmapTransformation = mBitmapTransformation;
+        BitmapTransformation bitmapTransformation = mBitmapTransformation;
         if (bitmapTransformation != null) {
             Context context = getContext();
             T data = descriptor.getData();
             try {
-                image = bitmapTransformation.transform(context, data, image);
+                image = bitmapTransformation.transform(context, image);
             } catch (Throwable error) {
                 processError(context, data, error);
                 return;

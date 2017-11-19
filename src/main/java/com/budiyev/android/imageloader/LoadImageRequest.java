@@ -23,73 +23,34 @@
  */
 package com.budiyev.android.imageloader;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
-import android.support.annotation.AnyThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.Px;
 import android.widget.ImageView;
 
-public final class LoadImageRequest {
-    private final Context mContext;
-    private Uri mSource;
+public final class LoadImageRequest<T> {
+    private DataDescriptor<T> mDescriptor;
+    private BitmapLoader<T> mBitmapLoader;
+    private LoadCallback<T> mLoadCallback;
+    private ErrorCallback<T> mErrorCallback;
+    private DisplayCallback<T> mDisplayCallback;
+    private List<BitmapTransformation> mTransformations;
+    private ImageView mView;
     private Drawable mPlaceholder;
     private Drawable mErrorDrawable;
-    private LoadCallback<Uri> mLoadCallback;
-    private DisplayCallback<Uri> mDisplayCallback;
-    private ErrorCallback<Uri> mErrorCallback;
-    private ImageView mView;
-    private List<BitmapTransformation<Uri>> mTransformations;
-    private int mRequiredWidth = -1;
-    private int mRequiredHeight = -1;
-    private boolean mFadeEnabled = true;
-    private long mFadeDuration = 200L;
+    private boolean mFadeEnabled;
+    private long mFadeDuration;
     private float mCornerRadius;
 
-    LoadImageRequest(@NonNull Context context) {
-        mContext = context.getApplicationContext();
+    LoadImageRequest() {
     }
 
-    /**
-     * Source data, if not set, {@link #load()} method will do nothing
-     */
     @NonNull
-    public LoadImageRequest from(@Nullable Uri uri) {
-        mSource = uri;
-        return this;
-    }
-
-    /**
-     * Source data, if not set, {@link #load()} method will do nothing
-     */
-    @NonNull
-    public LoadImageRequest from(@NonNull String uri) {
-        mSource = Uri.parse(uri);
-        return this;
-    }
-
-    /**
-     * Source data, if not set, {@link #load()} method will do nothing
-     */
-    @NonNull
-    public LoadImageRequest from(@NonNull File file) {
-        mSource = Uri.fromFile(file);
-        return this;
-    }
-
-    /**
-     * Required size of image
-     */
-    @NonNull
-    public LoadImageRequest size(@Px int requiredWidth, @Px int requiredHeight) {
-        mRequiredWidth = requiredWidth;
-        mRequiredHeight = requiredHeight;
+    public LoadImageRequest<T> from(@Nullable DataDescriptor<T> descriptor) {
+        mDescriptor = descriptor;
         return this;
     }
 
@@ -98,7 +59,7 @@ public final class LoadImageRequest {
      * for square image, will lead to circle result
      */
     @NonNull
-    public LoadImageRequest roundCorners() {
+    public LoadImageRequest<T> roundCorners() {
         mCornerRadius = RoundedDrawable.MAX_RADIUS;
         return this;
     }
@@ -107,7 +68,7 @@ public final class LoadImageRequest {
      * Display image with rounded corners using specified corner radius
      */
     @NonNull
-    public LoadImageRequest roundCorners(float cornerRadius) {
+    public LoadImageRequest<T> roundCorners(float cornerRadius) {
         mCornerRadius = cornerRadius;
         return this;
     }
@@ -116,7 +77,7 @@ public final class LoadImageRequest {
      * Placeholder
      */
     @NonNull
-    public LoadImageRequest placeholder(@Nullable Drawable placeholder) {
+    public LoadImageRequest<T> placeholder(@Nullable Drawable placeholder) {
         mPlaceholder = placeholder;
         return this;
     }
@@ -125,7 +86,7 @@ public final class LoadImageRequest {
      * Error drawable, that will be displayed when image, couldn't be loaded
      */
     @NonNull
-    public LoadImageRequest errorDrawable(@Nullable Drawable errorDrawable) {
+    public LoadImageRequest<T> errorDrawable(@Nullable Drawable errorDrawable) {
         mErrorDrawable = errorDrawable;
         return this;
     }
@@ -137,8 +98,8 @@ public final class LoadImageRequest {
      * @see BitmapTransformation
      */
     @NonNull
-    public LoadImageRequest transform(@NonNull BitmapTransformation<Uri> transformation) {
-        List<BitmapTransformation<Uri>> transformations = mTransformations;
+    public LoadImageRequest<T> transform(@NonNull BitmapTransformation transformation) {
+        List<BitmapTransformation> transformations = mTransformations;
         if (transformations == null) {
             transformations = new ArrayList<>();
             mTransformations = transformations;
@@ -152,7 +113,7 @@ public final class LoadImageRequest {
      * supported on API 19+
      */
     @NonNull
-    public LoadImageRequest fade() {
+    public LoadImageRequest<T> fade() {
         mFadeEnabled = true;
         return this;
     }
@@ -162,7 +123,7 @@ public final class LoadImageRequest {
      * supported on API 19+
      */
     @NonNull
-    public LoadImageRequest noFade() {
+    public LoadImageRequest<T> noFade() {
         mFadeEnabled = true;
         return this;
     }
@@ -173,7 +134,7 @@ public final class LoadImageRequest {
      * supported on API 19+
      */
     @NonNull
-    public LoadImageRequest fade(boolean enabled, long duration) {
+    public LoadImageRequest<T> fade(boolean enabled, long duration) {
         mFadeEnabled = enabled;
         mFadeDuration = duration;
         return this;
@@ -183,7 +144,7 @@ public final class LoadImageRequest {
      * Load callback
      */
     @NonNull
-    public LoadImageRequest onLoaded(@Nullable LoadCallback<Uri> callback) {
+    public LoadImageRequest<T> onLoaded(@Nullable LoadCallback<T> callback) {
         mLoadCallback = callback;
         return this;
     }
@@ -192,7 +153,7 @@ public final class LoadImageRequest {
      * Error callback
      */
     @NonNull
-    public LoadImageRequest onError(@Nullable ErrorCallback<Uri> callback) {
+    public LoadImageRequest<T> onError(@Nullable ErrorCallback<T> callback) {
         mErrorCallback = callback;
         return this;
     }
@@ -201,7 +162,7 @@ public final class LoadImageRequest {
      * Display callback
      */
     @NonNull
-    public LoadImageRequest onDisplayed(@Nullable DisplayCallback<Uri> callback) {
+    public LoadImageRequest<T> onDisplayed(@Nullable DisplayCallback<T> callback) {
         mDisplayCallback = callback;
         return this;
     }
@@ -210,22 +171,8 @@ public final class LoadImageRequest {
      * Target view in which image will be loaded
      */
     @NonNull
-    public LoadImageRequest into(@Nullable ImageView view) {
+    public LoadImageRequest<T> into(@Nullable ImageView view) {
         mView = view;
         return this;
-    }
-
-    /**
-     * Load image
-     */
-    @AnyThread
-    public void load() {
-        Uri source = mSource;
-        if (source == null) {
-            return;
-        }
-        new LoadImageRequestInternal(mContext, source, mRequiredWidth, mRequiredHeight, mView,
-                mPlaceholder, mErrorDrawable, mTransformations, mLoadCallback, mDisplayCallback,
-                mErrorCallback, mFadeEnabled, mFadeDuration, mCornerRadius).execute();
     }
 }

@@ -32,20 +32,18 @@ import android.support.annotation.WorkerThread;
 /**
  * Bitmap processor
  */
-public interface BitmapTransformation<T> {
+public interface BitmapTransformation {
     /**
      * Process loaded bitmap before displaying
      *
      * @param context Context
-     * @param data    Source data
      * @param bitmap  Bitmap, loaded from source data
      * @return Processed bitmap
      * @see ImageUtils
      */
     @NonNull
     @WorkerThread
-    Bitmap transform(@NonNull Context context, @NonNull T data, @NonNull Bitmap bitmap)
-            throws Throwable;
+    Bitmap transform(@NonNull Context context, @NonNull Bitmap bitmap) throws Throwable;
 
     /**
      * Unique key that identifies concrete transformation
