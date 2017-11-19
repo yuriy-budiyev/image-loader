@@ -29,6 +29,7 @@ import java.util.concurrent.ExecutorService;
 import android.app.Application;
 import android.content.Context;
 import android.os.Handler;
+import android.support.annotation.AnyThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -63,6 +64,20 @@ public final class ImageLoader {
             ((StorageImageCache) mStorageCache).setExecutor(mExecutor);
         }
     }
+
+    /**
+     * Create new load image request
+     *
+     * @param loader Bitmap loader for specified data type
+     * @return New load image request
+     */
+    @NonNull
+    @AnyThread
+    public <T> LoadImageRequest<T> request(@NonNull BitmapLoader<T> loader) {
+        return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler,
+                mMemoryCache, mStorageCache, loader);
+    }
+
 
     /**
      * Delete cached image for specified {@link DataDescriptor}

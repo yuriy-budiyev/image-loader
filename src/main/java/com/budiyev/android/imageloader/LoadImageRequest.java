@@ -60,8 +60,8 @@ public final class LoadImageRequest<T> {
 
     LoadImageRequest(@NonNull Context context, @NonNull ExecutorService executor,
             @NonNull PauseLock pauseLock, @NonNull Handler mainThreadHandler,
-            @NonNull BitmapLoader<T> bitmapLoader, @Nullable ImageCache memoryCache,
-            @Nullable ImageCache storageCache) {
+            @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache,
+            @NonNull BitmapLoader<T> bitmapLoader) {
         mContext = context;
         mExecutor = executor;
         mPauseLock = pauseLock;
