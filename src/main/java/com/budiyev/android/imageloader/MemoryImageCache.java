@@ -15,7 +15,7 @@ final class MemoryImageCache implements ImageCache {
     }
 
     public MemoryImageCache(int maxSize) {
-        mCache = new InternalCacheImpl(maxSize);
+        mCache = new CacheImpl(maxSize);
     }
 
     @Nullable
@@ -39,8 +39,8 @@ final class MemoryImageCache implements ImageCache {
         mCache.evictAll();
     }
 
-    private static final class InternalCacheImpl extends LruCache<String, Bitmap> {
-        public InternalCacheImpl(int maxSize) {
+    private static final class CacheImpl extends LruCache<String, Bitmap> {
+        public CacheImpl(int maxSize) {
             super(maxSize);
         }
 
