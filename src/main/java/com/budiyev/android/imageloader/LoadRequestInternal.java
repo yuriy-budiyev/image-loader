@@ -26,10 +26,38 @@ package com.budiyev.android.imageloader;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-class DisplayImageRequestInternal<T> extends LoadImageRequestInternal<T> {
-    public DisplayImageRequestInternal(@NonNull BitmapLoader<T> bitmapLoader,
+class LoadRequestInternal<T> {
+    private final BitmapLoader<T> mBitmapLoader;
+    private final DataDescriptor<T> mDescriptor;
+    private final LoadCallback<T> mLoadCallback;
+    private final ErrorCallback<T> mErrorCallback;
+
+    public LoadRequestInternal(@NonNull BitmapLoader<T> bitmapLoader,
             @NonNull DataDescriptor<T> descriptor, @Nullable LoadCallback<T> loadCallback,
             @Nullable ErrorCallback<T> errorCallback) {
-        super(bitmapLoader, descriptor, loadCallback, errorCallback);
+        mBitmapLoader = bitmapLoader;
+        mDescriptor = descriptor;
+        mLoadCallback = loadCallback;
+        mErrorCallback = errorCallback;
+    }
+
+    @NonNull
+    public BitmapLoader<T> getBitmapLoader() {
+        return mBitmapLoader;
+    }
+
+    @NonNull
+    public DataDescriptor<T> getDescriptor() {
+        return mDescriptor;
+    }
+
+    @Nullable
+    public LoadCallback<T> getLoadCallback() {
+        return mLoadCallback;
+    }
+
+    @Nullable
+    public ErrorCallback<T> getErrorCallback() {
+        return mErrorCallback;
     }
 }

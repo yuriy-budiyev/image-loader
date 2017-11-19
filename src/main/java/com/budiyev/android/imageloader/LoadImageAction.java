@@ -34,31 +34,24 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 
-class LoadImageAction<T> {
+class LoadImageAction<T, R extends LoadRequestInternal<T>> {
     private final Context mContext;
-    private final DataDescriptor<T> mDescriptor;
-    private final BitmapLoader<T> mBitmapLoader;
+    private final R mRequest;
     private final PauseLock mPauseLock;
     private final ImageCache mMemoryCache;
     private final ImageCache mStorageCache;
-    private final LoadCallback<T> mLoadCallback;
-    private final ErrorCallback<T> mErrorCallback;
     private volatile Future<?> mFuture;
     private volatile boolean mCancelled;
     private volatile boolean mCalled;
 
-    public LoadImageAction(@NonNull Context context, @NonNull DataDescriptor<T> descriptor,
-            @NonNull BitmapLoader<T> bitmapLoader, @NonNull PauseLock pauseLock,
-            @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache,
-            @Nullable LoadCallback<T> loadCallback, @Nullable ErrorCallback<T> errorCallback) {
+    public LoadImageAction(@NonNull Context context, @NonNull R request,
+            @NonNull PauseLock pauseLock, @Nullable ImageCache memoryCache,
+            @Nullable ImageCache storageCache) {
         mContext = context;
-        mDescriptor = descriptor;
-        mBitmapLoader = bitmapLoader;
+        mRequest = request;
         mPauseLock = pauseLock;
         mMemoryCache = memoryCache;
         mStorageCache = storageCache;
-        mLoadCallback = loadCallback;
-        mErrorCallback = errorCallback;
     }
 
     @WorkerThread
@@ -104,13 +97,8 @@ class LoadImageAction<T> {
     }
 
     @NonNull
-    protected final DataDescriptor<T> getDescriptor() {
-        return mDescriptor;
-    }
-
-    @NonNull
-    protected final BitmapLoader<T> getBitmapLoader() {
-        return mBitmapLoader;
+    public R getRequest() {
+        return mRequest;
     }
 
     @NonNull
@@ -128,16 +116,6 @@ class LoadImageAction<T> {
         return mStorageCache;
     }
 
-    @Nullable
-    protected final LoadCallback<T> getLoadCallback() {
-        return mLoadCallback;
-    }
-
-    @Nullable
-    protected final ErrorCallback<T> getErrorCallback() {
-        return mErrorCallback;
-    }
-
     protected final boolean isCancelled() {
         return mCancelled;
     }
@@ -146,7 +124,7 @@ class LoadImageAction<T> {
         if (mCancelled) {
             return;
         }
-        LoadCallback<T> loadCallback = mLoadCallback;
+        LoadCallback<T> loadCallback = mRequest.getLoadCallback();
         if (loadCallback != null) {
             loadCallback.onLoaded(context, data, image);
         }
@@ -158,7 +136,7 @@ class LoadImageAction<T> {
         if (mCancelled) {
             return;
         }
-        ErrorCallback<T> errorCallback = mErrorCallback;
+        ErrorCallback<T> errorCallback = mRequest.getErrorCallback();
         if (errorCallback != null) {
             errorCallback.onError(context, data, error);
         }
@@ -176,8 +154,8 @@ class LoadImageAction<T> {
             return;
         }
         Context context = mContext;
-        String key = mDescriptor.getKey();
-        T data = mDescriptor.getData();
+        String key = mRequest.getDescriptor().getKey();
+        T data = mRequest.getDescriptor().getData();
         Bitmap image;
         // Memory cache
         ImageCache memoryCache = mMemoryCache;
@@ -208,7 +186,7 @@ class LoadImageAction<T> {
         }
         // Load new image
         try {
-            image = mBitmapLoader.load(context, data);
+            image = mRequest.getBitmapLoader().load(context, data);
         } catch (Throwable error) {
             processError(context, data, error);
             return;

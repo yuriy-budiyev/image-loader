@@ -23,8 +23,6 @@
  */
 package com.budiyev.android.imageloader;
 
-import java.lang.ref.WeakReference;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -36,61 +34,39 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.widget.ImageView;
 
-class DisplayImageAction<T> extends LoadImageAction<T> {
+class DisplayImageAction<T> extends LoadImageAction<T, DisplayRequestInternal<T>> {
     private final Handler mMainThreadHandler;
-    private final BitmapTransformation mBitmapTransformation;
-    private final DisplayCallback<T> mDisplayCallback;
-    private final WeakReference<ImageView> mView;
-    private final Drawable mPlaceholder;
-    private final Drawable mErrorDrawable;
-    private final boolean mFadeEnabled;
-    private final long mFadeDuration;
-    private final float mCornerRadius;
 
-    public DisplayImageAction(@NonNull Context context, @NonNull DataDescriptor<T> descriptor,
-            @NonNull BitmapLoader<T> bitmapLoader, @NonNull PauseLock pauseLock,
-            @Nullable ImageCache storageCache, @Nullable LoadCallback<T> loadCallback,
-            @Nullable ErrorCallback<T> errorCallback, @NonNull Handler mainThreadHandler,
-            @Nullable BitmapTransformation bitmapTransformation, @Nullable ImageCache memoryCache,
-            @Nullable DisplayCallback<T> displayCallback, @NonNull ImageView view,
-            @NonNull Drawable placeholder, @Nullable Drawable errorDrawable, boolean fadeEnabled,
-            long fadeDuration, float cornerRadius) {
-        super(context, descriptor, bitmapLoader, pauseLock, memoryCache, storageCache, loadCallback,
-                errorCallback);
+    public DisplayImageAction(@NonNull Context context, @NonNull DisplayRequestInternal<T> request,
+            @NonNull PauseLock pauseLock, @NonNull Handler mainThreadHandler,
+            @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache) {
+        super(context, request, pauseLock, memoryCache, storageCache);
         mMainThreadHandler = mainThreadHandler;
-        mBitmapTransformation = bitmapTransformation;
-        mDisplayCallback = displayCallback;
-        mView = new WeakReference<>(view);
-        mPlaceholder = placeholder;
-        mErrorDrawable = errorDrawable;
-        mFadeEnabled = fadeEnabled;
-        mFadeDuration = fadeDuration;
-        mCornerRadius = cornerRadius;
     }
 
     public boolean hasSameDescriptor(@NonNull String descriptorKey) {
-        return getDescriptor().getKey().equals(descriptorKey);
+        return getRequest().getDescriptor().getKey().equals(descriptorKey);
     }
 
     @Override
     protected void onImageLoaded(@NonNull Bitmap image) {
-        DataDescriptor<T> descriptor = getDescriptor();
-        BitmapTransformation bitmapTransformation = mBitmapTransformation;
-        if (bitmapTransformation != null) {
+        DataDescriptor<T> descriptor = getRequest().getDescriptor();
+        BitmapTransformation transformation = getRequest().getTransformation();
+        if (transformation != null) {
             Context context = getContext();
             T data = descriptor.getData();
             try {
-                image = bitmapTransformation.transform(context, image);
+                image = transformation.transform(context, image);
             } catch (Throwable error) {
                 processError(context, data, error);
                 return;
             }
             ImageCache memoryCache = getMemoryCache();
             if (memoryCache != null) {
-                memoryCache.put(descriptor.getKey() + bitmapTransformation.getKey(), image);
+                memoryCache.put(descriptor.getKey() + transformation.getKey(), image);
             }
         }
-        if (isCancelled() || mView.get() == null) {
+        if (isCancelled() || getRequest().getView().get() == null) {
             return;
         }
         mMainThreadHandler.post(new SetImageAction(image));
@@ -98,28 +74,29 @@ class DisplayImageAction<T> extends LoadImageAction<T> {
 
     @Override
     protected void onError(@NonNull Throwable error) {
-        if (mErrorDrawable != null || !isCancelled()) {
+        if (getRequest().getErrorDrawable() != null || !isCancelled()) {
             mMainThreadHandler.post(new SetErrorDrawableAction());
         }
     }
 
     @Override
     protected void onCancelled() {
-        mView.clear();
+        getRequest().getView().clear();
     }
 
     private final class SetErrorDrawableAction implements Runnable {
         @Override
         public void run() {
-            Drawable errorDrawable = mErrorDrawable;
-            ImageView view = mView.get();
+            Drawable errorDrawable = getRequest().getErrorDrawable();
+            ImageView view = getRequest().getView().get();
             if (isCancelled() || errorDrawable == null || view == null ||
                     InternalUtils.getDisplayImageAction(view) != DisplayImageAction.this) {
                 return;
             }
-            if (mFadeEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                view.setImageDrawable(new FadeDrawable(mPlaceholder, errorDrawable, mFadeDuration,
-                        mMainThreadHandler, null));
+            if (getRequest().isFadeEnabled() &&
+                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                view.setImageDrawable(new FadeDrawable(getRequest().getPlaceholder(), errorDrawable,
+                        getRequest().getFadeDuration(), mMainThreadHandler, null));
             } else {
                 view.setImageDrawable(errorDrawable);
             }
@@ -139,23 +116,25 @@ class DisplayImageAction<T> extends LoadImageAction<T> {
             if (isCancelled()) {
                 return;
             }
-            ImageView view = mView.get();
+            ImageView view = getRequest().getView().get();
             if (view == null ||
                     InternalUtils.getDisplayImageAction(view) != DisplayImageAction.this) {
                 return;
             }
             Bitmap image = mImage;
             Context context = getContext();
-            T data = getDescriptor().getData();
-            DisplayCallback<T> displayCallback = mDisplayCallback;
-            float cornerRadius = mCornerRadius;
+            T data = getRequest().getDescriptor().getData();
+            DisplayCallback<T> displayCallback = getRequest().getDisplayCallback();
+            float cornerRadius = getRequest().getCornerRadius();
             boolean roundCorners = cornerRadius > 0 || cornerRadius == RoundedDrawable.MAX_RADIUS;
-            if (mFadeEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                view.setImageDrawable(new FadeDrawable(mPlaceholder, roundCorners ?
+            if (getRequest().isFadeEnabled() &&
+                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                view.setImageDrawable(new FadeDrawable(getRequest().getPlaceholder(), roundCorners ?
                         new RoundedDrawable(context.getResources(), image, cornerRadius) :
-                        new BitmapDrawable(context.getResources(), image), mFadeDuration,
-                        mMainThreadHandler, displayCallback == null ? null :
-                        new FadeCallback<>(context, displayCallback, data, image, view)));
+                        new BitmapDrawable(context.getResources(), image),
+                        getRequest().getFadeDuration(), mMainThreadHandler,
+                        displayCallback == null ? null :
+                                new FadeCallback<>(context, displayCallback, data, image, view)));
             } else {
                 if (roundCorners) {
                     view.setImageDrawable(

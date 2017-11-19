@@ -1,0 +1,104 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2017 Yuriy Budiyev [yuriy.budiyev@yandex.ru]
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package com.budiyev.android.imageloader;
+
+import java.lang.ref.WeakReference;
+import java.util.List;
+
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.widget.ImageView;
+
+class DisplayRequestInternal<T> extends LoadRequestInternal<T> {
+    private final DisplayCallback<T> mDisplayCallback;
+    private final BitmapTransformation mTransformation;
+    private final WeakReference<ImageView> mView;
+    private final Drawable mPlaceholder;
+    private final Drawable mErrorDrawable;
+    private final boolean mFadeEnabled;
+    private final long mFadeDuration;
+    private final float mCornerRadius;
+
+    public DisplayRequestInternal(@NonNull BitmapLoader<T> bitmapLoader,
+            @NonNull DataDescriptor<T> descriptor, @Nullable LoadCallback<T> loadCallback,
+            @Nullable ErrorCallback<T> errorCallback,
+            @Nullable List<BitmapTransformation> transformations, @NonNull ImageView view,
+            @Nullable DisplayCallback<T> displayCallback, @Nullable Drawable placeholder,
+            @Nullable Drawable errorDrawable, boolean fadeEnabled, long fadeDuration,
+            float cornerRadius) {
+        super(bitmapLoader, descriptor, loadCallback, errorCallback);
+        mDisplayCallback = displayCallback;
+        mTransformation = null;
+        mView = new WeakReference<>(view);
+        if (placeholder != null) {
+            mPlaceholder = placeholder;
+        } else {
+            mPlaceholder = new ColorDrawable(Color.TRANSPARENT);
+        }
+        mErrorDrawable = errorDrawable;
+        mFadeEnabled = fadeEnabled;
+        mFadeDuration = fadeDuration;
+        mCornerRadius = cornerRadius;
+    }
+
+    @Nullable
+    public DisplayCallback<T> getDisplayCallback() {
+        return mDisplayCallback;
+    }
+
+    @Nullable
+    public BitmapTransformation getTransformation() {
+        return mTransformation;
+    }
+
+    @NonNull
+    public WeakReference<ImageView> getView() {
+        return mView;
+    }
+
+    @NonNull
+    public Drawable getPlaceholder() {
+        return mPlaceholder;
+    }
+
+    @Nullable
+    public Drawable getErrorDrawable() {
+        return mErrorDrawable;
+    }
+
+    public boolean isFadeEnabled() {
+        return mFadeEnabled;
+    }
+
+    public long getFadeDuration() {
+        return mFadeDuration;
+    }
+
+    public float getCornerRadius() {
+        return mCornerRadius;
+    }
+}
