@@ -30,6 +30,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.net.URLConnection;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -46,11 +47,12 @@ import android.view.View;
 import android.widget.ImageView;
 
 final class InternalUtils {
+    private static final int CONNECT_TIMEOUT = 5000;
     private static final int BUFFER_SIZE = 16384;
+    private static final int MAX_POOL_SIZE = 4;
     private static final String URI_SCHEME_HTTP = "http";
     private static final String URI_SCHEME_HTTPS = "https";
     private static final String URI_SCHEME_FTP = "ftp";
-    private static final int MAX_POOL_SIZE = 4;
 
     private InternalUtils() {
     }
@@ -119,7 +121,9 @@ final class InternalUtils {
         String scheme = uri.getScheme();
         if (URI_SCHEME_HTTP.equalsIgnoreCase(scheme) || URI_SCHEME_HTTPS.equalsIgnoreCase(scheme) ||
                 URI_SCHEME_FTP.equalsIgnoreCase(scheme)) {
-            return new URL(uri.toString()).openConnection().getInputStream();
+            URLConnection connection = new URL(uri.toString()).openConnection();
+            connection.setConnectTimeout(CONNECT_TIMEOUT);
+            return connection.getInputStream();
         } else {
             return context.getContentResolver().openInputStream(uri);
         }
@@ -127,7 +131,9 @@ final class InternalUtils {
 
     @Nullable
     public static InputStream getDataStreamFromUrl(@NonNull String url) throws IOException {
-        return new URL(url).openConnection().getInputStream();
+        URLConnection connection = new URL(url).openConnection();
+        connection.setConnectTimeout(CONNECT_TIMEOUT);
+        return connection.getInputStream();
     }
 
     public static void close(@Nullable Closeable closeable) {
