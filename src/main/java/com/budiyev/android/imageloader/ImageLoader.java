@@ -83,7 +83,7 @@ public final class ImageLoader {
     /**
      * Create new load image request
      *
-     * @return Data type selector instance
+     * @return Source data type selector
      */
     @NonNull
     @AnyThread
@@ -159,8 +159,13 @@ public final class ImageLoader {
         clearStorageCache();
     }
 
-    void runOnMainThread(@NonNull Runnable action) {
-        mMainThreadHandler.post(action);
+    /**
+     * Get default image loader instance,
+     * automatically cares about memory and storage caching
+     */
+    @NonNull
+    public static ImageLoader with(@NonNull Context context) {
+        return ImageLoaderHolder.get(context);
     }
 
     /**
