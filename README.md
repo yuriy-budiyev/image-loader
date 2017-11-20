@@ -11,7 +11,7 @@ Almost unlimited customization.
 ### Usage
 ```gradle
 dependencies {
-    implementation 'com.budiyev.android:image-loader:1.9.0'
+    implementation 'com.budiyev.android:image-loader:1.9.1'
 }
 ```
 ### Basic usage sample
@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ImageView view = findViewById(R.id.image_view);
 
-        ImageLoader.with(this).request().uri().from(Uri.parse("https://some.url/image")).load(view);
+        ImageLoader.with(this).request().url().from("https://some.url/image").load(view);
     }
 }
 ```
