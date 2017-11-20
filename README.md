@@ -11,7 +11,7 @@ Almost unlimited customization.
 ### Usage
 ```gradle
 dependencies {
-    implementation 'com.budiyev.android:image-loader:1.8.5'
+    implementation 'com.budiyev.android:image-loader:1.9.0'
 }
 ```
 ### Basic usage sample
@@ -25,82 +25,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ImageView view = findViewById(R.id.image_view);
 
-        ImageLoader.with(this).from("https://some.url/image").into(view).load();
-    }
-}
-```
-
-### Simple singleton implementation
-You can build your own loader using builder
-
-```java
-/**
- * Simple image loader that automatically cares about memory and storage caching,
- * read documentation for more info
- */
-public final class MyImageLoader {
-    private static volatile MyImageLoader sInstance;
-    private final ImageLoader<Uri> mLoader;
-
-    private MyImageLoader(@NonNull Context context) {
-        mLoader = ImageLoader.builder(context).uri().memoryCache().storageCache().build();
-    }
-
-    /**
-     * Load image form {@code url} to {@code view}
-     *
-     * @param url  Source URL
-     * @param view Target image view
-     */
-    @MainThread
-    public void load(@NonNull String url, @NonNull ImageView view) {
-        mLoader.load(DataUtils.descriptor(Uri.parse(url)), view);
-    }
-
-    /**
-     * Get (or create, if not exist) loader instance
-     *
-     * @param context Context
-     * @return Loader instance
-     */
-    @NonNull
-    public static MyImageLoader with(@NonNull Context context) {
-        MyImageLoader instance = sInstance;
-        if (instance == null) {
-            synchronized (MyImageLoader.class) {
-                instance = sInstance;
-                if (instance == null) {
-                    instance = new MyImageLoader(context);
-                    sInstance = instance;
-                }
-            }
-        }
-        return instance;
-    }
-
-    /**
-     * Clear memory cache if it exists, would be good to call this method in
-     * {@link Application#onTrimMemory(int)} method,
-     * read documentation for more info
-     */
-    public static void clearMemoryCache() {
-        MyImageLoader instance = sInstance;
-        if (instance != null) {
-            instance.mLoader.clearMemoryCache();
-        }
-    }
-}
-```
-### Implementation usage sample
-```java
-public class MainActivity extends AppCompatActivity {
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        ImageView view = findViewById(R.id.image_view);
-        
-        MyImageLoader.with(this).load("https://some.url/image", view);
+        ImageLoader.with(this).request().uri().from(Uri.parse("https://some.url/image")).load(view);
     }
 }
 ```
