@@ -37,7 +37,8 @@ public interface ErrorCallback<T> {
      *
      * @param context Context
      * @param data    Data
-     * @param error   Throwable, that has been thrown by {@link BitmapLoader#load(Context, Object)}
+     * @param error   Throwable, that has been thrown by
+     *                {@link BitmapLoader#load(Context, Object, Size)}
      *                method or {@link ImageNotLoadedException} if {@link BitmapLoader}
      *                returned {@code null}
      */
