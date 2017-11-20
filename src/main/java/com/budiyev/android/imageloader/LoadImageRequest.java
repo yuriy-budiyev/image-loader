@@ -58,8 +58,8 @@ public final class LoadImageRequest<T> {
     private List<BitmapTransformation> mTransformations;
     private Drawable mPlaceholder;
     private Drawable mErrorDrawable;
-    private boolean mFadeEnabled;
-    private long mFadeDuration;
+    private boolean mFadeEnabled = true;
+    private long mFadeDuration = 200L;
     private float mCornerRadius;
 
     LoadImageRequest(@NonNull Context context, @NonNull ExecutorService executor,
