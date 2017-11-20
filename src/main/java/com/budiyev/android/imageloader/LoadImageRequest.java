@@ -225,6 +225,9 @@ public final class LoadImageRequest<T> {
         return this;
     }
 
+    /**
+     * Load image
+     */
     @AnyThread
     public void load() {
         DataDescriptor<T> descriptor = getDescriptor();
@@ -235,6 +238,9 @@ public final class LoadImageRequest<T> {
                 mLoadCallback, mErrorCallback, mPauseLock).execute(mExecutor);
     }
 
+    /**
+     * Load image and display it in the specified {@code view}
+     */
     @MainThread
     public void load(@NonNull View view) {
         DataDescriptor<T> descriptor = getDescriptor();
