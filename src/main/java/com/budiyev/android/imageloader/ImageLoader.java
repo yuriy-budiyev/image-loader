@@ -196,7 +196,7 @@ public final class ImageLoader {
         @NonNull
         public LoadImageRequest<Uri> uri() {
             return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler,
-                    mMemoryCache, mStorageCache, new UriBitmapLoader());
+                    mMemoryCache, mStorageCache, LoaderCache.getUriBitmapLoader());
         }
 
         /**
@@ -205,7 +205,7 @@ public final class ImageLoader {
         @NonNull
         public LoadImageRequest<File> file() {
             return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler,
-                    mMemoryCache, mStorageCache, new FileBitmapLoader());
+                    mMemoryCache, mStorageCache, LoaderCache.getFileBitmapLoader());
         }
 
         /**
@@ -214,7 +214,7 @@ public final class ImageLoader {
         @NonNull
         public LoadImageRequest<FileDescriptor> fileDescriptor() {
             return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler,
-                    mMemoryCache, mStorageCache, new FileDescriptorBitmapLoader());
+                    mMemoryCache, mStorageCache, LoaderCache.getFileDescriptorBitmapLoader());
         }
 
         /**
@@ -223,7 +223,7 @@ public final class ImageLoader {
         @NonNull
         public LoadImageRequest<Integer> resource() {
             return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler,
-                    mMemoryCache, mStorageCache, new ResourceBitmapLoader());
+                    mMemoryCache, mStorageCache, LoaderCache.getResourceBitmapLoader());
         }
 
         /**
@@ -232,7 +232,7 @@ public final class ImageLoader {
         @NonNull
         public LoadImageRequest<byte[]> byteArray() {
             return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler,
-                    mMemoryCache, mStorageCache, new ByteArrayBitmapLoader());
+                    mMemoryCache, mStorageCache, LoaderCache.getByteArrayBitmapLoader());
         }
     }
 
