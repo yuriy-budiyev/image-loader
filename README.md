@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
                 .transform(ImageUtils.convertToGrayScale())
                 /*Load image into view*/
                 .load(view);
+                /*Also, load, error and display callbacks can be specified for each request*/
     }
 }
 ```
