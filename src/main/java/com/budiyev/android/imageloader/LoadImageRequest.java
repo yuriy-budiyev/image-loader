@@ -41,6 +41,9 @@ import android.support.annotation.Nullable;
 import android.support.annotation.Px;
 import android.view.View;
 
+/**
+ * Load image request
+ */
 public final class LoadImageRequest<T> {
     private final Context mContext;
     private final ExecutorService mExecutor;
