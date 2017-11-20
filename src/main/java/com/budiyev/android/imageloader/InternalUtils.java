@@ -125,6 +125,11 @@ final class InternalUtils {
         }
     }
 
+    @Nullable
+    public static InputStream getDataStreamFromUrl(@NonNull String url) throws IOException {
+        return new URL(url).openConnection().getInputStream();
+    }
+
     public static void close(@Nullable Closeable closeable) {
         if (closeable == null) {
             return;

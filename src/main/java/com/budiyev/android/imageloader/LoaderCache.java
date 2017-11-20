@@ -31,6 +31,7 @@ import android.support.annotation.NonNull;
 final class LoaderCache {
     private static final Lock LOCK = new ReentrantLock();
     private static volatile UriBitmapLoader sUriBitmapLoader;
+    private static volatile UrlBitmapLoader sUrlBitmapLoader;
     private static volatile FileBitmapLoader sFileBitmapLoader;
     private static volatile FileDescriptorBitmapLoader sFileDescriptorBitmapLoader;
     private static volatile ResourceBitmapLoader sResourceBitmapLoader;
@@ -49,6 +50,24 @@ final class LoaderCache {
                 if (loader == null) {
                     loader = new UriBitmapLoader();
                     sUriBitmapLoader = loader;
+                }
+            } finally {
+                LOCK.unlock();
+            }
+        }
+        return loader;
+    }
+
+    @NonNull
+    public static UrlBitmapLoader getUrlBitmapLoader() {
+        UrlBitmapLoader loader = sUrlBitmapLoader;
+        if (loader == null) {
+            LOCK.lock();
+            try {
+                loader = sUrlBitmapLoader;
+                if (loader == null) {
+                    loader = new UrlBitmapLoader();
+                    sUrlBitmapLoader = loader;
                 }
             } finally {
                 LOCK.unlock();

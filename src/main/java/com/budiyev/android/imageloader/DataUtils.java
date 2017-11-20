@@ -91,7 +91,7 @@ public final class DataUtils {
      * Load sampled bitmap from uri
      *
      * @param context        Context
-     * @param uri            Uri
+     * @param uri            URI
      * @param requiredWidth  Required width
      * @param requiredHeight Required height
      * @return Loaded bitmap or {@code null}
@@ -117,6 +117,44 @@ public final class DataUtils {
         inputStream = null;
         try {
             inputStream = InternalUtils.getDataStreamFromUri(context, uri);
+            if (inputStream == null) {
+                return null;
+            }
+            return BitmapFactory.decodeStream(inputStream, null, options);
+        } finally {
+            InternalUtils.close(inputStream);
+        }
+    }
+
+    /**
+     * Load sampled bitmap from url
+     *
+     * @param url            URL
+     * @param requiredWidth  Required width
+     * @param requiredHeight Required height
+     * @return Loaded bitmap or {@code null}
+     */
+    @Nullable
+    @WorkerThread
+    public static Bitmap loadSampledBitmapFromUrl(@NonNull String url, int requiredWidth,
+            int requiredHeight) throws IOException {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        InputStream inputStream = null;
+        try {
+            inputStream = InternalUtils.getDataStreamFromUrl(url);
+            if (inputStream == null) {
+                return null;
+            }
+            BitmapFactory.decodeStream(inputStream, null, options);
+        } finally {
+            InternalUtils.close(inputStream);
+        }
+        calculateSampleSize(options, requiredWidth, requiredHeight);
+        options.inJustDecodeBounds = false;
+        inputStream = null;
+        try {
+            inputStream = InternalUtils.getDataStreamFromUrl(url);
             if (inputStream == null) {
                 return null;
             }

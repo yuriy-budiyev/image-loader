@@ -206,6 +206,15 @@ public final class ImageLoader {
         }
 
         /**
+         * URL image load request
+         */
+        @NonNull
+        public LoadImageRequest<String> url() {
+            return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler,
+                    mMemoryCache, mStorageCache, LoaderCache.getUrlBitmapLoader());
+        }
+
+        /**
          * {@link File} image load request
          */
         @NonNull
