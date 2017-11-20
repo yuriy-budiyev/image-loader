@@ -637,7 +637,7 @@ public final class ImageUtils {
             mWidth = width;
             mHeight = height;
             mUpscale = upscale;
-            mKey = "_fit_center_" + upscale + "_" + width + "x" + height;
+            mKey = "_scale_to_fit_" + upscale + "_" + width + "x" + height;
         }
 
         @NonNull
