@@ -73,6 +73,7 @@ final class ImageLoaderHolder {
 
         @Override
         public void onConfigurationChanged(Configuration newConfig) {
+            // Do nothing
         }
 
         @Override

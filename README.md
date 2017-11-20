@@ -25,7 +25,26 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ImageView view = findViewById(R.id.image_view);
 
-        ImageLoader.with(this).request().url().from("https://some.url/image").load(view);
+        ImageLoader.with(this)
+                /*Create new load request, optionally, specify custom bitmap loader*/
+                .request()
+                /*Select source data type*/
+                .url()
+                /*Set source data*/
+                .from("https://some.url/image")
+                /*Required image size (to load sampled bitmaps)*/
+                .size(1000, 1000)
+                /*Display loaded image with rounded corners, optionally, specify corner radius*/
+                .roundCorners()
+                /*Placeholder drawable*/
+                .placeholder(new ColorDrawable(Color.LTGRAY))
+                /*Error drawable*/
+                .errorDrawable(new ColorDrawable(Color.RED))
+                /*Apply transformations*/
+                .transform(ImageUtils.cropCenter())
+                .transform(ImageUtils.convertToGrayScale())
+                /*Load image into view*/
+                .load(view);
     }
 }
 ```
