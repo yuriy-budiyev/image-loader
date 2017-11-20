@@ -60,6 +60,15 @@ public final class DataUtils {
     }
 
     /**
+     * Default {@link DataDescriptor}, {@code data}'s toString() method will be used
+     * for key generation, any characters are allowed
+     */
+    @NonNull
+    public static <T> DataDescriptor<T> descriptor(@NonNull T data) {
+        return new StringDataDescriptor<>(data, null);
+    }
+
+    /**
      * Generate SHA-256 hash string with {@link Character#MAX_RADIX} radix
      * for specified {@link String}; usable for keys of {@link DataDescriptor} implementations
      *
