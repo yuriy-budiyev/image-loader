@@ -47,7 +47,7 @@ import android.view.View;
 import android.widget.ImageView;
 
 final class InternalUtils {
-    private static final int CONNECT_TIMEOUT = 5000;
+    private static final int CONNECT_TIMEOUT = 10000;
     private static final int BUFFER_SIZE = 16384;
     private static final int MAX_POOL_SIZE = 4;
     private static final String URI_SCHEME_HTTP = "http";
