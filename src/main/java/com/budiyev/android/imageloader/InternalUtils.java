@@ -32,13 +32,17 @@ import java.io.InputStream;
 import java.net.URL;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.view.View;
 import android.widget.ImageView;
 
 final class InternalUtils {
@@ -99,9 +103,9 @@ final class InternalUtils {
 
     @Nullable
     @MainThread
-    public static DisplayImageAction<?> getDisplayImageAction(@Nullable ImageView view) {
+    public static DisplayImageAction<?> getDisplayImageAction(@Nullable View view) {
         if (view != null) {
-            Drawable drawable = view.getDrawable();
+            Drawable drawable = getDrawable(view);
             if (drawable instanceof PlaceholderDrawable) {
                 return ((PlaceholderDrawable) drawable).getAction();
             }
@@ -128,6 +132,41 @@ final class InternalUtils {
         try {
             closeable.close();
         } catch (IOException ignored) {
+        }
+    }
+
+    public static void setDrawable(@NonNull Drawable drawable, @NonNull View view) {
+        if (view instanceof ImageView) {
+            ((ImageView) view).setImageDrawable(drawable);
+        } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                view.setBackground(drawable);
+            } else {
+                view.setBackgroundDrawable(drawable);
+            }
+        }
+    }
+
+    public static void setBitmap(@NonNull Resources resources, @NonNull Bitmap bitmap,
+            @NonNull View view) {
+        if (view instanceof ImageView) {
+            ((ImageView) view).setImageBitmap(bitmap);
+        } else {
+            Drawable drawable = new BitmapDrawable(resources, bitmap);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                view.setBackground(drawable);
+            } else {
+                view.setBackgroundDrawable(drawable);
+            }
+        }
+    }
+
+    @Nullable
+    public static Drawable getDrawable(@NonNull View view) {
+        if (view instanceof ImageView) {
+            return ((ImageView) view).getDrawable();
+        } else {
+            return view.getBackground();
         }
     }
 

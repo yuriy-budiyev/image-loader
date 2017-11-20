@@ -24,14 +24,22 @@
 package com.budiyev.android.imageloader;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 final class StringDataDescriptor<T> implements DataDescriptor<T> {
     private final T mData;
     private final String mKey;
+    private final Size mSize;
 
-    public StringDataDescriptor(@NonNull T data) {
+    public StringDataDescriptor(@NonNull T data, @Nullable Size size) {
         mData = data;
-        mKey = DataUtils.generateSHA256(data.toString());
+        String hash = DataUtils.generateSHA256(data.toString());
+        if (size != null) {
+            mKey = hash + "_sampled_" + size;
+        } else {
+            mKey = hash;
+        }
+        mSize = size;
     }
 
     @NonNull
@@ -44,6 +52,12 @@ final class StringDataDescriptor<T> implements DataDescriptor<T> {
     @Override
     public String getKey() {
         return mKey;
+    }
+
+    @Nullable
+    @Override
+    public Size getRequiredSize() {
+        return mSize;
     }
 
     @Override

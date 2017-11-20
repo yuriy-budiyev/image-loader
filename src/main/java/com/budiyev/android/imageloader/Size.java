@@ -23,45 +23,57 @@
  */
 package com.budiyev.android.imageloader;
 
-import java.util.List;
+/**
+ * Encapsulates width and height
+ */
+public final class Size {
+    private final int mWidth;
+    private final int mHeight;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.support.annotation.NonNull;
-
-final class BitmapTransformationGroup implements BitmapTransformation {
-    private final List<BitmapTransformation> mTransformations;
-    private final String mKey;
-
-    public BitmapTransformationGroup(@NonNull List<BitmapTransformation> transformations) {
-        mTransformations = transformations;
-        StringBuilder sb = new StringBuilder();
-        for (BitmapTransformation t : transformations) {
-            sb.append(t.getKey());
-        }
-        mKey = sb.toString();
+    /**
+     * Size
+     *
+     * @param width  Width
+     * @param height Height
+     */
+    public Size(int width, int height) {
+        mWidth = width;
+        mHeight = height;
     }
 
-    @NonNull
-    @Override
-    public Bitmap transform(@NonNull Context context, @NonNull Bitmap bitmap) throws Throwable {
-        boolean first = true;
-        for (BitmapTransformation t : mTransformations) {
-            Bitmap processed = t.transform(context, bitmap);
-            if (bitmap != processed) {
-                if (!first && !bitmap.isRecycled()) {
-                    bitmap.recycle();
-                }
-                first = false;
-            }
-            bitmap = processed;
-        }
-        return bitmap;
+    /**
+     * Width
+     */
+    public int getWidth() {
+        return mWidth;
     }
 
-    @NonNull
+    /**
+     * Height
+     */
+    public int getHeight() {
+        return mHeight;
+    }
+
     @Override
-    public String getKey() {
-        return mKey;
+    public int hashCode() {
+        return mWidth ^ ((mHeight << (Integer.SIZE / 2)) | (mHeight >>> (Integer.SIZE / 2)));
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        } else if (obj instanceof Size) {
+            Size other = (Size) obj;
+            return mWidth == other.mWidth && mHeight == other.mHeight;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public String toString() {
+        return mWidth + "x" + mHeight;
     }
 }

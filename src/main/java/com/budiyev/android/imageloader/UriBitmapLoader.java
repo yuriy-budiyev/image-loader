@@ -35,16 +35,22 @@ import android.support.annotation.Nullable;
 final class UriBitmapLoader implements BitmapLoader<Uri> {
     @Nullable
     @Override
-    public Bitmap load(@NonNull Context context, @NonNull Uri data) throws Throwable {
-        InputStream inputStream = null;
-        try {
-            inputStream = InternalUtils.getDataStreamFromUri(context, data);
-            if (inputStream == null) {
-                return null;
+    public Bitmap load(@NonNull Context context, @NonNull Uri data, @Nullable Size size)
+            throws Throwable {
+        if (size != null) {
+            return DataUtils
+                    .loadSampledBitmapFromUri(context, data, size.getWidth(), size.getHeight());
+        } else {
+            InputStream inputStream = null;
+            try {
+                inputStream = InternalUtils.getDataStreamFromUri(context, data);
+                if (inputStream == null) {
+                    return null;
+                }
+                return BitmapFactory.decodeStream(inputStream);
+            } finally {
+                InternalUtils.close(inputStream);
             }
-            return BitmapFactory.decodeStream(inputStream);
-        } finally {
-            InternalUtils.close(inputStream);
         }
     }
 }

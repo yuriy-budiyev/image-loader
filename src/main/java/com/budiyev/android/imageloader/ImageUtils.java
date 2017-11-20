@@ -145,7 +145,6 @@ public final class ImageUtils {
         return new CropCenterTransformation(resultWidth, resultHeight);
     }
 
-
     /**
      * Fit image to specified frame ({@code resultWidth} x {@code resultHeight},
      * image will be scaled if needed

@@ -55,8 +55,8 @@ public final class DataUtils {
      * for key generation, any characters are allowed
      */
     @NonNull
-    public static <T> DataDescriptor<T> descriptor(@NonNull T data) {
-        return new StringDataDescriptor<>(data);
+    public static <T> DataDescriptor<T> descriptor(@NonNull T data, @Nullable Size size) {
+        return new StringDataDescriptor<>(data, size);
     }
 
     /**

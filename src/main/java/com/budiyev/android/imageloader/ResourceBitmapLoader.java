@@ -37,22 +37,28 @@ import android.util.TypedValue;
 final class ResourceBitmapLoader implements BitmapLoader<Integer> {
     @Nullable
     @Override
-    public Bitmap load(@NonNull Context context, @NonNull Integer data) throws Throwable {
+    public Bitmap load(@NonNull Context context, @NonNull Integer data, @Nullable Size size)
+            throws Throwable {
         Resources resources = context.getResources();
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        TypedValue typedValue = new TypedValue();
-        options.inTargetDensity = resources.getDisplayMetrics().densityDpi;
-        if (typedValue.density == TypedValue.DENSITY_DEFAULT) {
-            options.inDensity = DisplayMetrics.DENSITY_DEFAULT;
-        } else if (typedValue.density != TypedValue.DENSITY_NONE) {
-            options.inDensity = typedValue.density;
-        }
-        InputStream inputStream = null;
-        try {
-            inputStream = resources.openRawResource(data, typedValue);
-            return BitmapFactory.decodeStream(inputStream, null, options);
-        } finally {
-            InternalUtils.close(inputStream);
+        if (size != null) {
+            return DataUtils.loadSampledBitmapFromResource(resources, data, size.getWidth(),
+                    size.getHeight());
+        } else {
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            TypedValue typedValue = new TypedValue();
+            options.inTargetDensity = resources.getDisplayMetrics().densityDpi;
+            if (typedValue.density == TypedValue.DENSITY_DEFAULT) {
+                options.inDensity = DisplayMetrics.DENSITY_DEFAULT;
+            } else if (typedValue.density != TypedValue.DENSITY_NONE) {
+                options.inDensity = typedValue.density;
+            }
+            InputStream inputStream = null;
+            try {
+                inputStream = resources.openRawResource(data, typedValue);
+                return BitmapFactory.decodeStream(inputStream, null, options);
+            } finally {
+                InternalUtils.close(inputStream);
+            }
         }
     }
 }

@@ -92,7 +92,6 @@ public final class ImageLoader {
                 mMemoryCache, mStorageCache);
     }
 
-
     /**
      * Delete cached image for specified {@link DataDescriptor}
      */

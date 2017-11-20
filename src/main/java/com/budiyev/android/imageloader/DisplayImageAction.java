@@ -26,6 +26,7 @@ package com.budiyev.android.imageloader;
 import java.lang.ref.WeakReference;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -34,13 +35,13 @@ import android.os.Handler;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.widget.ImageView;
+import android.view.View;
 
 final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
     private final Handler mMainThreadHandler;
     private final BitmapTransformation mTransformation;
     private final DisplayCallback<T> mDisplayCallback;
-    private final WeakReference<ImageView> mView;
+    private final WeakReference<View> mView;
     private final Drawable mPlaceholder;
     private final Drawable mErrorDrawable;
     private final boolean mFadeEnabled;
@@ -49,12 +50,12 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
 
     public DisplayImageAction(@NonNull Context context, @NonNull DataDescriptor<T> descriptor,
             @NonNull BitmapLoader<T> bitmapLoader, @Nullable BitmapTransformation transformation,
-            @NonNull Drawable placeholder, @Nullable Drawable errorDrawable,
-            @NonNull ImageView view, @Nullable ImageCache memoryCache,
-            @Nullable ImageCache storageCache, @Nullable LoadCallback<T> loadCallback,
-            @Nullable ErrorCallback<T> errorCallback, @Nullable DisplayCallback<T> displayCallback,
-            @NonNull PauseLock pauseLock, @NonNull Handler mainThreadHandler, boolean fadeEnabled,
-            long fadeDuration, float cornerRadius) {
+            @NonNull Drawable placeholder, @Nullable Drawable errorDrawable, @NonNull View view,
+            @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache,
+            @Nullable LoadCallback<T> loadCallback, @Nullable ErrorCallback<T> errorCallback,
+            @Nullable DisplayCallback<T> displayCallback, @NonNull PauseLock pauseLock,
+            @NonNull Handler mainThreadHandler, boolean fadeEnabled, long fadeDuration,
+            float cornerRadius) {
         super(context, descriptor, bitmapLoader, memoryCache, storageCache, loadCallback,
                 errorCallback, pauseLock);
         mTransformation = transformation;
@@ -112,16 +113,17 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
         @Override
         public void run() {
             Drawable errorDrawable = mErrorDrawable;
-            ImageView view = mView.get();
+            View view = mView.get();
             if (isCancelled() || errorDrawable == null || view == null ||
                     InternalUtils.getDisplayImageAction(view) != DisplayImageAction.this) {
                 return;
             }
             if (mFadeEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                view.setImageDrawable(new FadeDrawable(mPlaceholder, errorDrawable, mFadeDuration,
-                        mMainThreadHandler, null));
+                InternalUtils.setDrawable(
+                        new FadeDrawable(mPlaceholder, errorDrawable, mFadeDuration,
+                                mMainThreadHandler, null), view);
             } else {
-                view.setImageDrawable(errorDrawable);
+                InternalUtils.setDrawable(errorDrawable, view);
             }
         }
     }
@@ -139,29 +141,30 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
             if (isCancelled()) {
                 return;
             }
-            ImageView view = mView.get();
+            View view = mView.get();
             if (view == null ||
                     InternalUtils.getDisplayImageAction(view) != DisplayImageAction.this) {
                 return;
             }
             Bitmap image = mImage;
             Context context = getContext();
+            Resources resources = context.getResources();
             T data = getDescriptor().getData();
             DisplayCallback<T> displayCallback = mDisplayCallback;
             float cornerRadius = mCornerRadius;
             boolean roundCorners = cornerRadius > 0 || cornerRadius == RoundedDrawable.MAX_RADIUS;
             if (mFadeEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                view.setImageDrawable(new FadeDrawable(mPlaceholder, roundCorners ?
-                        new RoundedDrawable(context.getResources(), image, cornerRadius) :
-                        new BitmapDrawable(context.getResources(), image), mFadeDuration,
+                InternalUtils.setDrawable(new FadeDrawable(mPlaceholder,
+                        roundCorners ? new RoundedDrawable(resources, image, cornerRadius) :
+                                new BitmapDrawable(resources, image), mFadeDuration,
                         mMainThreadHandler, displayCallback == null ? null :
-                        new FadeCallback<>(context, displayCallback, data, image, view)));
+                        new FadeCallback<>(context, displayCallback, data, image, view)), view);
             } else {
                 if (roundCorners) {
-                    view.setImageDrawable(
-                            new RoundedDrawable(context.getResources(), image, cornerRadius));
+                    InternalUtils
+                            .setDrawable(new RoundedDrawable(resources, image, cornerRadius), view);
                 } else {
-                    view.setImageBitmap(image);
+                    InternalUtils.setBitmap(resources, image, view);
                 }
                 if (displayCallback != null) {
                     displayCallback.onDisplayed(context, data, image, view);
@@ -175,10 +178,10 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
         private final DisplayCallback<T> mDisplayCallback;
         private final T mData;
         private final Bitmap mImage;
-        private final ImageView mView;
+        private final View mView;
 
         private FadeCallback(@NonNull Context context, @NonNull DisplayCallback<T> displayCallback,
-                @NonNull T data, @NonNull Bitmap image, @NonNull ImageView view) {
+                @NonNull T data, @NonNull Bitmap image, @NonNull View view) {
             mContext = context;
             mDisplayCallback = displayCallback;
             mData = data;

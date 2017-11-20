@@ -27,7 +27,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
-import android.widget.ImageView;
+import android.view.View;
 
 /**
  * Display callback
@@ -45,5 +45,5 @@ public interface DisplayCallback<T> {
      */
     @MainThread
     void onDisplayed(@NonNull Context context, @NonNull T data, @NonNull Bitmap image,
-            @NonNull ImageView view);
+            @NonNull View view);
 }

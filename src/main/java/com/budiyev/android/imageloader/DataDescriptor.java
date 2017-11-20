@@ -25,13 +25,14 @@ package com.budiyev.android.imageloader;
 
 import android.support.annotation.AnyThread;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 /**
  * Data descriptor, provides data and key that identifies this data
  */
 public interface DataDescriptor<T> {
     /**
-     * Data, that will be transferred to {@link BitmapLoader}, {@link PlaceholderProvider},
+     * Data, that will be transferred to {@link BitmapLoader},
      * {@link LoadCallback} and {@link ErrorCallback}
      *
      * @return Data
@@ -51,4 +52,14 @@ public interface DataDescriptor<T> {
     @NonNull
     @AnyThread
     String getKey();
+
+    /**
+     * Optional required image size, if not specified full sized image should be loaded,
+     * note that key should be unique for each size
+     *
+     * @return Required image size
+     */
+    @Nullable
+    @AnyThread
+    Size getRequiredSize();
 }

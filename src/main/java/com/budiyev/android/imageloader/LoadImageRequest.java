@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -37,7 +38,8 @@ import android.support.annotation.AnyThread;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.widget.ImageView;
+import android.support.annotation.Px;
+import android.view.View;
 
 public final class LoadImageRequest<T> {
     private final Context mContext;
@@ -47,6 +49,8 @@ public final class LoadImageRequest<T> {
     private final ImageCache mStorageCache;
     private final BitmapLoader<T> mBitmapLoader;
     private final Handler mMainThreadHandler;
+    private T mData;
+    private Size mRequiredSize;
     private DataDescriptor<T> mDescriptor;
     private LoadCallback<T> mLoadCallback;
     private ErrorCallback<T> mErrorCallback;
@@ -78,7 +82,20 @@ public final class LoadImageRequest<T> {
      */
     @NonNull
     public LoadImageRequest<T> from(@NonNull T data) {
-        mDescriptor = new StringDataDescriptor<>(data);
+        mDescriptor = null;
+        mData = data;
+        return this;
+    }
+
+    /**
+     * Required image size, affects only when source data set through {@code from(T data)} method
+     *
+     * @see DataDescriptor
+     */
+    @NonNull
+    public LoadImageRequest<T> size(@Px int requiredWidth, @Px int requiredHeight) {
+        mDescriptor = null;
+        mRequiredSize = new Size(requiredWidth, requiredHeight);
         return this;
     }
 
@@ -89,6 +106,8 @@ public final class LoadImageRequest<T> {
      */
     @NonNull
     public LoadImageRequest<T> from(@Nullable DataDescriptor<T> descriptor) {
+        mData = null;
+        mRequiredSize = null;
         mDescriptor = descriptor;
         return this;
     }
@@ -206,10 +225,9 @@ public final class LoadImageRequest<T> {
         return this;
     }
 
-
     @AnyThread
     public void load() {
-        DataDescriptor<T> descriptor = mDescriptor;
+        DataDescriptor<T> descriptor = getDescriptor();
         if (descriptor == null) {
             return;
         }
@@ -218,8 +236,8 @@ public final class LoadImageRequest<T> {
     }
 
     @MainThread
-    public void load(@NonNull ImageView view) {
-        DataDescriptor<T> descriptor = mDescriptor;
+    public void load(@NonNull View view) {
+        DataDescriptor<T> descriptor = getDescriptor();
         if (descriptor == null) {
             return;
         }
@@ -253,11 +271,12 @@ public final class LoadImageRequest<T> {
             if (loadCallback != null) {
                 loadCallback.onLoaded(context, data, image);
             }
+            Resources resources = context.getResources();
             if (cornerRadius > 0 || cornerRadius == RoundedDrawable.MAX_RADIUS) {
-                view.setImageDrawable(
-                        new RoundedDrawable(context.getResources(), image, cornerRadius));
+                InternalUtils
+                        .setDrawable(new RoundedDrawable(resources, image, cornerRadius), view);
             } else {
-                view.setImageBitmap(image);
+                InternalUtils.setBitmap(resources, image, view);
             }
             if (displayCallback != null) {
                 displayCallback.onDisplayed(context, data, image, view);
@@ -280,7 +299,20 @@ public final class LoadImageRequest<T> {
                         placeholder, mErrorDrawable, view, memoryCache, mStorageCache, loadCallback,
                         mErrorCallback, displayCallback, mPauseLock, mMainThreadHandler,
                         mFadeEnabled, mFadeDuration, cornerRadius);
-        view.setImageDrawable(new PlaceholderDrawable(placeholder, action));
+        InternalUtils.setDrawable(new PlaceholderDrawable(placeholder, action), view);
         action.execute(mExecutor);
+    }
+
+    @Nullable
+    private DataDescriptor<T> getDescriptor() {
+        DataDescriptor<T> descriptor = mDescriptor;
+        if (descriptor != null) {
+            return descriptor;
+        }
+        T data = mData;
+        if (data != null) {
+            return new StringDataDescriptor<>(data, mRequiredSize);
+        }
+        return null;
     }
 }

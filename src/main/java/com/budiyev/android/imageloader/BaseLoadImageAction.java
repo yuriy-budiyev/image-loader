@@ -170,8 +170,9 @@ abstract class BaseLoadImageAction<T> {
             return;
         }
         Context context = mContext;
-        String key = mDescriptor.getKey();
-        T data = mDescriptor.getData();
+        DataDescriptor<T> descriptor = mDescriptor;
+        String key = descriptor.getKey();
+        T data = descriptor.getData();
         Bitmap image;
         // Memory cache
         ImageCache memoryCache = mMemoryCache;
@@ -202,7 +203,7 @@ abstract class BaseLoadImageAction<T> {
         }
         // Load new image
         try {
-            image = mBitmapLoader.load(context, data);
+            image = mBitmapLoader.load(context, data, descriptor.getRequiredSize());
         } catch (Throwable error) {
             processError(context, data, error);
             return;

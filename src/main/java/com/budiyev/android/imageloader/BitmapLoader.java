@@ -33,7 +33,9 @@ public interface BitmapLoader<T> {
     /**
      * Load {@link Bitmap} from source data
      *
-     * @param data Data
+     * @param context Context
+     * @param data    Data
+     * @param size    Required image size
      * @return Loaded bitmap; or {@code null} if unable to load it, in that case,
      * {@link ErrorCallback#onError(Context, Object, Throwable)} will be called with
      * {@link NullPointerException}.
@@ -44,5 +46,5 @@ public interface BitmapLoader<T> {
      */
     @Nullable
     @WorkerThread
-    Bitmap load(@NonNull Context context, @NonNull T data) throws Throwable;
+    Bitmap load(@NonNull Context context, @NonNull T data, @Nullable Size size) throws Throwable;
 }
