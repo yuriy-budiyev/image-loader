@@ -136,7 +136,8 @@ abstract class BaseLoadImageAction<T> {
         return mCancelled;
     }
 
-    protected void processImage(@NonNull Context context, @NonNull T data, @NonNull Bitmap image) {
+    protected final void processImage(@NonNull Context context, @NonNull T data,
+            @NonNull Bitmap image) {
         if (mCancelled) {
             return;
         }
@@ -147,7 +148,7 @@ abstract class BaseLoadImageAction<T> {
         onImageLoaded(image);
     }
 
-    protected void processError(@NonNull Context context, @NonNull T data,
+    protected final void processError(@NonNull Context context, @NonNull T data,
             @NonNull Throwable error) {
         if (mCancelled) {
             return;
