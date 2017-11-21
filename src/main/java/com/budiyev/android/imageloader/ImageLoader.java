@@ -28,6 +28,8 @@ import java.io.FileDescriptor;
 import java.util.concurrent.ExecutorService;
 
 import android.app.Application;
+import android.content.ComponentCallbacks;
+import android.content.ComponentCallbacks2;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Handler;
@@ -97,7 +99,13 @@ public final class ImageLoader {
      * Delete cached image for specified {@link DataDescriptor}
      */
     public void invalidate(@NonNull DataDescriptor<?> descriptor) {
-        String key = descriptor.getKey();
+        invalidate(descriptor.getKey());
+    }
+
+    /**
+     * Delete cached image for specified key
+     */
+    public void invalidate(@NonNull String key) {
         ImageCache memoryCache = mMemoryCache;
         if (memoryCache != null) {
             memoryCache.remove(key);
@@ -134,6 +142,12 @@ public final class ImageLoader {
      * Clear memory cache;
      * for better memory management when one singleton loader instance used across the app,
      * this method should be called in {@link Application#onTrimMemory(int)}
+     * or {@link ComponentCallbacks2#onTrimMemory(int)},
+     * default instance ({@link #with(Context)}) automatically
+     * cares about it
+     *
+     * @see ComponentCallbacks2
+     * @see Context#registerComponentCallbacks(ComponentCallbacks)
      */
     public void clearMemoryCache() {
         ImageCache memoryCache = mMemoryCache;
