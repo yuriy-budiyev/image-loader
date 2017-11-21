@@ -190,7 +190,8 @@ public final class ImageUtils {
     @NonNull
     public static Bitmap invertColors(@NonNull Bitmap image) {
         return applyColorFilter(image, new ColorMatrixColorFilter(
-                new float[] {-1, 0, 0, 0, 255, 0, -1, 0, 0, 255, 0, 0, -1, 0, 255, 0, 0, 0, 1, 0}));
+                new float[] {-1f, 0f, 0f, 0f, 255f, 0f, -1f, 0f, 0f, 255f, 0f, 0f, -1f, 0f, 255f,
+                        0f, 0f, 0f, 1f, 0f}));
     }
 
     /**
@@ -202,7 +203,7 @@ public final class ImageUtils {
     @NonNull
     public static Bitmap convertToGrayScale(@NonNull Bitmap image) {
         ColorMatrix colorMatrix = new ColorMatrix();
-        colorMatrix.setSaturation(0);
+        colorMatrix.setSaturation(0f);
         return applyColorFilter(image, new ColorMatrixColorFilter(colorMatrix));
     }
 
@@ -220,7 +221,7 @@ public final class ImageUtils {
         Bitmap bitmap =
                 Bitmap.createBitmap(image.getWidth(), image.getHeight(), Bitmap.Config.ARGB_8888);
         bitmap.setDensity(image.getDensity());
-        new Canvas(bitmap).drawBitmap(image, 0, 0, paint);
+        new Canvas(bitmap).drawBitmap(image, 0f, 0f, paint);
         return bitmap;
     }
 
@@ -233,7 +234,7 @@ public final class ImageUtils {
     @NonNull
     public static Bitmap mirrorHorizontally(@NonNull Bitmap image) {
         Matrix matrix = new Matrix();
-        matrix.setScale(-1, 1);
+        matrix.setScale(-1f, 1f);
         return Bitmap.createBitmap(image, 0, 0, image.getWidth(), image.getHeight(), matrix, true);
     }
 
@@ -246,7 +247,7 @@ public final class ImageUtils {
     @NonNull
     public static Bitmap mirrorVertically(@NonNull Bitmap image) {
         Matrix matrix = new Matrix();
-        matrix.setScale(1, -1);
+        matrix.setScale(1f, -1f);
         return Bitmap.createBitmap(image, 0, 0, image.getWidth(), image.getHeight(), matrix, true);
     }
 
