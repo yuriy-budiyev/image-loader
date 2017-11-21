@@ -27,9 +27,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 final class StringDataDescriptor<T> implements DataDescriptor<T> {
-    private final T mData;
     private final String mKey;
     private final Size mSize;
+    private final T mData;
 
     public StringDataDescriptor(@NonNull T data, @Nullable Size size) {
         mData = data;
@@ -71,9 +71,8 @@ final class StringDataDescriptor<T> implements DataDescriptor<T> {
                 mKey.equals(((StringDataDescriptor) obj).mKey);
     }
 
-    @NonNull
     @Override
     public String toString() {
-        return "DataDescriptor [key: " + mKey + ", data: " + mData + "]";
+        return "DataDescriptor {key: " + mKey + "}";
     }
 }
