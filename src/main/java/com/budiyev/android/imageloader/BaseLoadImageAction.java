@@ -153,13 +153,21 @@ abstract class BaseLoadImageAction<T> {
         DataDescriptor<T> descriptor = mDescriptor;
         String key = descriptor.getKey();
         T data = descriptor.getData();
-        Bitmap image;
+        Bitmap image = null;
         // Memory cache
         ImageCache memoryCache = mMemoryCache;
         if (memoryCache != null) {
+            BitmapTransformation transformation = mTransformation;
+            if (transformation != null) {
+                image = memoryCache.get(key + transformation.getKey());
+            }
+            if (image != null) {
+                processImage(context, descriptor, image, false);
+                return;
+            }
             image = memoryCache.get(key);
             if (image != null) {
-                processImage(context, descriptor, image);
+                processImage(context, descriptor, image, true);
                 return;
             }
         }
@@ -171,7 +179,7 @@ abstract class BaseLoadImageAction<T> {
         if (storageCache != null) {
             image = storageCache.get(key);
             if (image != null) {
-                processImage(context, descriptor, image);
+                processImage(context, descriptor, image, true);
                 return;
             }
         }
@@ -189,7 +197,7 @@ abstract class BaseLoadImageAction<T> {
             processError(context, data, new ImageNotLoadedException());
             return;
         }
-        processImage(context, descriptor, image);
+        processImage(context, descriptor, image, true);
         if (mCancelled) {
             return;
         }
@@ -200,14 +208,14 @@ abstract class BaseLoadImageAction<T> {
 
     @WorkerThread
     private void processImage(@NonNull Context context, @NonNull DataDescriptor<T> descriptor,
-            @NonNull Bitmap image) {
+            @NonNull Bitmap image, boolean transform) {
         if (mCancelled) {
             return;
         }
         T data = descriptor.getData();
         String key = descriptor.getKey();
         BitmapTransformation transformation = mTransformation;
-        if (transformation != null) {
+        if (transform && transformation != null) {
             key += transformation.getKey();
             try {
                 image = transformation.transform(context, image);
