@@ -33,7 +33,6 @@ import android.content.ComponentCallbacks2;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Handler;
-import android.support.annotation.AnyThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -77,7 +76,6 @@ public final class ImageLoader {
      * @return New load image request
      */
     @NonNull
-    @AnyThread
     public <T> LoadImageRequest<T> request(@NonNull BitmapLoader<T> loader) {
         return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler,
                 mMemoryCache, mStorageCache, loader);
@@ -89,7 +87,6 @@ public final class ImageLoader {
      * @return Source data type selector
      */
     @NonNull
-    @AnyThread
     public DataTypeSelector request() {
         return new DataTypeSelector(mContext, mExecutor, mPauseLock, mMainThreadHandler,
                 mMemoryCache, mStorageCache);
@@ -97,15 +94,13 @@ public final class ImageLoader {
 
     /**
      * Delete cached image for specified {@link DataDescriptor}
+     *
+     * @see DataDescriptor
+     * @see DataUtils#descriptor(Object)
+     * @see DataUtils#descriptor(Object, Size)
      */
     public void invalidate(@NonNull DataDescriptor<?> descriptor) {
-        invalidate(descriptor.getKey());
-    }
-
-    /**
-     * Delete cached image for specified key
-     */
-    public void invalidate(@NonNull String key) {
+        String key = descriptor.getKey();
         ImageCache memoryCache = mMemoryCache;
         if (memoryCache != null) {
             memoryCache.remove(key);

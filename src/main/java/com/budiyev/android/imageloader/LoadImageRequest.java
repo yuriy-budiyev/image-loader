@@ -237,8 +237,9 @@ public final class LoadImageRequest<T> {
         if (descriptor == null) {
             return;
         }
-        new LoadImageAction<>(mContext, descriptor, mBitmapLoader, mMemoryCache, mStorageCache,
-                mLoadCallback, mErrorCallback, mPauseLock).execute(mExecutor);
+        new LoadImageAction<>(mContext, descriptor, mBitmapLoader, getTransformation(),
+                mMemoryCache, mStorageCache, mLoadCallback, mErrorCallback, mPauseLock)
+                .execute(mExecutor);
     }
 
     /**
@@ -253,17 +254,7 @@ public final class LoadImageRequest<T> {
         Bitmap image = null;
         String key = descriptor.getKey();
         ImageCache memoryCache = mMemoryCache;
-        List<BitmapTransformation> transformations = mTransformations;
-        BitmapTransformation transformation;
-        if (transformations != null && !transformations.isEmpty()) {
-            if (transformations.size() == 1) {
-                transformation = transformations.get(0);
-            } else {
-                transformation = new BitmapTransformationGroup(transformations);
-            }
-        } else {
-            transformation = null;
-        }
+        BitmapTransformation transformation = getTransformation();
         if (memoryCache != null) {
             if (transformation != null) {
                 image = memoryCache.get(key + transformation.getKey());
@@ -323,5 +314,19 @@ public final class LoadImageRequest<T> {
             return new StringDataDescriptor<>(data, mRequiredSize);
         }
         return null;
+    }
+
+    @Nullable
+    private BitmapTransformation getTransformation() {
+        List<BitmapTransformation> transformations = mTransformations;
+        if (transformations != null && !transformations.isEmpty()) {
+            if (transformations.size() == 1) {
+                return transformations.get(0);
+            } else {
+                return new BitmapTransformationGroup(transformations);
+            }
+        } else {
+            return null;
+        }
     }
 }
