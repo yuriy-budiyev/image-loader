@@ -39,7 +39,6 @@ import android.view.View;
 
 final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
     private final Handler mMainThreadHandler;
-    private final BitmapTransformation mTransformation;
     private final DisplayCallback<T> mDisplayCallback;
     private final WeakReference<View> mView;
     private final Drawable mPlaceholder;
@@ -56,9 +55,8 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
             @Nullable DisplayCallback<T> displayCallback, @NonNull PauseLock pauseLock,
             @NonNull Handler mainThreadHandler, boolean fadeEnabled, long fadeDuration,
             float cornerRadius) {
-        super(context, descriptor, bitmapLoader, memoryCache, storageCache, loadCallback,
-                errorCallback, pauseLock);
-        mTransformation = transformation;
+        super(context, descriptor, bitmapLoader, transformation, memoryCache, storageCache,
+                loadCallback, errorCallback, pauseLock);
         mDisplayCallback = displayCallback;
         mView = new WeakReference<>(view);
         mPlaceholder = placeholder;
@@ -75,22 +73,6 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
 
     @Override
     protected void onImageLoaded(@NonNull Bitmap image) {
-        DataDescriptor<T> descriptor = getDescriptor();
-        BitmapTransformation transformation = mTransformation;
-        if (transformation != null) {
-            Context context = getContext();
-            T data = descriptor.getData();
-            try {
-                image = transformation.transform(context, image);
-            } catch (Throwable error) {
-                processError(context, data, error);
-                return;
-            }
-            ImageCache memoryCache = getMemoryCache();
-            if (memoryCache != null) {
-                memoryCache.put(descriptor.getKey() + transformation.getKey(), image);
-            }
-        }
         if (isCancelled() || mView.get() == null) {
             return;
         }

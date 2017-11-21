@@ -38,6 +38,7 @@ abstract class BaseLoadImageAction<T> {
     private final Context mContext;
     private final DataDescriptor<T> mDescriptor;
     private final BitmapLoader<T> mBitmapLoader;
+    private final BitmapTransformation mTransformation;
     private final PauseLock mPauseLock;
     private final ImageCache mMemoryCache;
     private final ImageCache mStorageCache;
@@ -48,12 +49,14 @@ abstract class BaseLoadImageAction<T> {
     private volatile boolean mCalled;
 
     protected BaseLoadImageAction(@NonNull Context context, @NonNull DataDescriptor<T> descriptor,
-            @NonNull BitmapLoader<T> bitmapLoader, @Nullable ImageCache memoryCache,
-            @Nullable ImageCache storageCache, @Nullable LoadCallback<T> loadCallback,
-            @Nullable ErrorCallback<T> errorCallback, @NonNull PauseLock pauseLock) {
+            @NonNull BitmapLoader<T> bitmapLoader, @Nullable BitmapTransformation transformation,
+            @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache,
+            @Nullable LoadCallback<T> loadCallback, @Nullable ErrorCallback<T> errorCallback,
+            @NonNull PauseLock pauseLock) {
         mContext = context;
         mDescriptor = descriptor;
         mBitmapLoader = bitmapLoader;
+        mTransformation = transformation;
         mPauseLock = pauseLock;
         mMemoryCache = memoryCache;
         mStorageCache = storageCache;
@@ -136,30 +139,6 @@ abstract class BaseLoadImageAction<T> {
         return mCancelled;
     }
 
-    protected final void processImage(@NonNull Context context, @NonNull T data,
-            @NonNull Bitmap image) {
-        if (mCancelled) {
-            return;
-        }
-        LoadCallback<T> loadCallback = mLoadCallback;
-        if (loadCallback != null) {
-            loadCallback.onLoaded(context, data, image);
-        }
-        onImageLoaded(image);
-    }
-
-    protected final void processError(@NonNull Context context, @NonNull T data,
-            @NonNull Throwable error) {
-        if (mCancelled) {
-            return;
-        }
-        ErrorCallback<T> errorCallback = mErrorCallback;
-        if (errorCallback != null) {
-            errorCallback.onError(context, data, error);
-        }
-        onError(error);
-    }
-
     @WorkerThread
     private void loadImage() {
         while (!mCancelled && !mPauseLock.shouldInterruptEarly() && mPauseLock.isPaused()) {
@@ -180,7 +159,7 @@ abstract class BaseLoadImageAction<T> {
         if (memoryCache != null) {
             image = memoryCache.get(key);
             if (image != null) {
-                processImage(context, data, image);
+                processImage(context, descriptor, image);
                 return;
             }
         }
@@ -192,10 +171,7 @@ abstract class BaseLoadImageAction<T> {
         if (storageCache != null) {
             image = storageCache.get(key);
             if (image != null) {
-                if (memoryCache != null) {
-                    memoryCache.put(key, image);
-                }
-                processImage(context, data, image);
+                processImage(context, descriptor, image);
                 return;
             }
         }
@@ -213,16 +189,57 @@ abstract class BaseLoadImageAction<T> {
             processError(context, data, new ImageNotLoadedException());
             return;
         }
-        if (memoryCache != null) {
-            memoryCache.put(key, image);
-        }
-        processImage(context, data, image);
+        processImage(context, descriptor, image);
         if (mCancelled) {
             return;
         }
         if (storageCache != null) {
             storageCache.put(key, image);
         }
+    }
+
+    @WorkerThread
+    private void processImage(@NonNull Context context, @NonNull DataDescriptor<T> descriptor,
+            @NonNull Bitmap image) {
+        if (mCancelled) {
+            return;
+        }
+        T data = descriptor.getData();
+        String key = descriptor.getKey();
+        BitmapTransformation transformation = mTransformation;
+        if (transformation != null) {
+            key += transformation.getKey();
+            try {
+                image = transformation.transform(context, image);
+            } catch (Throwable error) {
+                processError(context, data, error);
+                return;
+            }
+        }
+        if (mCancelled) {
+            return;
+        }
+        ImageCache memoryCache = mMemoryCache;
+        if (memoryCache != null) {
+            memoryCache.put(key, image);
+        }
+        LoadCallback<T> loadCallback = mLoadCallback;
+        if (loadCallback != null) {
+            loadCallback.onLoaded(context, data, image);
+        }
+        onImageLoaded(image);
+    }
+
+    @WorkerThread
+    private void processError(@NonNull Context context, @NonNull T data, @NonNull Throwable error) {
+        if (mCancelled) {
+            return;
+        }
+        ErrorCallback<T> errorCallback = mErrorCallback;
+        if (errorCallback != null) {
+            errorCallback.onError(context, data, error);
+        }
+        onError(error);
     }
 
     private final class LoadImageTask implements Callable<Void> {
