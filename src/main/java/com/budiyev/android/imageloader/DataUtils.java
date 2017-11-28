@@ -98,8 +98,8 @@ public final class DataUtils {
      */
     @Nullable
     @WorkerThread
-    public static Bitmap loadSampledBitmapFromUri(@NonNull Context context, @NonNull Uri uri,
-            int requiredWidth, int requiredHeight) throws IOException {
+    public static Bitmap loadSampledBitmapFromUri(@NonNull Context context, @NonNull Uri uri, int requiredWidth,
+            int requiredHeight) throws IOException {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         InputStream inputStream = null;
@@ -136,8 +136,8 @@ public final class DataUtils {
      */
     @Nullable
     @WorkerThread
-    public static Bitmap loadSampledBitmapFromUrl(@NonNull String url, int requiredWidth,
-            int requiredHeight) throws IOException {
+    public static Bitmap loadSampledBitmapFromUrl(@NonNull String url, int requiredWidth, int requiredHeight)
+            throws IOException {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         InputStream inputStream = null;
@@ -174,8 +174,8 @@ public final class DataUtils {
      */
     @Nullable
     @WorkerThread
-    public static Bitmap loadSampledBitmapFromFile(@NonNull File file, int requiredWidth,
-            int requiredHeight) throws IOException {
+    public static Bitmap loadSampledBitmapFromFile(@NonNull File file, int requiredWidth, int requiredHeight)
+            throws IOException {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         InputStream inputStream = null;
@@ -207,8 +207,8 @@ public final class DataUtils {
      */
     @Nullable
     @WorkerThread
-    public static Bitmap loadSampledBitmapFromFileDescriptor(@NonNull FileDescriptor fileDescriptor,
-            int requiredWidth, int requiredHeight) {
+    public static Bitmap loadSampledBitmapFromFileDescriptor(@NonNull FileDescriptor fileDescriptor, int requiredWidth,
+            int requiredHeight) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         InputStream inputStream = null;
@@ -240,8 +240,8 @@ public final class DataUtils {
      */
     @Nullable
     @WorkerThread
-    public static Bitmap loadSampledBitmapFromResource(@NonNull Resources resources, int resourceId,
-            int requiredWidth, int requiredHeight) {
+    public static Bitmap loadSampledBitmapFromResource(@NonNull Resources resources, int resourceId, int requiredWidth,
+            int requiredHeight) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         TypedValue typedValue = new TypedValue();
         options.inJustDecodeBounds = true;
@@ -279,8 +279,8 @@ public final class DataUtils {
      */
     @Nullable
     @WorkerThread
-    public static Bitmap loadSampledBitmapFromByteArray(@NonNull byte[] byteArray,
-            int requiredWidth, int requiredHeight) {
+    public static Bitmap loadSampledBitmapFromByteArray(@NonNull byte[] byteArray, int requiredWidth,
+            int requiredHeight) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length, options);
@@ -289,8 +289,8 @@ public final class DataUtils {
         return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length, options);
     }
 
-    private static void calculateSampleSize(@NonNull BitmapFactory.Options options,
-            int requiredWidth, int requiredHeight) {
+    private static void calculateSampleSize(@NonNull BitmapFactory.Options options, int requiredWidth,
+            int requiredHeight) {
         int sampleSize = 1;
         int width = options.outWidth;
         int height = options.outHeight;

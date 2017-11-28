@@ -53,8 +53,8 @@ public final class ImageLoader {
      * @see #with(Context)
      * @see Builder
      */
-    private ImageLoader(@NonNull Context context, @Nullable ImageCache memoryCache,
-            @Nullable ImageCache storageCache, @Nullable ExecutorService executor) {
+    private ImageLoader(@NonNull Context context, @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache,
+            @Nullable ExecutorService executor) {
         mContext = context;
         mMainThreadHandler = new Handler(context.getMainLooper());
         mMemoryCache = memoryCache;
@@ -77,8 +77,8 @@ public final class ImageLoader {
      */
     @NonNull
     public <T> LoadImageRequest<T> request(@NonNull BitmapLoader<T> loader) {
-        return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler,
-                mMemoryCache, mStorageCache, loader);
+        return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache, mStorageCache,
+                loader);
     }
 
     /**
@@ -88,8 +88,7 @@ public final class ImageLoader {
      */
     @NonNull
     public DataTypeSelector request() {
-        return new DataTypeSelector(mContext, mExecutor, mPauseLock, mMainThreadHandler,
-                mMemoryCache, mStorageCache);
+        return new DataTypeSelector(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache, mStorageCache);
     }
 
     /**
@@ -195,8 +194,8 @@ public final class ImageLoader {
         private final ImageCache mStorageCache;
 
         private DataTypeSelector(@NonNull Context context, @NonNull ExecutorService executor,
-                @NonNull PauseLock pauseLock, @NonNull Handler mainThreadHandler,
-                @NonNull ImageCache memoryCache, @NonNull ImageCache storageCache) {
+                @NonNull PauseLock pauseLock, @NonNull Handler mainThreadHandler, @NonNull ImageCache memoryCache,
+                @NonNull ImageCache storageCache) {
             mContext = context;
             mExecutor = executor;
             mPauseLock = pauseLock;
@@ -210,8 +209,8 @@ public final class ImageLoader {
          */
         @NonNull
         public LoadImageRequest<Uri> uri() {
-            return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler,
-                    mMemoryCache, mStorageCache, LoaderCache.getUriBitmapLoader());
+            return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache,
+                    mStorageCache, LoaderCache.getUriBitmapLoader());
         }
 
         /**
@@ -219,8 +218,8 @@ public final class ImageLoader {
          */
         @NonNull
         public LoadImageRequest<String> url() {
-            return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler,
-                    mMemoryCache, mStorageCache, LoaderCache.getUrlBitmapLoader());
+            return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache,
+                    mStorageCache, LoaderCache.getUrlBitmapLoader());
         }
 
         /**
@@ -228,8 +227,8 @@ public final class ImageLoader {
          */
         @NonNull
         public LoadImageRequest<File> file() {
-            return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler,
-                    mMemoryCache, mStorageCache, LoaderCache.getFileBitmapLoader());
+            return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache,
+                    mStorageCache, LoaderCache.getFileBitmapLoader());
         }
 
         /**
@@ -237,8 +236,8 @@ public final class ImageLoader {
          */
         @NonNull
         public LoadImageRequest<FileDescriptor> fileDescriptor() {
-            return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler,
-                    mMemoryCache, mStorageCache, LoaderCache.getFileDescriptorBitmapLoader());
+            return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache,
+                    mStorageCache, LoaderCache.getFileDescriptorBitmapLoader());
         }
 
         /**
@@ -246,8 +245,8 @@ public final class ImageLoader {
          */
         @NonNull
         public LoadImageRequest<Integer> resource() {
-            return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler,
-                    mMemoryCache, mStorageCache, LoaderCache.getResourceBitmapLoader());
+            return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache,
+                    mStorageCache, LoaderCache.getResourceBitmapLoader());
         }
 
         /**
@@ -255,8 +254,8 @@ public final class ImageLoader {
          */
         @NonNull
         public LoadImageRequest<byte[]> byteArray() {
-            return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler,
-                    mMemoryCache, mStorageCache, LoaderCache.getByteArrayBitmapLoader());
+            return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache,
+                    mStorageCache, LoaderCache.getByteArrayBitmapLoader());
         }
     }
 
@@ -356,8 +355,7 @@ public final class ImageLoader {
          * @see CompressMode
          */
         @NonNull
-        public Builder storageCache(@NonNull File directory, @NonNull CompressMode compressMode,
-                long maxSize) {
+        public Builder storageCache(@NonNull File directory, @NonNull CompressMode compressMode, long maxSize) {
             mStorageCache = new StorageImageCache(directory, compressMode, maxSize);
             return this;
         }

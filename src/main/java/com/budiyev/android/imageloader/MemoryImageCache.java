@@ -14,8 +14,7 @@ import android.util.LruCache;
 final class MemoryImageCache implements ImageCache {
     private static final float DEFAULT_MEMORY_FRACTION = 0.25f;
     private final LruCache<String, Bitmap> mCache;
-    private final Set<String> mKeySet =
-            Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
+    private final Set<String> mKeySet = Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
 
     public MemoryImageCache() {
         this(Math.round(Runtime.getRuntime().maxMemory() * DEFAULT_MEMORY_FRACTION));

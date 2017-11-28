@@ -60,8 +60,7 @@ final class StorageImageCache implements ImageCache {
         this(getDefaultDirectory(context), maxSize);
     }
 
-    public StorageImageCache(@NonNull Context context, @NonNull CompressMode compressMode,
-            long maxSize) {
+    public StorageImageCache(@NonNull Context context, @NonNull CompressMode compressMode, long maxSize) {
         this(getDefaultDirectory(context), compressMode, maxSize);
     }
 
@@ -73,8 +72,7 @@ final class StorageImageCache implements ImageCache {
         this(directory, CompressMode.LOSSLESS, maxSize);
     }
 
-    public StorageImageCache(@NonNull File directory, @NonNull CompressMode compressMode,
-            long maxSize) {
+    public StorageImageCache(@NonNull File directory, @NonNull CompressMode compressMode, long maxSize) {
         mDirectory = directory;
         mCompressMode = compressMode;
         mMaxSize = maxSize;

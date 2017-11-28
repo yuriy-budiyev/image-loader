@@ -76,8 +76,7 @@ final class InternalUtils {
                 }
                 outputBuffer.write(buffer, 0, read);
             }
-            return BitmapFactory
-                    .decodeByteArray(outputBuffer.getArray(), 0, outputBuffer.getSize());
+            return BitmapFactory.decodeByteArray(outputBuffer.getArray(), 0, outputBuffer.getSize());
         } catch (IOException e) {
             return null;
         } finally {
@@ -116,8 +115,7 @@ final class InternalUtils {
     }
 
     @Nullable
-    public static InputStream getDataStreamFromUri(@NonNull Context context, @NonNull Uri uri)
-            throws IOException {
+    public static InputStream getDataStreamFromUri(@NonNull Context context, @NonNull Uri uri) throws IOException {
         String scheme = uri.getScheme();
         if (URI_SCHEME_HTTP.equalsIgnoreCase(scheme) || URI_SCHEME_HTTPS.equalsIgnoreCase(scheme) ||
                 URI_SCHEME_FTP.equalsIgnoreCase(scheme)) {
@@ -158,8 +156,7 @@ final class InternalUtils {
         }
     }
 
-    public static void setBitmap(@NonNull Resources resources, @NonNull Bitmap bitmap,
-            @NonNull View view) {
+    public static void setBitmap(@NonNull Resources resources, @NonNull Bitmap bitmap, @NonNull View view) {
         if (view instanceof ImageView) {
             ((ImageView) view).setImageBitmap(bitmap);
         } else {

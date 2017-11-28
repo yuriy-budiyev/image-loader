@@ -67,8 +67,7 @@ final class StringDataDescriptor<T> implements DataDescriptor<T> {
 
     @Override
     public boolean equals(Object obj) {
-        return obj == this || obj instanceof StringDataDescriptor &&
-                mKey.equals(((StringDataDescriptor) obj).mKey);
+        return obj == this || obj instanceof StringDataDescriptor && mKey.equals(((StringDataDescriptor) obj).mKey);
     }
 
     @Override

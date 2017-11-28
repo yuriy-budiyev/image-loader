@@ -50,9 +50,8 @@ abstract class BaseLoadImageAction<T> {
 
     protected BaseLoadImageAction(@NonNull Context context, @NonNull DataDescriptor<T> descriptor,
             @NonNull BitmapLoader<T> bitmapLoader, @Nullable BitmapTransformation transformation,
-            @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache,
-            @Nullable LoadCallback<T> loadCallback, @Nullable ErrorCallback<T> errorCallback,
-            @NonNull PauseLock pauseLock) {
+            @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache, @Nullable LoadCallback<T> loadCallback,
+            @Nullable ErrorCallback<T> errorCallback, @NonNull PauseLock pauseLock) {
         mContext = context;
         mDescriptor = descriptor;
         mBitmapLoader = bitmapLoader;
@@ -207,8 +206,8 @@ abstract class BaseLoadImageAction<T> {
     }
 
     @WorkerThread
-    private void processImage(@NonNull Context context, @NonNull DataDescriptor<T> descriptor,
-            @NonNull Bitmap image, boolean transformed) {
+    private void processImage(@NonNull Context context, @NonNull DataDescriptor<T> descriptor, @NonNull Bitmap image,
+            boolean transformed) {
         if (mCancelled) {
             return;
         }

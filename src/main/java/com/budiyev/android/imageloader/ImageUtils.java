@@ -176,8 +176,7 @@ public final class ImageUtils {
      */
     @NonNull
     @SuppressWarnings("unchecked")
-    public static BitmapTransformation scaleToFit(int resultWidth, int resultHeight,
-            boolean upscale) {
+    public static BitmapTransformation scaleToFit(int resultWidth, int resultHeight, boolean upscale) {
         return new ScaleToFitTransformation(resultWidth, resultHeight, upscale);
     }
 
@@ -190,8 +189,7 @@ public final class ImageUtils {
     @NonNull
     public static Bitmap invertColors(@NonNull Bitmap image) {
         return applyColorFilter(image, new ColorMatrixColorFilter(
-                new float[] {-1f, 0f, 0f, 0f, 255f, 0f, -1f, 0f, 0f, 255f, 0f, 0f, -1f, 0f, 255f,
-                        0f, 0f, 0f, 1f, 0f}));
+                new float[] {-1f, 0f, 0f, 0f, 255f, 0f, -1f, 0f, 0f, 255f, 0f, 0f, -1f, 0f, 255f, 0f, 0f, 0f, 1f, 0f}));
     }
 
     /**
@@ -218,8 +216,7 @@ public final class ImageUtils {
     public static Bitmap applyColorFilter(@NonNull Bitmap image, @NonNull ColorFilter colorFilter) {
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
         paint.setColorFilter(colorFilter);
-        Bitmap bitmap =
-                Bitmap.createBitmap(image.getWidth(), image.getHeight(), Bitmap.Config.ARGB_8888);
+        Bitmap bitmap = Bitmap.createBitmap(image.getWidth(), image.getHeight(), Bitmap.Config.ARGB_8888);
         bitmap.setDensity(image.getDensity());
         new Canvas(bitmap).drawBitmap(image, 0f, 0f, paint);
         return bitmap;
@@ -321,14 +318,12 @@ public final class ImageUtils {
         int cropWidth = resultRatioWidth * sourceHeight / resultRatioHeight;
         if (cropWidth > sourceWidth) {
             int cropHeight = resultRatioHeight * sourceWidth / resultRatioWidth;
-            cropped = Bitmap.createBitmap(image, 0, (sourceHeight - cropHeight) / 2, sourceWidth,
-                    cropHeight);
+            cropped = Bitmap.createBitmap(image, 0, (sourceHeight - cropHeight) / 2, sourceWidth, cropHeight);
             if (cropHeight == resultHeight && sourceWidth == resultWidth) {
                 return cropped;
             }
         } else {
-            cropped = Bitmap.createBitmap(image, (sourceWidth - cropWidth) / 2, 0, cropWidth,
-                    sourceHeight);
+            cropped = Bitmap.createBitmap(image, (sourceWidth - cropWidth) / 2, 0, cropWidth, sourceHeight);
             if (cropWidth == resultWidth && sourceHeight == resultHeight) {
                 return cropped;
             }
@@ -412,8 +407,7 @@ public final class ImageUtils {
      * @return Scaled image or original image
      */
     @NonNull
-    public static Bitmap scaleToFit(@NonNull Bitmap image, int resultWidth, int resultHeight,
-            boolean upscale) {
+    public static Bitmap scaleToFit(@NonNull Bitmap image, int resultWidth, int resultHeight, boolean upscale) {
         int sourceWidth = image.getWidth();
         int sourceHeight = image.getHeight();
         if (sourceWidth == resultWidth && sourceHeight == resultHeight) {

@@ -65,9 +65,8 @@ public final class LoadImageRequest<T> {
     private long mFadeDuration = 200L;
     private float mCornerRadius;
 
-    LoadImageRequest(@NonNull Context context, @NonNull ExecutorService executor,
-            @NonNull PauseLock pauseLock, @NonNull Handler mainThreadHandler,
-            @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache,
+    LoadImageRequest(@NonNull Context context, @NonNull ExecutorService executor, @NonNull PauseLock pauseLock,
+            @NonNull Handler mainThreadHandler, @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache,
             @NonNull BitmapLoader<T> bitmapLoader) {
         mContext = context;
         mExecutor = executor;
@@ -237,9 +236,8 @@ public final class LoadImageRequest<T> {
         if (descriptor == null) {
             return;
         }
-        new LoadImageAction<>(mContext, descriptor, mBitmapLoader, getTransformation(),
-                mMemoryCache, mStorageCache, mLoadCallback, mErrorCallback, mPauseLock)
-                .execute(mExecutor);
+        new LoadImageAction<>(mContext, descriptor, mBitmapLoader, getTransformation(), mMemoryCache, mStorageCache,
+                mLoadCallback, mErrorCallback, mPauseLock).execute(mExecutor);
     }
 
     /**
@@ -273,8 +271,7 @@ public final class LoadImageRequest<T> {
             }
             Resources resources = context.getResources();
             if (cornerRadius > 0 || cornerRadius == RoundedDrawable.MAX_RADIUS) {
-                InternalUtils
-                        .setDrawable(new RoundedDrawable(resources, image, cornerRadius), view);
+                InternalUtils.setDrawable(new RoundedDrawable(resources, image, cornerRadius), view);
             } else {
                 InternalUtils.setBitmap(resources, image, view);
             }
@@ -295,10 +292,9 @@ public final class LoadImageRequest<T> {
             placeholder = new ColorDrawable(Color.TRANSPARENT);
         }
         DisplayImageAction<T> action =
-                new DisplayImageAction<>(context, descriptor, mBitmapLoader, transformation,
-                        placeholder, mErrorDrawable, view, memoryCache, mStorageCache, loadCallback,
-                        mErrorCallback, displayCallback, mPauseLock, mMainThreadHandler,
-                        mFadeEnabled, mFadeDuration, cornerRadius);
+                new DisplayImageAction<>(context, descriptor, mBitmapLoader, transformation, placeholder,
+                        mErrorDrawable, view, memoryCache, mStorageCache, loadCallback, mErrorCallback, displayCallback,
+                        mPauseLock, mMainThreadHandler, mFadeEnabled, mFadeDuration, cornerRadius);
         InternalUtils.setDrawable(new PlaceholderDrawable(placeholder, action), view);
         action.execute(mExecutor);
     }

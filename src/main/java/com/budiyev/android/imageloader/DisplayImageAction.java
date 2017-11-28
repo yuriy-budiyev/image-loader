@@ -50,13 +50,12 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
     public DisplayImageAction(@NonNull Context context, @NonNull DataDescriptor<T> descriptor,
             @NonNull BitmapLoader<T> bitmapLoader, @Nullable BitmapTransformation transformation,
             @NonNull Drawable placeholder, @Nullable Drawable errorDrawable, @NonNull View view,
-            @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache,
-            @Nullable LoadCallback<T> loadCallback, @Nullable ErrorCallback<T> errorCallback,
-            @Nullable DisplayCallback<T> displayCallback, @NonNull PauseLock pauseLock,
-            @NonNull Handler mainThreadHandler, boolean fadeEnabled, long fadeDuration,
+            @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache, @Nullable LoadCallback<T> loadCallback,
+            @Nullable ErrorCallback<T> errorCallback, @Nullable DisplayCallback<T> displayCallback,
+            @NonNull PauseLock pauseLock, @NonNull Handler mainThreadHandler, boolean fadeEnabled, long fadeDuration,
             float cornerRadius) {
-        super(context, descriptor, bitmapLoader, transformation, memoryCache, storageCache,
-                loadCallback, errorCallback, pauseLock);
+        super(context, descriptor, bitmapLoader, transformation, memoryCache, storageCache, loadCallback, errorCallback,
+                pauseLock);
         mDisplayCallback = displayCallback;
         mView = new WeakReference<>(view);
         mPlaceholder = placeholder;
@@ -102,8 +101,7 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
             }
             if (mFadeEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 InternalUtils.setDrawable(
-                        new FadeDrawable(mPlaceholder, errorDrawable, mFadeDuration,
-                                mMainThreadHandler, null), view);
+                        new FadeDrawable(mPlaceholder, errorDrawable, mFadeDuration, mMainThreadHandler, null), view);
             } else {
                 InternalUtils.setDrawable(errorDrawable, view);
             }
@@ -124,8 +122,7 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
                 return;
             }
             View view = mView.get();
-            if (view == null ||
-                    InternalUtils.getDisplayImageAction(view) != DisplayImageAction.this) {
+            if (view == null || InternalUtils.getDisplayImageAction(view) != DisplayImageAction.this) {
                 return;
             }
             Bitmap image = mImage;
@@ -138,13 +135,12 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
             if (mFadeEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 InternalUtils.setDrawable(new FadeDrawable(mPlaceholder,
                         roundCorners ? new RoundedDrawable(resources, image, cornerRadius) :
-                                new BitmapDrawable(resources, image), mFadeDuration,
-                        mMainThreadHandler, displayCallback == null ? null :
-                        new FadeCallback<>(context, displayCallback, data, image, view)), view);
+                                new BitmapDrawable(resources, image), mFadeDuration, mMainThreadHandler,
+                        displayCallback == null ? null :
+                                new FadeCallback<>(context, displayCallback, data, image, view)), view);
             } else {
                 if (roundCorners) {
-                    InternalUtils
-                            .setDrawable(new RoundedDrawable(resources, image, cornerRadius), view);
+                    InternalUtils.setDrawable(new RoundedDrawable(resources, image, cornerRadius), view);
                 } else {
                     InternalUtils.setBitmap(resources, image, view);
                 }
@@ -162,8 +158,8 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
         private final Bitmap mImage;
         private final View mView;
 
-        private FadeCallback(@NonNull Context context, @NonNull DisplayCallback<T> displayCallback,
-                @NonNull T data, @NonNull Bitmap image, @NonNull View view) {
+        private FadeCallback(@NonNull Context context, @NonNull DisplayCallback<T> displayCallback, @NonNull T data,
+                @NonNull Bitmap image, @NonNull View view) {
             mContext = context;
             mDisplayCallback = displayCallback;
             mData = data;

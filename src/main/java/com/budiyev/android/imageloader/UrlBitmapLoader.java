@@ -34,8 +34,7 @@ import android.support.annotation.Nullable;
 final class UrlBitmapLoader implements BitmapLoader<String> {
     @Nullable
     @Override
-    public Bitmap load(@NonNull Context context, @NonNull String data, @Nullable Size size)
-            throws Throwable {
+    public Bitmap load(@NonNull Context context, @NonNull String data, @Nullable Size size) throws Throwable {
         if (size != null) {
             return DataUtils.loadSampledBitmapFromUrl(data, size.getWidth(), size.getHeight());
         } else {

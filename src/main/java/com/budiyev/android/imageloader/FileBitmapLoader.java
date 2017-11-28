@@ -36,8 +36,7 @@ import android.support.annotation.Nullable;
 final class FileBitmapLoader implements BitmapLoader<File> {
     @Nullable
     @Override
-    public Bitmap load(@NonNull Context context, @NonNull File data, @Nullable Size size)
-            throws Throwable {
+    public Bitmap load(@NonNull Context context, @NonNull File data, @Nullable Size size) throws Throwable {
         if (size != null) {
             return DataUtils.loadSampledBitmapFromFile(data, size.getWidth(), size.getHeight());
         } else {

@@ -44,6 +44,5 @@ public interface DisplayCallback<T> {
      * @param view    View
      */
     @MainThread
-    void onDisplayed(@NonNull Context context, @NonNull T data, @NonNull Bitmap image,
-            @NonNull View view);
+    void onDisplayed(@NonNull Context context, @NonNull T data, @NonNull Bitmap image, @NonNull View view);
 }

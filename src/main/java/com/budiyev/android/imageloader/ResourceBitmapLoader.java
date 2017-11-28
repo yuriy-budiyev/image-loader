@@ -37,12 +37,10 @@ import android.util.TypedValue;
 final class ResourceBitmapLoader implements BitmapLoader<Integer> {
     @Nullable
     @Override
-    public Bitmap load(@NonNull Context context, @NonNull Integer data, @Nullable Size size)
-            throws Throwable {
+    public Bitmap load(@NonNull Context context, @NonNull Integer data, @Nullable Size size) throws Throwable {
         Resources resources = context.getResources();
         if (size != null) {
-            return DataUtils.loadSampledBitmapFromResource(resources, data, size.getWidth(),
-                    size.getHeight());
+            return DataUtils.loadSampledBitmapFromResource(resources, data, size.getWidth(), size.getHeight());
         } else {
             BitmapFactory.Options options = new BitmapFactory.Options();
             TypedValue typedValue = new TypedValue();
