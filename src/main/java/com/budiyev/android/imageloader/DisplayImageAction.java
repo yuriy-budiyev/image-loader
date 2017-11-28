@@ -136,8 +136,8 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
                 InternalUtils.setDrawable(new FadeDrawable(mPlaceholder,
                         roundCorners ? new RoundedDrawable(resources, image, cornerRadius) :
                                 new BitmapDrawable(resources, image), mFadeDuration, mMainThreadHandler,
-                        displayCallback == null ? null :
-                                new FadeCallback<>(context, displayCallback, data, image, view)), view);
+                        displayCallback != null ? new FadeCallback<>(context, displayCallback, data, image, view) :
+                                null), view);
             } else {
                 if (roundCorners) {
                     InternalUtils.setDrawable(new RoundedDrawable(resources, image, cornerRadius), view);
