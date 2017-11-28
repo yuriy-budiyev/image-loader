@@ -23,24 +23,66 @@
  */
 package com.budiyev.android.imageloader;
 
+import java.util.List;
+import java.util.concurrent.AbstractExecutorService;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-final class ImageLoaderExecutor extends ThreadPoolExecutor {
-    public ImageLoaderExecutor(int poolSize) {
-        super(poolSize, poolSize, 0L, TimeUnit.NANOSECONDS, new LinkedBlockingQueue<Runnable>(),
-                new ImageLoaderThreadFactory(), new DiscardPolicy());
+final class SynchronousExecutor extends AbstractExecutorService {
+    private static final Lock INSTANCE_LOCK = new ReentrantLock();
+    private static volatile ExecutorService sInstance;
+
+    private SynchronousExecutor() {
     }
 
     @Override
-    protected void afterExecute(@NonNull Runnable r, @Nullable Throwable t) {
+    public void shutdown() {
+        throw new UnsupportedOperationException("shutdown");
+    }
+
+    @NonNull
+    @Override
+    public List<Runnable> shutdownNow() {
+        throw new UnsupportedOperationException("shutdownNow");
+    }
+
+    @Override
+    public boolean isShutdown() {
+        return false;
+    }
+
+    @Override
+    public boolean isTerminated() {
+        return false;
+    }
+
+    @Override
+    public boolean awaitTermination(long timeout, @NonNull TimeUnit unit) throws InterruptedException {
+        throw new UnsupportedOperationException("awaitTermination");
+    }
+
+    @Override
+    public void execute(@NonNull Runnable command) {
+        Throwable thrown = null;
+        try {
+            command.run();
+        } catch (Throwable t) {
+            thrown = t;
+            throw t;
+        } finally {
+            afterExecute(command, thrown);
+        }
+    }
+
+    private void afterExecute(@NonNull Runnable r, @Nullable Throwable t) {
         if (t == null && r instanceof Future<?>) {
             Future<?> f = (Future<?>) r;
             if (f.isDone()) {
@@ -52,5 +94,23 @@ final class ImageLoaderExecutor extends ThreadPoolExecutor {
                 }
             }
         }
+    }
+
+    @NonNull
+    public static ExecutorService get() {
+        ExecutorService instance = sInstance;
+        if (instance == null) {
+            INSTANCE_LOCK.lock();
+            try {
+                instance = sInstance;
+                if (instance == null) {
+                    instance = new SynchronousExecutor();
+                    sInstance = instance;
+                }
+            } finally {
+                INSTANCE_LOCK.unlock();
+            }
+        }
+        return instance;
     }
 }

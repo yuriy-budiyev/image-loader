@@ -64,6 +64,7 @@ public final class LoadImageRequest<T> {
     private boolean mFadeEnabled = true;
     private long mFadeDuration = 200L;
     private float mCornerRadius;
+    private boolean mSynchronous;
 
     LoadImageRequest(@NonNull Context context, @NonNull ExecutorService executor, @NonNull PauseLock pauseLock,
             @NonNull Handler mainThreadHandler, @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache,
@@ -228,6 +229,26 @@ public final class LoadImageRequest<T> {
     }
 
     /**
+     * Execute request synchronously (on current thread)
+     */
+    @NonNull
+    public LoadImageRequest<T> sync() {
+        mSynchronous = true;
+        return this;
+    }
+
+    /**
+     * Execute request asynchronously (default),
+     * for custom image loaders, request will be executed on executor,
+     * specified in builder (if it was specified), generally executed on default image loader executor
+     */
+    @NonNull
+    public LoadImageRequest<T> async() {
+        mSynchronous = false;
+        return this;
+    }
+
+    /**
      * Load image
      */
     @AnyThread
@@ -237,7 +258,7 @@ public final class LoadImageRequest<T> {
             return;
         }
         new LoadImageAction<>(mContext, descriptor, mBitmapLoader, getTransformation(), mMemoryCache, mStorageCache,
-                mLoadCallback, mErrorCallback, mPauseLock).execute(mExecutor);
+                mLoadCallback, mErrorCallback, mPauseLock).execute(getExecutor());
     }
 
     /**
@@ -296,7 +317,12 @@ public final class LoadImageRequest<T> {
                         mErrorDrawable, view, memoryCache, mStorageCache, loadCallback, mErrorCallback, displayCallback,
                         mPauseLock, mMainThreadHandler, mFadeEnabled, mFadeDuration, cornerRadius);
         InternalUtils.setDrawable(new PlaceholderDrawable(placeholder, action), view);
-        action.execute(mExecutor);
+        action.execute(getExecutor());
+    }
+
+    @NonNull
+    private ExecutorService getExecutor() {
+        return mSynchronous ? SynchronousExecutor.get() : mExecutor;
     }
 
     @Nullable
