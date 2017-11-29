@@ -64,7 +64,6 @@ public final class LoadImageRequest<T> {
     private boolean mFadeEnabled = true;
     private long mFadeDuration = 200L;
     private float mCornerRadius;
-    private boolean mSynchronous;
 
     LoadImageRequest(@NonNull Context context, @NonNull ExecutorService executor, @NonNull PauseLock pauseLock,
             @NonNull Handler mainThreadHandler, @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache,
@@ -229,23 +228,19 @@ public final class LoadImageRequest<T> {
     }
 
     /**
-     * Execute request synchronously (on current thread)
+     * Load image synchronously (on current thread)
+     *
+     * @return Loaded bitmap or {@code null} if bitmap could not be loaded or source data hasn't been specified
      */
-    @NonNull
-    public LoadImageRequest<T> sync() {
-        mSynchronous = true;
-        return this;
-    }
-
-    /**
-     * Execute request asynchronously (default),
-     * for custom image loaders, request will be executed on executor,
-     * specified in builder (if it was specified), generally executed on default image loader executor
-     */
-    @NonNull
-    public LoadImageRequest<T> async() {
-        mSynchronous = false;
-        return this;
+    @Nullable
+    @AnyThread
+    public Bitmap loadSync() {
+        DataDescriptor<T> descriptor = getDescriptor();
+        if (descriptor == null) {
+            return null;
+        }
+        return new SyncLoadImageAction<>(mContext, descriptor, mBitmapLoader, getTransformation(), mMemoryCache,
+                mStorageCache, mLoadCallback, mErrorCallback, mPauseLock).execute();
     }
 
     /**
@@ -258,7 +253,7 @@ public final class LoadImageRequest<T> {
             return;
         }
         new LoadImageAction<>(mContext, descriptor, mBitmapLoader, getTransformation(), mMemoryCache, mStorageCache,
-                mLoadCallback, mErrorCallback, mPauseLock).execute(getExecutor());
+                mLoadCallback, mErrorCallback, mPauseLock).execute(mExecutor);
     }
 
     /**
@@ -317,12 +312,7 @@ public final class LoadImageRequest<T> {
                         mErrorDrawable, view, memoryCache, mStorageCache, loadCallback, mErrorCallback, displayCallback,
                         mPauseLock, mMainThreadHandler, mFadeEnabled, mFadeDuration, cornerRadius);
         InternalUtils.setDrawable(new PlaceholderDrawable(placeholder, action), view);
-        action.execute(getExecutor());
-    }
-
-    @NonNull
-    private ExecutorService getExecutor() {
-        return mSynchronous ? SynchronousExecutor.get() : mExecutor;
+        action.execute(mExecutor);
     }
 
     @Nullable
