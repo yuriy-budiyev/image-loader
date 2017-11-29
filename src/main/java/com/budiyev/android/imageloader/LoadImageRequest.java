@@ -39,6 +39,7 @@ import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.Px;
+import android.support.annotation.WorkerThread;
 import android.view.View;
 
 /**
@@ -233,7 +234,7 @@ public final class LoadImageRequest<T> {
      * @return Loaded bitmap or {@code null} if bitmap could not be loaded or source data hasn't been specified
      */
     @Nullable
-    @AnyThread
+    @WorkerThread
     public Bitmap loadSync() {
         DataDescriptor<T> descriptor = getDescriptor();
         if (descriptor == null) {
