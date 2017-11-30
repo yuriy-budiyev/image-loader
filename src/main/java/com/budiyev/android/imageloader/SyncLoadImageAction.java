@@ -27,6 +27,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.WorkerThread;
 
 final class SyncLoadImageAction<T> extends BaseLoadImageAction<T> {
     private Bitmap mImage;
@@ -40,6 +41,7 @@ final class SyncLoadImageAction<T> extends BaseLoadImageAction<T> {
     }
 
     @Nullable
+    @WorkerThread
     public Bitmap execute() {
         loadImage();
         return mImage;
