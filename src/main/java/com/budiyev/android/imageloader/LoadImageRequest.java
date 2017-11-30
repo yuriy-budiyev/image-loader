@@ -231,7 +231,7 @@ public final class LoadImageRequest<T> {
     /**
      * Load image synchronously (on current thread)
      *
-     * @return Loaded bitmap or {@code null} if bitmap could not be loaded or source data hasn't been specified
+     * @return Loaded image or {@code null} if image could not be loaded or source data hasn't been specified
      */
     @Nullable
     @WorkerThread

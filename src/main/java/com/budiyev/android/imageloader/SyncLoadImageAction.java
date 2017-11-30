@@ -29,7 +29,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 final class SyncLoadImageAction<T> extends BaseLoadImageAction<T> {
-    private Bitmap mBitmap;
+    private Bitmap mImage;
 
     protected SyncLoadImageAction(@NonNull Context context, @NonNull DataDescriptor<T> descriptor,
             @NonNull BitmapLoader<T> bitmapLoader, @Nullable BitmapTransformation transformation,
@@ -41,13 +41,13 @@ final class SyncLoadImageAction<T> extends BaseLoadImageAction<T> {
 
     @Nullable
     public Bitmap execute() {
-        execute(SynchronousExecutor.get());
-        return mBitmap;
+        loadImage();
+        return mImage;
     }
 
     @Override
     protected void onImageLoaded(@NonNull Bitmap image) {
-        mBitmap = image;
+        mImage = image;
     }
 
     @Override

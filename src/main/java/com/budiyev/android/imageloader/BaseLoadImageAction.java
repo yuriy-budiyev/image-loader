@@ -139,7 +139,7 @@ abstract class BaseLoadImageAction<T> {
     }
 
     @WorkerThread
-    private void loadImage() {
+    protected final void loadImage() {
         while (!mCancelled && !mPauseLock.shouldInterruptEarly() && mPauseLock.isPaused()) {
             if (mPauseLock.await()) {
                 return;
