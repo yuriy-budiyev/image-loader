@@ -26,9 +26,12 @@ public class MainActivity extends AppCompatActivity {
         ImageView view = findViewById(R.id.image_view);
 
         ImageLoader.with(this)
-                /*Create new load request, optionally, specify custom bitmap loader*/
+                /*Create new load request, optionally, specify custom bitmap loader
+                  to be able to load bitmaps from any data type you need*/
                 .request()
-                /*Select source data type*/
+                /*Select source data type (if custom bitmap loader isn't specified).
+                  Supported Android URIs, string URLs, files, file descriptors,
+                  resources and byte arrays*/
                 .url()
                 /*Set source data*/
                 .from("https://some.url/image")
