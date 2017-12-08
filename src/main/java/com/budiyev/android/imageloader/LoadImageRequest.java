@@ -49,6 +49,7 @@ import android.view.View;
  * Load image request
  */
 public final class LoadImageRequest<T> {
+    private static final long DEFAULT_FADE_DURATION = 200L;
     private final Context mContext;
     private final ExecutorService mExecutor;
     private final PauseLock mPauseLock;
@@ -66,7 +67,7 @@ public final class LoadImageRequest<T> {
     private Drawable mPlaceholder;
     private Drawable mErrorDrawable;
     private boolean mFadeEnabled = true;
-    private long mFadeDuration = 200L;
+    private long mFadeDuration = DEFAULT_FADE_DURATION;
     private float mCornerRadius;
 
     LoadImageRequest(@NonNull Context context, @NonNull ExecutorService executor, @NonNull PauseLock pauseLock,
@@ -215,6 +216,7 @@ public final class LoadImageRequest<T> {
     @NonNull
     public LoadImageRequest<T> fade() {
         mFadeEnabled = true;
+        mFadeDuration = DEFAULT_FADE_DURATION;
         return this;
     }
 
