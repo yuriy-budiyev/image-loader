@@ -133,8 +133,8 @@ public final class LoadImageRequest<T> {
      * zero means that rounding is disabled
      */
     @NonNull
-    public LoadImageRequest<T> roundCorners(@FloatRange(from = 0f, to = Float.MAX_VALUE) float cornerRadius) {
-        mCornerRadius = cornerRadius;
+    public LoadImageRequest<T> roundCorners(@FloatRange(from = 0f, to = Float.MAX_VALUE) float radius) {
+        mCornerRadius = radius;
         return this;
     }
 
