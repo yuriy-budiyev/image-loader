@@ -37,6 +37,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.support.annotation.AnyThread;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.FloatRange;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -128,10 +129,11 @@ public final class LoadImageRequest<T> {
     }
 
     /**
-     * Display image with rounded corners using specified corner radius
+     * Display image with rounded corners using specified corner radius (in pixels),
+     * zero means that rounding is disabled
      */
     @NonNull
-    public LoadImageRequest<T> roundCorners(float cornerRadius) {
+    public LoadImageRequest<T> roundCorners(@FloatRange(from = 0f, to = Float.MAX_VALUE) float cornerRadius) {
         mCornerRadius = cornerRadius;
         return this;
     }
