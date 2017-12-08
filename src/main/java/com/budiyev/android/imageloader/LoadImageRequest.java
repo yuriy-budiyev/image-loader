@@ -24,6 +24,7 @@
 package com.budiyev.android.imageloader;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
@@ -179,12 +180,29 @@ public final class LoadImageRequest<T> {
      */
     @NonNull
     public LoadImageRequest<T> transform(@NonNull BitmapTransformation transformation) {
-        List<BitmapTransformation> transformations = mTransformations;
-        if (transformations == null) {
-            transformations = new ArrayList<>();
-            mTransformations = transformations;
+        List<BitmapTransformation> t = mTransformations;
+        if (t == null) {
+            t = new ArrayList<>();
+            mTransformations = t;
         }
-        transformations.add(transformation);
+        t.add(transformation);
+        return this;
+    }
+
+    /**
+     * Add bitmap transformations
+     *
+     * @see ImageUtils
+     * @see BitmapTransformation
+     */
+    @NonNull
+    public LoadImageRequest<T> transform(@NonNull Collection<BitmapTransformation> transformations) {
+        List<BitmapTransformation> t = mTransformations;
+        if (t == null) {
+            t = new ArrayList<>();
+            mTransformations = t;
+        }
+        t.addAll(transformations);
         return this;
     }
 
