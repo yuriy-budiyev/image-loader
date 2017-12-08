@@ -45,9 +45,9 @@ final class ByteBuffer extends OutputStream {
     }
 
     @Override
-    public void write(@NonNull byte b[], int offset, int length) {
+    public void write(@NonNull byte[] bytes, int offset, int length) {
         grow(mSize + length);
-        System.arraycopy(b, offset, mArray, mSize, length);
+        System.arraycopy(bytes, offset, mArray, mSize, length);
         mSize += length;
     }
 

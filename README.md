@@ -5,13 +5,17 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/7ecfc5f4065c41ba9cd2e9409d072ebb)](https://www.codacy.com/app/yuriy-budiyev/image-loader?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=yuriy-budiyev/image-loader&amp;utm_campaign=Badge_Grade)
 
 Image loader library for Android.
-Allows you to build your own image loader that will do exactly what you want.
-Almost unlimited customization.
+
+Features:
+* Image transformations
+* Automatic memory and storage caching
+* Almost unlimited customization
+* Generic load requests, ability to load images from any custom data type
 
 ### Usage
 ```gradle
 dependencies {
-    implementation 'com.budiyev.android:image-loader:1.9.9'
+    implementation 'com.budiyev.android:image-loader:2.0.0'
 }
 ```
 ### Basic usage sample

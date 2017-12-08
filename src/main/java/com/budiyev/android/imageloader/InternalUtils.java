@@ -32,6 +32,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -43,8 +44,15 @@ import android.os.Build;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.media.ExifInterface;
 import android.view.View;
 import android.widget.ImageView;
+
+import static android.media.ExifInterface.ORIENTATION_NORMAL;
+import static android.media.ExifInterface.ORIENTATION_ROTATE_180;
+import static android.media.ExifInterface.ORIENTATION_ROTATE_270;
+import static android.media.ExifInterface.ORIENTATION_ROTATE_90;
+import static android.media.ExifInterface.TAG_ORIENTATION;
 
 final class InternalUtils {
     private static final int CONNECT_TIMEOUT = 10000;
@@ -180,5 +188,32 @@ final class InternalUtils {
 
     public static int getPoolSize() {
         return Math.min(Runtime.getRuntime().availableProcessors(), MAX_POOL_SIZE);
+    }
+
+    public static boolean isUriLocal(@NonNull Uri uri) {
+        String scheme = uri.getScheme();
+        return ContentResolver.SCHEME_FILE.equals(scheme) || ContentResolver.SCHEME_CONTENT.equals(scheme) ||
+                ContentResolver.SCHEME_ANDROID_RESOURCE.equals(scheme);
+    }
+
+    public static int getExifRotation(@NonNull String fileName) {
+        try {
+            return getExifRotation(new ExifInterface(fileName));
+        } catch (IOException e) {
+            return 0;
+        }
+    }
+
+    public static int getExifRotation(@NonNull ExifInterface exifInterface) {
+        switch (exifInterface.getAttributeInt(TAG_ORIENTATION, ORIENTATION_NORMAL)) {
+            case ORIENTATION_ROTATE_90:
+                return 90;
+            case ORIENTATION_ROTATE_180:
+                return 180;
+            case ORIENTATION_ROTATE_270:
+                return 270;
+            default:
+                return 0;
+        }
     }
 }

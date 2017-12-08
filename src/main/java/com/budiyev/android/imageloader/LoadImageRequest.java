@@ -35,6 +35,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.support.annotation.AnyThread;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -144,11 +145,29 @@ public final class LoadImageRequest<T> {
     }
 
     /**
+     * Placeholder
+     */
+    @NonNull
+    public LoadImageRequest<T> placeholder(@DrawableRes int resId) {
+        mPlaceholder = mContext.getResources().getDrawable(resId);
+        return this;
+    }
+
+    /**
      * Error drawable, that will be displayed when image, couldn't be loaded
      */
     @NonNull
     public LoadImageRequest<T> errorDrawable(@Nullable Drawable errorDrawable) {
         mErrorDrawable = errorDrawable;
+        return this;
+    }
+
+    /**
+     * Error drawable, that will be displayed when image, couldn't be loaded
+     */
+    @NonNull
+    public LoadImageRequest<T> errorDrawable(@DrawableRes int resId) {
+        mErrorDrawable = mContext.getResources().getDrawable(resId);
         return this;
     }
 
