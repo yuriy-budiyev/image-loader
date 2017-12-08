@@ -368,12 +368,12 @@ public final class LoadImageRequest<T> {
 
     @Nullable
     private BitmapTransformation getTransformation() {
-        List<BitmapTransformation> transformations = mTransformations;
-        if (transformations != null && !transformations.isEmpty()) {
-            if (transformations.size() == 1) {
-                return transformations.get(0);
+        List<BitmapTransformation> t = mTransformations;
+        if (t != null && !t.isEmpty()) {
+            if (t.size() == 1) {
+                return t.get(0);
             } else {
-                return new BitmapTransformationGroup(transformations);
+                return new BitmapTransformationGroup(t);
             }
         } else {
             return null;
