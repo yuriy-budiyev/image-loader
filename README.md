@@ -6,7 +6,7 @@
 
 Image loader library for Android.
 
-Features:
+### Features
 * Image transformations
 * Automatic memory and storage caching
 * Almost unlimited customization
