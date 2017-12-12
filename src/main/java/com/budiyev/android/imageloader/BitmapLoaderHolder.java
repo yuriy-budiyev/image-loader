@@ -28,7 +28,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import android.support.annotation.NonNull;
 
-final class LoaderCache {
+final class BitmapLoaderHolder {
     private static final Lock LOCK = new ReentrantLock();
     private static volatile UriBitmapLoader sUriBitmapLoader;
     private static volatile UrlBitmapLoader sUrlBitmapLoader;
@@ -37,11 +37,11 @@ final class LoaderCache {
     private static volatile ResourceBitmapLoader sResourceBitmapLoader;
     private static volatile ByteArrayBitmapLoader sByteArrayBitmapLoader;
 
-    private LoaderCache() {
+    private BitmapLoaderHolder() {
     }
 
     @NonNull
-    public static UriBitmapLoader getUriBitmapLoader() {
+    public static UriBitmapLoader uri() {
         UriBitmapLoader loader = sUriBitmapLoader;
         if (loader == null) {
             LOCK.lock();
@@ -59,7 +59,7 @@ final class LoaderCache {
     }
 
     @NonNull
-    public static UrlBitmapLoader getUrlBitmapLoader() {
+    public static UrlBitmapLoader url() {
         UrlBitmapLoader loader = sUrlBitmapLoader;
         if (loader == null) {
             LOCK.lock();
@@ -77,7 +77,7 @@ final class LoaderCache {
     }
 
     @NonNull
-    public static FileBitmapLoader getFileBitmapLoader() {
+    public static FileBitmapLoader file() {
         FileBitmapLoader loader = sFileBitmapLoader;
         if (loader == null) {
             LOCK.lock();
@@ -95,7 +95,7 @@ final class LoaderCache {
     }
 
     @NonNull
-    public static FileDescriptorBitmapLoader getFileDescriptorBitmapLoader() {
+    public static FileDescriptorBitmapLoader fileDescriptor() {
         FileDescriptorBitmapLoader loader = sFileDescriptorBitmapLoader;
         if (loader == null) {
             LOCK.lock();
@@ -113,7 +113,7 @@ final class LoaderCache {
     }
 
     @NonNull
-    public static ResourceBitmapLoader getResourceBitmapLoader() {
+    public static ResourceBitmapLoader resource() {
         ResourceBitmapLoader loader = sResourceBitmapLoader;
         if (loader == null) {
             LOCK.lock();
@@ -131,7 +131,7 @@ final class LoaderCache {
     }
 
     @NonNull
-    public static ByteArrayBitmapLoader getByteArrayBitmapLoader() {
+    public static ByteArrayBitmapLoader byteArray() {
         ByteArrayBitmapLoader loader = sByteArrayBitmapLoader;
         if (loader == null) {
             LOCK.lock();

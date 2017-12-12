@@ -210,7 +210,7 @@ public final class ImageLoader {
         @NonNull
         public LoadImageRequest<Uri> uri() {
             return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache,
-                    mStorageCache, LoaderCache.getUriBitmapLoader());
+                    mStorageCache, BitmapLoaderHolder.uri());
         }
 
         /**
@@ -219,7 +219,7 @@ public final class ImageLoader {
         @NonNull
         public LoadImageRequest<String> url() {
             return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache,
-                    mStorageCache, LoaderCache.getUrlBitmapLoader());
+                    mStorageCache, BitmapLoaderHolder.url());
         }
 
         /**
@@ -228,7 +228,7 @@ public final class ImageLoader {
         @NonNull
         public LoadImageRequest<File> file() {
             return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache,
-                    mStorageCache, LoaderCache.getFileBitmapLoader());
+                    mStorageCache, BitmapLoaderHolder.file());
         }
 
         /**
@@ -237,7 +237,7 @@ public final class ImageLoader {
         @NonNull
         public LoadImageRequest<FileDescriptor> fileDescriptor() {
             return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache,
-                    mStorageCache, LoaderCache.getFileDescriptorBitmapLoader());
+                    mStorageCache, BitmapLoaderHolder.fileDescriptor());
         }
 
         /**
@@ -246,7 +246,7 @@ public final class ImageLoader {
         @NonNull
         public LoadImageRequest<Integer> resource() {
             return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache,
-                    mStorageCache, LoaderCache.getResourceBitmapLoader());
+                    mStorageCache, BitmapLoaderHolder.resource());
         }
 
         /**
@@ -255,7 +255,7 @@ public final class ImageLoader {
         @NonNull
         public LoadImageRequest<byte[]> byteArray() {
             return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache,
-                    mStorageCache, LoaderCache.getByteArrayBitmapLoader());
+                    mStorageCache, BitmapLoaderHolder.byteArray());
         }
     }
 
