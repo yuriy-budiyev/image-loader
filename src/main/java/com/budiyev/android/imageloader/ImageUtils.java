@@ -38,6 +38,9 @@ import android.graphics.RectF;
 import android.support.annotation.NonNull;
 
 public final class ImageUtils {
+    private static final float[] INVERT_COLORS_MATRIX =
+            new float[] {-1, 0, 0, 0, 255, 0, -1, 0, 0, 255, 0, 0, -1, 0, 255, 0, 0, 0, 1, 0};
+
     private ImageUtils() {
     }
 
@@ -188,8 +191,7 @@ public final class ImageUtils {
      */
     @NonNull
     public static Bitmap invertColors(@NonNull Bitmap image) {
-        return applyColorFilter(image, new ColorMatrixColorFilter(
-                new float[] {-1f, 0f, 0f, 0f, 255f, 0f, -1f, 0f, 0f, 255f, 0f, 0f, -1f, 0f, 255f, 0f, 0f, 0f, 1f, 0f}));
+        return applyColorFilter(image, new ColorMatrixColorFilter(INVERT_COLORS_MATRIX));
     }
 
     /**
