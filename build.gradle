@@ -143,7 +143,6 @@ bintray {
         vcsUrl = gitUrl
         licenses = allLicenses
         publish = true
-        publicDownloadNumbers = false
 
         version {
             desc = libraryDescription
