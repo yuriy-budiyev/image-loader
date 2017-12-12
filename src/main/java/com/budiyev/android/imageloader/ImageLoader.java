@@ -64,8 +64,8 @@ public final class ImageLoader {
         } else {
             mExecutor = new ImageLoaderExecutor(InternalUtils.getPoolSize());
         }
-        if (mStorageCache instanceof StorageImageCache) {
-            ((StorageImageCache) mStorageCache).setExecutor(mExecutor);
+        if (storageCache instanceof StorageImageCache) {
+            ((StorageImageCache) storageCache).setExecutor(mExecutor);
         }
     }
 
