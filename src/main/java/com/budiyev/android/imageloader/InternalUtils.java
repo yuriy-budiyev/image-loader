@@ -110,16 +110,14 @@ final class InternalUtils {
         }
     }
 
-    @Nullable
-    @MainThread
-    public static DisplayImageAction<?> getDisplayImageAction(@Nullable View view) {
-        if (view != null) {
-            Drawable drawable = getDrawable(view);
-            if (drawable instanceof PlaceholderDrawable) {
-                return ((PlaceholderDrawable) drawable).getAction();
-            }
+    public static void close(@Nullable Closeable closeable) {
+        if (closeable == null) {
+            return;
         }
-        return null;
+        try {
+            closeable.close();
+        } catch (IOException ignored) {
+        }
     }
 
     @Nullable
@@ -142,14 +140,16 @@ final class InternalUtils {
         return connection.getInputStream();
     }
 
-    public static void close(@Nullable Closeable closeable) {
-        if (closeable == null) {
-            return;
+    @Nullable
+    @MainThread
+    public static DisplayImageAction<?> getAction(@Nullable View view) {
+        if (view != null) {
+            Drawable drawable = getDrawable(view);
+            if (drawable instanceof PlaceholderDrawable) {
+                return ((PlaceholderDrawable) drawable).getAction();
+            }
         }
-        try {
-            closeable.close();
-        } catch (IOException ignored) {
-        }
+        return null;
     }
 
     public static void setDrawable(@NonNull Drawable drawable, @NonNull View view) {

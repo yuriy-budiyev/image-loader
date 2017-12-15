@@ -96,7 +96,7 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
             Drawable errorDrawable = mErrorDrawable;
             View view = mView.get();
             if (isCancelled() || errorDrawable == null || view == null ||
-                    InternalUtils.getDisplayImageAction(view) != DisplayImageAction.this) {
+                    InternalUtils.getAction(view) != DisplayImageAction.this) {
                 return;
             }
             if (mFadeEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -122,7 +122,7 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
                 return;
             }
             View view = mView.get();
-            if (view == null || InternalUtils.getDisplayImageAction(view) != DisplayImageAction.this) {
+            if (view == null || InternalUtils.getAction(view) != DisplayImageAction.this) {
                 return;
             }
             Bitmap image = mImage;
