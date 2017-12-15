@@ -20,8 +20,6 @@ dependencies {
 }
 ```
 ### Basic usage sample
-Basic implementation automatically cares about memory and storage caching
-
 ```java
 public class MainActivity extends AppCompatActivity {
     @Override
