@@ -25,6 +25,9 @@ package com.budiyev.android.imageloader;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.concurrent.Callable;
@@ -34,6 +37,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -41,6 +45,7 @@ import android.support.annotation.Nullable;
 final class StorageImageCache implements ImageCache {
     public static final String DEFAULT_DIRECTORY = "image_loader_cache";
     public static final long DEFAULT_MAX_SIZE = 52428800L;
+    private static final int BUFFER_SIZE = 16384;
     private final Lock mTrimLock = new ReentrantLock();
     private final Callable<?> mTrimTask = new TrimTask();
     private final FileFilter mFileFilter = new CacheFileFilter();
@@ -95,7 +100,24 @@ final class StorageImageCache implements ImageCache {
         if (!file.exists()) {
             return null;
         }
-        Bitmap bitmap = InternalUtils.decodeBitmap(file);
+        Bitmap bitmap = null;
+        FileInputStream inputStream = null;
+        try {
+            inputStream = new FileInputStream(file);
+            ByteBuffer outputBuffer = new ByteBuffer(BUFFER_SIZE);
+            byte[] buffer = new byte[BUFFER_SIZE];
+            for (int read; ; ) {
+                read = inputStream.read(buffer, 0, buffer.length);
+                if (read == -1) {
+                    break;
+                }
+                outputBuffer.write(buffer, 0, read);
+            }
+            bitmap = BitmapFactory.decodeByteArray(outputBuffer.getArray(), 0, outputBuffer.getSize());
+        } catch (IOException ignored) {
+        } finally {
+            InternalUtils.close(inputStream);
+        }
         if (bitmap != null) {
             file.setLastModified(System.currentTimeMillis());
             return bitmap;
@@ -111,9 +133,27 @@ final class StorageImageCache implements ImageCache {
         if (file.exists()) {
             file.delete();
         }
-        ByteBuffer outputBuffer = InternalUtils.byteBuffer();
+        ByteBuffer outputBuffer = new ByteBuffer(BUFFER_SIZE);
         if (value.compress(mCompressMode.getFormat(), mCompressMode.getQuality(), outputBuffer)) {
-            if (InternalUtils.writeBytes(file, outputBuffer.getArray(), outputBuffer.getSize())) {
+            byte[] array = outputBuffer.getArray();
+            int size = outputBuffer.getSize();
+            FileOutputStream output = null;
+            boolean success;
+            try {
+                output = new FileOutputStream(file);
+                int remaining = size;
+                for (int write; remaining > 0; ) {
+                    write = Math.min(remaining, BUFFER_SIZE);
+                    output.write(array, (size - remaining), write);
+                    remaining -= write;
+                }
+                success = true;
+            } catch (IOException e) {
+                success = false;
+            } finally {
+                InternalUtils.close(output);
+            }
+            if (success) {
                 trim();
             } else {
                 file.delete();

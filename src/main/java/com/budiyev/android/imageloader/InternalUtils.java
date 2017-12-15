@@ -28,7 +28,6 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -38,7 +37,6 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -50,66 +48,14 @@ import android.support.media.ExifInterface;
 import android.view.View;
 import android.widget.ImageView;
 
-import static android.media.ExifInterface.ORIENTATION_NORMAL;
-import static android.media.ExifInterface.ORIENTATION_ROTATE_180;
-import static android.media.ExifInterface.ORIENTATION_ROTATE_270;
-import static android.media.ExifInterface.ORIENTATION_ROTATE_90;
-import static android.media.ExifInterface.TAG_ORIENTATION;
-
 final class InternalUtils {
     private static final int CONNECT_TIMEOUT = 10000;
-    private static final int BUFFER_SIZE = 16384;
     private static final int MAX_POOL_SIZE = 4;
     private static final String URI_SCHEME_HTTP = "http";
     private static final String URI_SCHEME_HTTPS = "https";
     private static final String URI_SCHEME_FTP = "ftp";
 
     private InternalUtils() {
-    }
-
-    @NonNull
-    public static ByteBuffer byteBuffer() {
-        return new ByteBuffer(BUFFER_SIZE);
-    }
-
-    @Nullable
-    public static Bitmap decodeBitmap(@NonNull File file) {
-        FileInputStream inputStream = null;
-        try {
-            inputStream = new FileInputStream(file);
-            ByteBuffer outputBuffer = byteBuffer();
-            byte[] buffer = new byte[BUFFER_SIZE];
-            for (int read; ; ) {
-                read = inputStream.read(buffer, 0, buffer.length);
-                if (read == -1) {
-                    break;
-                }
-                outputBuffer.write(buffer, 0, read);
-            }
-            return BitmapFactory.decodeByteArray(outputBuffer.getArray(), 0, outputBuffer.getSize());
-        } catch (IOException e) {
-            return null;
-        } finally {
-            close(inputStream);
-        }
-    }
-
-    public static boolean writeBytes(@NonNull File file, byte[] bytes, int length) {
-        FileOutputStream output = null;
-        try {
-            output = new FileOutputStream(file);
-            int remaining = length;
-            for (int write; remaining > 0; ) {
-                write = Math.min(remaining, BUFFER_SIZE);
-                output.write(bytes, (length - remaining), write);
-                remaining -= write;
-            }
-            return true;
-        } catch (IOException e) {
-            return false;
-        } finally {
-            close(output);
-        }
     }
 
     public static void close(@Nullable Closeable closeable) {
@@ -243,12 +189,12 @@ final class InternalUtils {
     }
 
     public static int getExifRotation(@NonNull ExifInterface exifInterface) {
-        switch (exifInterface.getAttributeInt(TAG_ORIENTATION, ORIENTATION_NORMAL)) {
-            case ORIENTATION_ROTATE_90:
+        switch (exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)) {
+            case ExifInterface.ORIENTATION_ROTATE_90:
                 return 90;
-            case ORIENTATION_ROTATE_180:
+            case ExifInterface.ORIENTATION_ROTATE_180:
                 return 180;
-            case ORIENTATION_ROTATE_270:
+            case ExifInterface.ORIENTATION_ROTATE_270:
                 return 270;
             default:
                 return 0;

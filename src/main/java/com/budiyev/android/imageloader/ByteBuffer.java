@@ -33,8 +33,8 @@ final class ByteBuffer extends OutputStream {
     private byte[] mArray;
     private int mSize;
 
-    public ByteBuffer(int size) {
-        mArray = new byte[size];
+    public ByteBuffer(int initialCapacity) {
+        mArray = new byte[initialCapacity];
     }
 
     @Override
