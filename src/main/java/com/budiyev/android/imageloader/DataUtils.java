@@ -40,8 +40,6 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
-import android.util.DisplayMetrics;
-import android.util.TypedValue;
 
 @SuppressWarnings("SameParameterValue")
 public final class DataUtils {
@@ -243,30 +241,11 @@ public final class DataUtils {
     public static Bitmap loadSampledBitmapFromResource(@NonNull Resources resources, int resourceId, int requiredWidth,
             int requiredHeight) {
         BitmapFactory.Options options = new BitmapFactory.Options();
-        TypedValue typedValue = new TypedValue();
         options.inJustDecodeBounds = true;
-        options.inTargetDensity = resources.getDisplayMetrics().densityDpi;
-        if (typedValue.density == TypedValue.DENSITY_DEFAULT) {
-            options.inDensity = DisplayMetrics.DENSITY_DEFAULT;
-        } else if (typedValue.density != TypedValue.DENSITY_NONE) {
-            options.inDensity = typedValue.density;
-        }
-        InputStream inputStream = null;
-        try {
-            inputStream = resources.openRawResource(resourceId, typedValue);
-            BitmapFactory.decodeStream(inputStream, null, options);
-        } finally {
-            InternalUtils.close(inputStream);
-        }
+        BitmapFactory.decodeResource(resources, resourceId, options);
         calculateSampleSize(options, requiredWidth, requiredHeight);
         options.inJustDecodeBounds = false;
-        inputStream = null;
-        try {
-            inputStream = resources.openRawResource(resourceId, typedValue);
-            return BitmapFactory.decodeStream(inputStream, null, options);
-        } finally {
-            InternalUtils.close(inputStream);
-        }
+        return BitmapFactory.decodeResource(resources, resourceId, options);
     }
 
     /**

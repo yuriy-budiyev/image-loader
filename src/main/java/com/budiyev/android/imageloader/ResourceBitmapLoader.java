@@ -23,16 +23,12 @@
  */
 package com.budiyev.android.imageloader;
 
-import java.io.InputStream;
-
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.DisplayMetrics;
-import android.util.TypedValue;
 
 final class ResourceBitmapLoader implements BitmapLoader<Integer> {
     @Nullable
@@ -42,21 +38,7 @@ final class ResourceBitmapLoader implements BitmapLoader<Integer> {
         if (size != null) {
             return DataUtils.loadSampledBitmapFromResource(resources, data, size.getWidth(), size.getHeight());
         } else {
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            TypedValue typedValue = new TypedValue();
-            options.inTargetDensity = resources.getDisplayMetrics().densityDpi;
-            if (typedValue.density == TypedValue.DENSITY_DEFAULT) {
-                options.inDensity = DisplayMetrics.DENSITY_DEFAULT;
-            } else if (typedValue.density != TypedValue.DENSITY_NONE) {
-                options.inDensity = typedValue.density;
-            }
-            InputStream inputStream = null;
-            try {
-                inputStream = resources.openRawResource(data, typedValue);
-                return BitmapFactory.decodeStream(inputStream, null, options);
-            } finally {
-                InternalUtils.close(inputStream);
-            }
+            return BitmapFactory.decodeResource(resources, data);
         }
     }
 }

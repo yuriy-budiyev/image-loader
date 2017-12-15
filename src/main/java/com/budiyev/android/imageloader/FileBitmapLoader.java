@@ -50,7 +50,7 @@ final class FileBitmapLoader implements BitmapLoader<File> {
             }
         }
         if (bitmap != null) {
-            int rotation = InternalUtils.getExifRotation(data.getAbsolutePath());
+            int rotation = InternalUtils.getExifRotation(data);
             if (rotation != 0) {
                 Bitmap rotated = ImageUtils.rotate(bitmap, rotation);
                 if (rotated != bitmap) {

@@ -37,16 +37,28 @@ final class FileDescriptorBitmapLoader implements BitmapLoader<FileDescriptor> {
     @Nullable
     @Override
     public Bitmap load(@NonNull Context context, @NonNull FileDescriptor data, @Nullable Size size) throws Throwable {
+        Bitmap bitmap;
         if (size != null) {
-            return DataUtils.loadSampledBitmapFromFileDescriptor(data, size.getWidth(), size.getHeight());
+            bitmap = DataUtils.loadSampledBitmapFromFileDescriptor(data, size.getWidth(), size.getHeight());
         } else {
             InputStream inputStream = null;
             try {
                 inputStream = new FileInputStream(data);
-                return BitmapFactory.decodeStream(inputStream);
+                bitmap = BitmapFactory.decodeStream(inputStream);
             } finally {
                 InternalUtils.close(inputStream);
             }
         }
+        if (bitmap != null) {
+            int rotation = InternalUtils.getExifRotation(data);
+            if (rotation != 0) {
+                Bitmap rotated = ImageUtils.rotate(bitmap, rotation);
+                if (rotated != bitmap) {
+                    bitmap.recycle();
+                }
+                bitmap = rotated;
+            }
+        }
+        return bitmap;
     }
 }

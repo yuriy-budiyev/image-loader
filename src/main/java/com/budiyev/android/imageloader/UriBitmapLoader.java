@@ -31,7 +31,6 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.media.ExifInterface;
 
 final class UriBitmapLoader implements BitmapLoader<Uri> {
     @Nullable
@@ -53,16 +52,7 @@ final class UriBitmapLoader implements BitmapLoader<Uri> {
             }
         }
         if (bitmap != null && InternalUtils.isUriLocal(data)) {
-            int rotation = 0;
-            InputStream inputStream = null;
-            try {
-                inputStream = context.getContentResolver().openInputStream(data);
-                if (inputStream != null) {
-                    rotation = InternalUtils.getExifRotation(new ExifInterface(inputStream));
-                }
-            } finally {
-                InternalUtils.close(inputStream);
-            }
+            int rotation = InternalUtils.getExifRotation(context, data);
             if (rotation != 0) {
                 Bitmap rotated = ImageUtils.rotate(bitmap, rotation);
                 if (rotated != bitmap) {

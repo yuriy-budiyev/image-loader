@@ -25,6 +25,7 @@ package com.budiyev.android.imageloader;
 
 import java.io.Closeable;
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -196,9 +197,37 @@ final class InternalUtils {
                 ContentResolver.SCHEME_ANDROID_RESOURCE.equals(scheme);
     }
 
-    public static int getExifRotation(@NonNull String fileName) {
+    public static int getExifRotation(@NonNull Context context, @NonNull Uri uri) {
+        InputStream inputStream = null;
         try {
-            return getExifRotation(new ExifInterface(fileName));
+            inputStream = context.getContentResolver().openInputStream(uri);
+            if (inputStream != null) {
+                return getExifRotation(new ExifInterface(inputStream));
+            } else {
+                return 0;
+            }
+        } catch (IOException e) {
+            return 0;
+        } finally {
+            close(inputStream);
+        }
+    }
+
+    public static int getExifRotation(@NonNull FileDescriptor fileDescriptor) {
+        InputStream inputStream = null;
+        try {
+            inputStream = new FileInputStream(fileDescriptor);
+            return getExifRotation(new ExifInterface(inputStream));
+        } catch (IOException e) {
+            return 0;
+        } finally {
+            close(inputStream);
+        }
+    }
+
+    public static int getExifRotation(@NonNull File file) {
+        try {
+            return getExifRotation(new ExifInterface(file.getAbsolutePath()));
         } catch (IOException e) {
             return 0;
         }
