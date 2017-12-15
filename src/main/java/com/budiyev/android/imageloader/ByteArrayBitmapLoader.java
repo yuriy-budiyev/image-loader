@@ -42,11 +42,7 @@ final class ByteArrayBitmapLoader implements BitmapLoader<byte[]> {
         if (bitmap != null) {
             int rotation = InternalUtils.getExifRotation(data);
             if (rotation != 0) {
-                Bitmap rotated = ImageUtils.rotate(bitmap, rotation);
-                if (bitmap != rotated) {
-                    bitmap.recycle();
-                }
-                bitmap = rotated;
+                bitmap = InternalUtils.rotateAndRecycle(bitmap, rotation);
             }
         }
         return bitmap;

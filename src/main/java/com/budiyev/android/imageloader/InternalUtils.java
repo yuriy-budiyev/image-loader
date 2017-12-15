@@ -200,4 +200,13 @@ final class InternalUtils {
                 return 0;
         }
     }
+
+    @NonNull
+    public static Bitmap rotateAndRecycle(@NonNull Bitmap bitmap, int rotation) {
+        Bitmap rotated = ImageUtils.rotate(bitmap, rotation);
+        if (bitmap != rotated) {
+            bitmap.recycle();
+        }
+        return rotated;
+    }
 }
