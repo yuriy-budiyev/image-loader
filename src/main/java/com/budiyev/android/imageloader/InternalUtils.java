@@ -23,6 +23,7 @@
  */
 package com.budiyev.android.imageloader;
 
+import java.io.ByteArrayInputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileDescriptor;
@@ -228,6 +229,14 @@ final class InternalUtils {
     public static int getExifRotation(@NonNull File file) {
         try {
             return getExifRotation(new ExifInterface(file.getAbsolutePath()));
+        } catch (IOException e) {
+            return 0;
+        }
+    }
+
+    public static int getExifRotation(@NonNull byte[] bytes) {
+        try {
+            return getExifRotation(new ExifInterface(new ByteArrayInputStream(bytes)));
         } catch (IOException e) {
             return 0;
         }

@@ -53,7 +53,7 @@ final class FileDescriptorBitmapLoader implements BitmapLoader<FileDescriptor> {
             int rotation = InternalUtils.getExifRotation(data);
             if (rotation != 0) {
                 Bitmap rotated = ImageUtils.rotate(bitmap, rotation);
-                if (rotated != bitmap) {
+                if (bitmap != rotated) {
                     bitmap.recycle();
                 }
                 bitmap = rotated;

@@ -33,10 +33,22 @@ final class ByteArrayBitmapLoader implements BitmapLoader<byte[]> {
     @Nullable
     @Override
     public Bitmap load(@NonNull Context context, @NonNull byte[] data, @Nullable Size size) throws Throwable {
+        Bitmap bitmap;
         if (size != null) {
-            return DataUtils.loadSampledBitmapFromByteArray(data, size.getWidth(), size.getHeight());
+            bitmap = DataUtils.loadSampledBitmapFromByteArray(data, size.getWidth(), size.getHeight());
         } else {
-            return BitmapFactory.decodeByteArray(data, 0, data.length);
+            bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
         }
+        if (bitmap != null) {
+            int rotation = InternalUtils.getExifRotation(data);
+            if (rotation != 0) {
+                Bitmap rotated = ImageUtils.rotate(bitmap, rotation);
+                if (bitmap != rotated) {
+                    bitmap.recycle();
+                }
+                bitmap = rotated;
+            }
+        }
+        return bitmap;
     }
 }

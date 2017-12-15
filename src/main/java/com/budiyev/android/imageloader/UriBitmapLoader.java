@@ -55,7 +55,7 @@ final class UriBitmapLoader implements BitmapLoader<Uri> {
             int rotation = InternalUtils.getExifRotation(context, data);
             if (rotation != 0) {
                 Bitmap rotated = ImageUtils.rotate(bitmap, rotation);
-                if (rotated != bitmap) {
+                if (bitmap != rotated) {
                     bitmap.recycle();
                 }
                 bitmap = rotated;
