@@ -338,7 +338,7 @@ public final class LoadImageRequest<T> {
             }
             return;
         }
-        DisplayImageAction<?> currentAction = InternalUtils.getAction(view);
+        DisplayImageAction<?> currentAction = InternalUtils.getDisplayImageAction(view);
         if (currentAction != null) {
             if (currentAction.hasSameDescriptor(key)) {
                 return;
