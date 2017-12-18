@@ -28,7 +28,6 @@ import java.io.FileDescriptor;
 import java.util.concurrent.ExecutorService;
 
 import android.app.Application;
-import android.content.ComponentCallbacks;
 import android.content.ComponentCallbacks2;
 import android.content.Context;
 import android.net.Uri;
@@ -50,8 +49,10 @@ public final class ImageLoader {
     private final ExecutorService mExecutor;
 
     /**
-     * @see #with(Context)
-     * @see Builder
+     * Image Loader
+     *
+     * @see #with
+     * @see #builder
      */
     private ImageLoader(@NonNull Context context, @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache,
             @Nullable ExecutorService executor) {
@@ -95,8 +96,7 @@ public final class ImageLoader {
      * Delete cached image for specified {@link DataDescriptor}
      *
      * @see DataDescriptor
-     * @see DataUtils#descriptor(Object)
-     * @see DataUtils#descriptor(Object, Size)
+     * @see DataUtils#descriptor
      */
     public void invalidate(@NonNull DataDescriptor<?> descriptor) {
         String key = descriptor.getKey();
@@ -135,13 +135,11 @@ public final class ImageLoader {
     /**
      * Clear memory cache;
      * for better memory management when one singleton loader instance used across the app,
-     * this method should be called in {@link Application#onTrimMemory(int)}
-     * or {@link ComponentCallbacks2#onTrimMemory(int)},
-     * default instance ({@link #with(Context)}) automatically
-     * cares about it
+     * this method should be called in {@link Application#onTrimMemory)} or {@link ComponentCallbacks2#onTrimMemory},
+     * default instance ({@link #with}) automatically cares about it
      *
      * @see ComponentCallbacks2
-     * @see Context#registerComponentCallbacks(ComponentCallbacks)
+     * @see Context#registerComponentCallbacks
      */
     public void clearMemoryCache() {
         ImageCache memoryCache = mMemoryCache;
@@ -301,7 +299,7 @@ public final class ImageLoader {
 
         /**
          * Default storage cache,
-         * located in subdirectory of {@link Context#getExternalCacheDir()}
+         * located in subdirectory of {@link Context#getExternalCacheDir}
          */
         @NonNull
         public Builder storageCache() {
@@ -311,7 +309,7 @@ public final class ImageLoader {
 
         /**
          * Default storage cache with specified maximum size,
-         * located in subdirectory of {@link Context#getExternalCacheDir()}
+         * located in subdirectory of {@link Context#getExternalCacheDir}
          */
         @NonNull
         public Builder storageCache(long maxSize) {
@@ -321,7 +319,7 @@ public final class ImageLoader {
 
         /**
          * Default storage cache with specified maximum size and compress mode,
-         * located in subdirectory of {@link Context#getExternalCacheDir()}
+         * located in subdirectory of {@link Context#getExternalCacheDir}
          *
          * @see CompressMode
          */

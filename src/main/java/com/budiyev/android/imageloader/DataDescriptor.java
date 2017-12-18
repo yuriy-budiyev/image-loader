@@ -47,7 +47,7 @@ public interface DataDescriptor<T> {
      * {@link DataDescriptor}s considered to be equal if their keys are equal
      *
      * @return Unique identifier
-     * @see DataUtils#generateSHA256(String)
+     * @see DataUtils#generateSHA256
      */
     @NonNull
     @AnyThread

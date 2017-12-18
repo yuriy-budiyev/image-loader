@@ -86,6 +86,8 @@ public final class LoadImageRequest<T> {
      * Source data,
      * default {@link DataDescriptor} will be used, {@code data}'s toString() method will be used
      * for key generation, any characters allowed
+     *
+     * @see #descriptor
      */
     @NonNull
     public LoadImageRequest<T> from(@NonNull T data) {
@@ -95,9 +97,9 @@ public final class LoadImageRequest<T> {
     }
 
     /**
-     * Required image size, affects only when source data set through {@code from(T data)} method
+     * Required image size, affects only when source data set through {@link #from} method
      *
-     * @see DataDescriptor
+     * @see #descriptor
      */
     @NonNull
     public LoadImageRequest<T> size(@Px int requiredWidth, @Px int requiredHeight) {
@@ -107,12 +109,16 @@ public final class LoadImageRequest<T> {
     }
 
     /**
-     * Source data descriptor
+     * Source data descriptor,
+     * note that this method and {@link #from} can't be used together and override each other,
+     * also, required image size, specified through {@link #size} doesn't make sense when this method is used,
+     * required size should be returned from {@link DataDescriptor#getRequiredSize}
      *
      * @see DataDescriptor
+     * @see #from
      */
     @NonNull
-    public LoadImageRequest<T> from(@Nullable DataDescriptor<T> descriptor) {
+    public LoadImageRequest<T> descriptor(@Nullable DataDescriptor<T> descriptor) {
         mData = null;
         mRequiredSize = null;
         mDescriptor = descriptor;

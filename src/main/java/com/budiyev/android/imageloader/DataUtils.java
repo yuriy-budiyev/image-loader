@@ -49,7 +49,7 @@ public final class DataUtils {
     }
 
     /**
-     * Default {@link DataDescriptor}, {@code data}'s toString() method will be used
+     * Default {@link DataDescriptor}, {@code data}'s toString method will be used
      * for key generation, any characters are allowed
      */
     @NonNull
@@ -58,7 +58,7 @@ public final class DataUtils {
     }
 
     /**
-     * Default {@link DataDescriptor}, {@code data}'s toString() method will be used
+     * Default {@link DataDescriptor}, {@code data}'s toString method will be used
      * for key generation, any characters are allowed
      */
     @NonNull
@@ -72,7 +72,7 @@ public final class DataUtils {
      *
      * @param string Source string
      * @return SHA-256 hash string
-     * @see DataDescriptor#getKey()
+     * @see DataDescriptor#getKey
      */
     @NonNull
     public static String generateSHA256(@NonNull String string) {
