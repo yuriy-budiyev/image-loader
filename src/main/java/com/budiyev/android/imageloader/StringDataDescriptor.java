@@ -26,52 +26,8 @@ package com.budiyev.android.imageloader;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-final class StringDataDescriptor<T> implements DataDescriptor<T> {
-    private final String mKey;
-    private final Size mSize;
-    private final T mData;
-
-    public StringDataDescriptor(@NonNull T data, @Nullable Size size) {
-        mData = data;
-        String hash = DataUtils.generateSHA256(data.toString());
-        if (size != null) {
-            mKey = hash + "_sampled_" + size;
-        } else {
-            mKey = hash;
-        }
-        mSize = size;
-    }
-
-    @NonNull
-    @Override
-    public T getData() {
-        return mData;
-    }
-
-    @NonNull
-    @Override
-    public String getKey() {
-        return mKey;
-    }
-
-    @Nullable
-    @Override
-    public Size getRequiredSize() {
-        return mSize;
-    }
-
-    @Override
-    public int hashCode() {
-        return mKey.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return obj == this || obj instanceof StringDataDescriptor && mKey.equals(((StringDataDescriptor) obj).mKey);
-    }
-
-    @Override
-    public String toString() {
-        return "DataDescriptor {key: " + mKey + "}";
+final class StringDataDescriptor extends BaseDataDescriptor<String> {
+    public StringDataDescriptor(@NonNull String data, @Nullable Size size) {
+        super(data, data, size);
     }
 }

@@ -23,44 +23,35 @@
  */
 package com.budiyev.android.imageloader;
 
-import android.support.annotation.AnyThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-/**
- * Data descriptor, provides data and key that identifies this data
- */
-public interface DataDescriptor<T> {
-    /**
-     * Data, that will be transferred to {@link BitmapLoader},
-     * {@link LoadCallback} and {@link ErrorCallback}
-     *
-     * @return Data
-     */
+abstract class BaseDataDescriptor<T> implements DataDescriptor<T> {
+    private final T mData;
+    private final String mKey;
+    private final Size mSize;
+
+    public BaseDataDescriptor(@NonNull T data, @NonNull String keyBase, @Nullable Size size) {
+        mData = data;
+        mKey = DataUtils.generateSHA256(keyBase);
+        mSize = size;
+    }
+
     @NonNull
-    @AnyThread
-    T getData();
+    @Override
+    public final T getData() {
+        return mData;
+    }
 
-    /**
-     * Must be unique for each image. If you want to use storage caching, ensure that
-     * returned value doesn't contain characters that can't be used in file name,
-     * {@link DataDescriptor}s considered to be equal if their keys are equal and not {@code null},
-     * caching is not available if this method returns {@code null}
-     *
-     * @return Unique identifier
-     * @see DataUtils#generateSHA256
-     */
     @Nullable
-    @AnyThread
-    String getKey();
+    @Override
+    public final String getKey() {
+        return mKey;
+    }
 
-    /**
-     * Optional required image size, if not specified full sized image should be loaded,
-     * note that key should be unique for each size
-     *
-     * @return Required image size
-     */
     @Nullable
-    @AnyThread
-    Size getRequiredSize();
+    @Override
+    public final Size getRequiredSize() {
+        return mSize;
+    }
 }
