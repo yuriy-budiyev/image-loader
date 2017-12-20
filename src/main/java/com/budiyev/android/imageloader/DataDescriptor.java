@@ -44,12 +44,13 @@ public interface DataDescriptor<T> {
     /**
      * Must be unique for each image. If you want to use storage caching, ensure that
      * returned value doesn't contain characters that can't be used in file name,
-     * {@link DataDescriptor}s considered to be equal if their keys are equal
+     * {@link DataDescriptor}s considered to be equal if their keys are equal and not {@code null},
+     * caching is not available if this method returns {@code null}
      *
      * @return Unique identifier
      * @see DataUtils#generateSHA256
      */
-    @NonNull
+    @Nullable
     @AnyThread
     String getKey();
 
