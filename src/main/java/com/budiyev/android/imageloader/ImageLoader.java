@@ -216,7 +216,7 @@ public final class ImageLoader {
         @NonNull
         public LoadImageRequest<String> url() {
             return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache,
-                    mStorageCache, new UrlBitmapLoader(), new StringDescriptorFactory());
+                    mStorageCache, new UrlBitmapLoader(), new UrlDescriptorFactory());
         }
 
         /**
@@ -234,7 +234,7 @@ public final class ImageLoader {
         @NonNull
         public LoadImageRequest<FileDescriptor> fileDescriptor() {
             return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache,
-                    mStorageCache, new FileDescriptorBitmapLoader(), new UnidentifiableDataDescriptor<>());
+                    mStorageCache, new FileDescriptorBitmapLoader(), new FileDescriptorDescriptorFactory());
         }
 
         /**
