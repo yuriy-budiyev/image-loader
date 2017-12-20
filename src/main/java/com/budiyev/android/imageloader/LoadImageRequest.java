@@ -365,6 +365,13 @@ public final class LoadImageRequest<T> {
         action.execute(mExecutor);
     }
 
+    /**
+     * Remove cached version of requested image
+     *
+     * @see #from
+     * @see #size
+     * @see #descriptor
+     */
     public void invalidate() {
         DataDescriptor<T> descriptor = getDescriptor();
         if (descriptor == null) {
