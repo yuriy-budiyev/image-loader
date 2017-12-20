@@ -193,7 +193,7 @@ public final class ImageRequest<T> {
     public ImageRequest<T> transform(@NonNull BitmapTransformation transformation) {
         List<BitmapTransformation> t = mTransformations;
         if (t == null) {
-            t = new ArrayList<>();
+            t = new ArrayList<BitmapTransformation>();
             mTransformations = t;
         }
         t.add(transformation);
@@ -210,7 +210,7 @@ public final class ImageRequest<T> {
     public ImageRequest<T> transform(@NonNull Collection<BitmapTransformation> transformations) {
         List<BitmapTransformation> t = mTransformations;
         if (t == null) {
-            t = new ArrayList<>();
+            t = new ArrayList<BitmapTransformation>();
             mTransformations = t;
         }
         t.addAll(transformations);
@@ -289,7 +289,7 @@ public final class ImageRequest<T> {
         if (descriptor == null) {
             return null;
         }
-        return new SyncLoadImageAction<>(mContext, descriptor, mBitmapLoader, getTransformation(), mMemoryCache,
+        return new SyncLoadImageAction<T>(mContext, descriptor, mBitmapLoader, getTransformation(), mMemoryCache,
                 mStorageCache, mLoadCallback, mErrorCallback, mPauseLock).execute();
     }
 
@@ -302,7 +302,7 @@ public final class ImageRequest<T> {
         if (descriptor == null) {
             return;
         }
-        new LoadImageAction<>(mContext, descriptor, mBitmapLoader, getTransformation(), mMemoryCache, mStorageCache,
+        new LoadImageAction<T>(mContext, descriptor, mBitmapLoader, getTransformation(), mMemoryCache, mStorageCache,
                 mLoadCallback, mErrorCallback, mPauseLock).execute(mExecutor);
     }
 
@@ -358,7 +358,7 @@ public final class ImageRequest<T> {
             placeholder = new ColorDrawable(Color.TRANSPARENT);
         }
         DisplayImageAction<T> action =
-                new DisplayImageAction<>(context, descriptor, mBitmapLoader, transformation, placeholder,
+                new DisplayImageAction<T>(context, descriptor, mBitmapLoader, transformation, placeholder,
                         mErrorDrawable, view, memoryCache, mStorageCache, loadCallback, mErrorCallback, displayCallback,
                         mPauseLock, mMainThreadHandler, mFadeEnabled, mFadeDuration, cornerRadius);
         InternalUtils.setDrawable(new PlaceholderDrawable(placeholder, action), view);

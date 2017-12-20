@@ -35,10 +35,10 @@ final class DataDescriptors {
     private final DataDescriptorFactory<String> mUrlDataDescriptorFactory = new UrlDataDescriptorFactory();
     private final DataDescriptorFactory<File> mFileDataDescriptorFactory = new FileDataDescriptorFactory();
     private final DataDescriptorFactory<FileDescriptor> mFileDescriptorDataDescriptorFactory =
-            new UnidentifiableDataDescriptorFactory<>();
+            new UnidentifiableDataDescriptorFactory<FileDescriptor>();
     private final DataDescriptorFactory<Integer> mResourceDataDescriptorFactory = new ResourceDataDescriptorFactory();
     private final DataDescriptorFactory<byte[]> mByteArrayDataDescriptorFactory =
-            new UnidentifiableDataDescriptorFactory<>();
+            new UnidentifiableDataDescriptorFactory<byte[]>();
 
     @NonNull
     @SuppressWarnings("unchecked")

@@ -80,7 +80,7 @@ public final class ImageLoader {
      */
     @NonNull
     public <T> ImageRequest<T> request(@NonNull BitmapLoader<T> loader) {
-        return new ImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache, mStorageCache,
+        return new ImageRequest<T>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache, mStorageCache,
                 loader, mDataDescriptors.<T>common());
     }
 
@@ -217,8 +217,8 @@ public final class ImageLoader {
          */
         @NonNull
         public ImageRequest<Uri> uri() {
-            return new ImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache, mStorageCache,
-                    mBitmapLoaders.uri(), mDataDescriptors.uri());
+            return new ImageRequest<Uri>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache,
+                    mStorageCache, mBitmapLoaders.uri(), mDataDescriptors.uri());
         }
 
         /**
@@ -226,8 +226,8 @@ public final class ImageLoader {
          */
         @NonNull
         public ImageRequest<String> url() {
-            return new ImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache, mStorageCache,
-                    mBitmapLoaders.url(), mDataDescriptors.url());
+            return new ImageRequest<String>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache,
+                    mStorageCache, mBitmapLoaders.url(), mDataDescriptors.url());
         }
 
         /**
@@ -235,8 +235,8 @@ public final class ImageLoader {
          */
         @NonNull
         public ImageRequest<File> file() {
-            return new ImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache, mStorageCache,
-                    mBitmapLoaders.file(), mDataDescriptors.file());
+            return new ImageRequest<File>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache,
+                    mStorageCache, mBitmapLoaders.file(), mDataDescriptors.file());
         }
 
         /**
@@ -244,8 +244,8 @@ public final class ImageLoader {
          */
         @NonNull
         public ImageRequest<FileDescriptor> fileDescriptor() {
-            return new ImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache, mStorageCache,
-                    mBitmapLoaders.fileDescriptor(), mDataDescriptors.fileDescriptor());
+            return new ImageRequest<FileDescriptor>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache,
+                    mStorageCache, mBitmapLoaders.fileDescriptor(), mDataDescriptors.fileDescriptor());
         }
 
         /**
@@ -253,8 +253,8 @@ public final class ImageLoader {
          */
         @NonNull
         public ImageRequest<Integer> resource() {
-            return new ImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache, mStorageCache,
-                    mBitmapLoaders.resource(), mDataDescriptors.resource());
+            return new ImageRequest<Integer>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache,
+                    mStorageCache, mBitmapLoaders.resource(), mDataDescriptors.resource());
         }
 
         /**
@@ -262,8 +262,8 @@ public final class ImageLoader {
          */
         @NonNull
         public ImageRequest<byte[]> byteArray() {
-            return new ImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache, mStorageCache,
-                    mBitmapLoaders.byteArray(), mDataDescriptors.byteArray());
+            return new ImageRequest<byte[]>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache,
+                    mStorageCache, mBitmapLoaders.byteArray(), mDataDescriptors.byteArray());
         }
     }
 
