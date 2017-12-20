@@ -26,10 +26,10 @@ package com.budiyev.android.imageloader;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-final class CommonDataDescriptorFactory<T> implements DataDescriptorFactory<T> {
+final class CommonDataDescriptorFactory implements DataDescriptorFactory<Object> {
     @NonNull
     @Override
-    public DataDescriptor<T> newDescriptor(@NonNull T data, @Nullable Size requiredSize) {
-        return new CommonDataDescriptor<>(data, requiredSize);
+    public DataDescriptor<Object> newDescriptor(@NonNull Object data, @Nullable Size requiredSize) {
+        return new CommonDataDescriptor(data, requiredSize);
     }
 }

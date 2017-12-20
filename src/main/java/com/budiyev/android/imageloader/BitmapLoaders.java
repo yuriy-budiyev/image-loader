@@ -23,21 +23,47 @@
  */
 package com.budiyev.android.imageloader;
 
+import java.io.File;
+import java.io.FileDescriptor;
+
+import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
-final class CommonDataDescriptor extends IdentifiableDataDescriptor<Object> {
-    public CommonDataDescriptor(@NonNull Object data, @Nullable Size requiredSize) {
-        super(data, data.toString(), requiredSize);
+final class BitmapLoaders {
+    private final BitmapLoader<Uri> mUriBitmapLoader = new UriBitmapLoader();
+    private final BitmapLoader<String> mUrlBitmapLoader = new UrlBitmapLoader();
+    private final BitmapLoader<File> mFileBitmapLoader = new FileBitmapLoader();
+    private final BitmapLoader<FileDescriptor> mFileDescriptorBitmapLoader = new FileDescriptorBitmapLoader();
+    private final BitmapLoader<Integer> mResourceBitmapLoader = new ResourceBitmapLoader();
+    private final BitmapLoader<byte[]> mByteArrayBitmapLoader = new ByteArrayBitmapLoader();
+
+    @NonNull
+    public BitmapLoader<Uri> uri() {
+        return mUriBitmapLoader;
     }
 
-    @Override
-    public boolean isStorageCachingEnabled() {
-        return true;
+    @NonNull
+    public BitmapLoader<String> url() {
+        return mUrlBitmapLoader;
     }
 
-    @Override
-    public boolean isMemoryCachingEnabled() {
-        return true;
+    @NonNull
+    public BitmapLoader<File> file() {
+        return mFileBitmapLoader;
+    }
+
+    @NonNull
+    public BitmapLoader<FileDescriptor> fileDescriptor() {
+        return mFileDescriptorBitmapLoader;
+    }
+
+    @NonNull
+    public BitmapLoader<Integer> resource() {
+        return mResourceBitmapLoader;
+    }
+
+    @NonNull
+    public BitmapLoader<byte[]> byteArray() {
+        return mByteArrayBitmapLoader;
     }
 }
