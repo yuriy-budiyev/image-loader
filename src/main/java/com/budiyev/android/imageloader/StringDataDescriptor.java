@@ -23,13 +23,11 @@
  */
 package com.budiyev.android.imageloader;
 
-import java.io.FileDescriptor;
-
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-final class FileDescriptorDataDescriptor extends UnidentifiableDataDescriptor<FileDescriptor> {
-    public FileDescriptorDataDescriptor(@NonNull FileDescriptor data, @Nullable Size size) {
-        super(data, size);
+final class StringDataDescriptor extends BaseDataDescriptor<String> {
+    public StringDataDescriptor(@NonNull String data, @Nullable Size size) {
+        super(data, data, size);
     }
 }
