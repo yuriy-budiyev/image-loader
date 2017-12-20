@@ -66,8 +66,9 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
         mCornerRadius = cornerRadius;
     }
 
-    public boolean hasSameDescriptor(@NonNull String descriptorKey) {
-        return getDescriptor().getKey().equals(descriptorKey);
+    public boolean hasSameDescriptor(@Nullable String descriptorKey) {
+        String key = getDescriptor().getKey();
+        return key != null && descriptorKey != null && key.equals(descriptorKey);
     }
 
     @Override

@@ -319,7 +319,7 @@ public final class LoadImageRequest<T> {
         String key = descriptor.getKey();
         ImageCache memoryCache = mMemoryCache;
         BitmapTransformation transformation = getTransformation();
-        if (memoryCache != null) {
+        if (key != null && memoryCache != null) {
             if (transformation != null) {
                 image = memoryCache.get(key + transformation.getKey());
             } else {

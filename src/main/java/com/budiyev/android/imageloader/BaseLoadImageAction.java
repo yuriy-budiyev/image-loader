@@ -155,7 +155,7 @@ abstract class BaseLoadImageAction<T> {
         Bitmap image = null;
         // Memory cache
         ImageCache memoryCache = mMemoryCache;
-        if (memoryCache != null) {
+        if (key != null && memoryCache != null) {
             BitmapTransformation transformation = mTransformation;
             if (transformation != null) {
                 image = memoryCache.get(key + transformation.getKey());
@@ -175,7 +175,7 @@ abstract class BaseLoadImageAction<T> {
         }
         // Storage cache
         ImageCache storageCache = mStorageCache;
-        if (storageCache != null) {
+        if (key != null && storageCache != null) {
             image = storageCache.get(key);
             if (image != null) {
                 processImage(context, descriptor, image, false);
@@ -200,7 +200,7 @@ abstract class BaseLoadImageAction<T> {
         if (mCancelled) {
             return;
         }
-        if (storageCache != null) {
+        if (key != null && storageCache != null) {
             storageCache.put(key, image);
         }
     }
@@ -215,7 +215,9 @@ abstract class BaseLoadImageAction<T> {
         String key = descriptor.getKey();
         BitmapTransformation transformation = mTransformation;
         if (!transformed && transformation != null) {
-            key += transformation.getKey();
+            if (key != null) {
+                key += transformation.getKey();
+            }
             try {
                 image = transformation.transform(context, image);
             } catch (Throwable error) {
@@ -229,7 +231,7 @@ abstract class BaseLoadImageAction<T> {
         if (!transformed) {
             // transformed == true also means that image was taken from memory cache
             ImageCache memoryCache = mMemoryCache;
-            if (memoryCache != null) {
+            if (key != null && memoryCache != null) {
                 memoryCache.put(key, image);
             }
         }
