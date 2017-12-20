@@ -26,14 +26,8 @@ package com.budiyev.android.imageloader;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-final class UnidentifiableDataDescriptor<T> extends BaseDataDescriptor<T> {
-    public UnidentifiableDataDescriptor(@NonNull T data, @Nullable Size requiredSize) {
-        super(data, requiredSize);
-    }
-
-    @Nullable
-    @Override
-    public String getKey() {
-        return null;
+final class CommonDataDescriptor<T> extends IdentifiableDataDescriptor<T> {
+    public CommonDataDescriptor(@NonNull T data, @Nullable Size requiredSize) {
+        super(data, data.toString(), requiredSize);
     }
 }

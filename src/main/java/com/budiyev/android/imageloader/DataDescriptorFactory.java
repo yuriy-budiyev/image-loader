@@ -28,5 +28,5 @@ import android.support.annotation.Nullable;
 
 interface DataDescriptorFactory<T> {
     @NonNull
-    DataDescriptor<T> newDescriptor(@NonNull T data, @Nullable Size size);
+    DataDescriptor<T> newDescriptor(@NonNull T data, @Nullable Size requiredSize);
 }
