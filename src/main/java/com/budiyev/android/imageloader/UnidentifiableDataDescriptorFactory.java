@@ -30,6 +30,6 @@ final class UnidentifiableDataDescriptorFactory<T> implements DataDescriptorFact
     @NonNull
     @Override
     public DataDescriptor<T> newDescriptor(@NonNull T data, @Nullable Size requiredSize) {
-        return new UnidentifiableDataDescriptor<T>(data, requiredSize);
+        return new UnidentifiableDataDescriptor<>(data, requiredSize);
     }
 }

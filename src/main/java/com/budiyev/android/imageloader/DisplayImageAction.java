@@ -57,7 +57,7 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
         super(context, descriptor, bitmapLoader, transformation, memoryCache, storageCache, loadCallback, errorCallback,
                 pauseLock);
         mDisplayCallback = displayCallback;
-        mView = new WeakReference<View>(view);
+        mView = new WeakReference<>(view);
         mPlaceholder = placeholder;
         mErrorDrawable = errorDrawable;
         mMainThreadHandler = mainThreadHandler;
@@ -137,7 +137,7 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
                 InternalUtils.setDrawable(new FadeDrawable(mPlaceholder,
                         roundCorners ? new RoundedDrawable(resources, image, cornerRadius) :
                                 new BitmapDrawable(resources, image), mFadeDuration, mMainThreadHandler,
-                        displayCallback != null ? new FadeCallback<T>(context, displayCallback, data, image, view) :
+                        displayCallback != null ? new FadeCallback<>(context, displayCallback, data, image, view) :
                                 null), view);
             } else {
                 if (roundCorners) {
