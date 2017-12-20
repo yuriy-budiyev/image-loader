@@ -54,6 +54,7 @@ public final class DataUtils {
      */
     @NonNull
     public static <T> DataDescriptor<T> descriptor(@NonNull T data, @Nullable Size size) {
+        return null;
         //return new StringDataDescriptor<>(data, size);
     }
 
@@ -63,6 +64,7 @@ public final class DataUtils {
      */
     @NonNull
     public static <T> DataDescriptor<T> descriptor(@NonNull T data) {
+        return null;
         //return new StringDataDescriptor<>(data, null);
     }
 

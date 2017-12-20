@@ -23,30 +23,11 @@
  */
 package com.budiyev.android.imageloader;
 
-import java.io.FileDescriptor;
-import java.io.FileInputStream;
-import java.io.InputStream;
-
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-final class FileDescriptorBitmapLoader implements BitmapLoader<FileDescriptor> {
-    @Nullable
-    @Override
-    public Bitmap load(@NonNull Context context, @NonNull FileDescriptor data, @Nullable Size size) throws Throwable {
-        if (size != null) {
-            return DataUtils.loadSampledBitmapFromFileDescriptor(data, size.getWidth(), size.getHeight());
-        } else {
-            InputStream inputStream = null;
-            try {
-                inputStream = new FileInputStream(data);
-                return BitmapFactory.decodeStream(inputStream);
-            } finally {
-                InternalUtils.close(inputStream);
-            }
-        }
+final class UrlDataDescriptor extends BaseDataDescriptor<String> {
+    public UrlDataDescriptor(@NonNull String data, @Nullable Size size) {
+        super(data, data, size);
     }
 }
