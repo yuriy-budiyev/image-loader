@@ -26,7 +26,7 @@ package com.budiyev.android.imageloader;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-abstract class UnidentifiableDataDescriptor<T> implements DataDescriptor<T> {
+final class UnidentifiableDataDescriptor<T> implements DataDescriptor<T> {
     private final T mData;
     private final Size mSize;
 

@@ -26,6 +26,8 @@ package com.budiyev.android.imageloader;
 import java.io.ByteArrayInputStream;
 import java.io.Closeable;
 import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -151,6 +153,18 @@ final class InternalUtils {
             } else {
                 return 0;
             }
+        } catch (IOException e) {
+            return 0;
+        } finally {
+            close(inputStream);
+        }
+    }
+
+    public static int getExifRotation(@NonNull FileDescriptor fileDescriptor) {
+        InputStream inputStream = null;
+        try {
+            inputStream = new FileInputStream(fileDescriptor);
+            return getExifRotation(new ExifInterface(inputStream));
         } catch (IOException e) {
             return 0;
         } finally {
