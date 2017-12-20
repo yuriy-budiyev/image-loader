@@ -56,7 +56,6 @@ public final class LoadImageRequest<T> {
     private final ImageCache mMemoryCache;
     private final ImageCache mStorageCache;
     private final BitmapLoader<T> mBitmapLoader;
-    private final DescriptorFactory<T> mDescriptorFactory;
     private final Handler mMainThreadHandler;
     private T mData;
     private Size mRequiredSize;
@@ -73,7 +72,7 @@ public final class LoadImageRequest<T> {
 
     LoadImageRequest(@NonNull Context context, @NonNull ExecutorService executor, @NonNull PauseLock pauseLock,
             @NonNull Handler mainThreadHandler, @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache,
-            @NonNull BitmapLoader<T> bitmapLoader, @NonNull DescriptorFactory<T> descriptorFactory) {
+            @NonNull BitmapLoader<T> bitmapLoader) {
         mContext = context;
         mExecutor = executor;
         mPauseLock = pauseLock;
@@ -81,7 +80,6 @@ public final class LoadImageRequest<T> {
         mStorageCache = storageCache;
         mBitmapLoader = bitmapLoader;
         mMainThreadHandler = mainThreadHandler;
-        mDescriptorFactory = descriptorFactory;
     }
 
     /**
@@ -373,7 +371,7 @@ public final class LoadImageRequest<T> {
         }
         T data = mData;
         if (data != null) {
-            return mDescriptorFactory.newDescriptor(data, mRequiredSize);
+            return new StringDataDescriptor<>(data, mRequiredSize);
         }
         return null;
     }
