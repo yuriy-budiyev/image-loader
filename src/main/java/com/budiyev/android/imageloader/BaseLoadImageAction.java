@@ -155,7 +155,7 @@ abstract class BaseLoadImageAction<T> {
         Bitmap image = null;
         // Memory cache
         ImageCache memoryCache = mMemoryCache;
-        if (key != null && memoryCache != null) {
+        if (key != null && memoryCache != null && descriptor.isMemoryCachingEnabled()) {
             BitmapTransformation transformation = mTransformation;
             if (transformation != null) {
                 image = memoryCache.get(key + transformation.getKey());
@@ -175,7 +175,8 @@ abstract class BaseLoadImageAction<T> {
         }
         // Storage cache
         ImageCache storageCache = mStorageCache;
-        if (key != null && storageCache != null) {
+        boolean storageCachingEnabled = descriptor.isStorageCachingEnabled();
+        if (key != null && storageCache != null && storageCachingEnabled) {
             image = storageCache.get(key);
             if (image != null) {
                 processImage(context, descriptor, image, false);
@@ -200,7 +201,7 @@ abstract class BaseLoadImageAction<T> {
         if (mCancelled) {
             return;
         }
-        if (key != null && storageCache != null) {
+        if (key != null && storageCache != null && storageCachingEnabled) {
             storageCache.put(key, image);
         }
     }
@@ -214,8 +215,9 @@ abstract class BaseLoadImageAction<T> {
         T data = descriptor.getData();
         String key = descriptor.getKey();
         BitmapTransformation transformation = mTransformation;
+        boolean memoryCachingEnabled = descriptor.isMemoryCachingEnabled();
         if (!transformed && transformation != null) {
-            if (key != null) {
+            if (key != null && memoryCachingEnabled) {
                 key += transformation.getKey();
             }
             try {
@@ -231,7 +233,7 @@ abstract class BaseLoadImageAction<T> {
         if (!transformed) {
             // transformed == true also means that image was taken from memory cache
             ImageCache memoryCache = mMemoryCache;
-            if (key != null && memoryCache != null) {
+            if (key != null && memoryCache != null && memoryCachingEnabled) {
                 memoryCache.put(key, image);
             }
         }

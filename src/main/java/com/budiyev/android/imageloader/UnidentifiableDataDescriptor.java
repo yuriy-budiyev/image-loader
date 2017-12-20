@@ -36,4 +36,14 @@ final class UnidentifiableDataDescriptor<T> extends BaseDataDescriptor<T> {
     public String getKey() {
         return null;
     }
+
+    @Override
+    public boolean isStorageCachingEnabled() {
+        return false;
+    }
+
+    @Override
+    public boolean isMemoryCachingEnabled() {
+        return false;
+    }
 }

@@ -63,4 +63,16 @@ public interface DataDescriptor<T> {
     @Nullable
     @AnyThread
     Size getRequiredSize();
+
+    /**
+     * Whether if loaded image should be cached in storage
+     */
+    @AnyThread
+    boolean isStorageCachingEnabled();
+
+    /**
+     * Whether if loaded image should be cached in memory
+     */
+    @AnyThread
+    boolean isMemoryCachingEnabled();
 }

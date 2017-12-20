@@ -32,4 +32,14 @@ final class FileDataDescriptor extends IdentifiableDataDescriptor<File> {
     public FileDataDescriptor(@NonNull File data, @Nullable Size requiredSize) {
         super(data, data.getAbsolutePath(), requiredSize);
     }
+
+    @Override
+    public boolean isStorageCachingEnabled() {
+        return false;
+    }
+
+    @Override
+    public boolean isMemoryCachingEnabled() {
+        return true;
+    }
 }

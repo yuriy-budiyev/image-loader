@@ -103,11 +103,11 @@ public final class ImageLoader {
             return;
         }
         ImageCache memoryCache = mMemoryCache;
-        if (memoryCache != null) {
+        if (memoryCache != null && descriptor.isMemoryCachingEnabled()) {
             memoryCache.remove(key);
         }
         ImageCache storageCache = mStorageCache;
-        if (storageCache != null) {
+        if (storageCache != null && descriptor.isStorageCachingEnabled()) {
             storageCache.remove(key);
         }
     }

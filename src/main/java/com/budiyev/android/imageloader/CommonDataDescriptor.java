@@ -30,4 +30,14 @@ final class CommonDataDescriptor<T> extends IdentifiableDataDescriptor<T> {
     public CommonDataDescriptor(@NonNull T data, @Nullable Size requiredSize) {
         super(data, data.toString(), requiredSize);
     }
+
+    @Override
+    public boolean isStorageCachingEnabled() {
+        return true;
+    }
+
+    @Override
+    public boolean isMemoryCachingEnabled() {
+        return true;
+    }
 }

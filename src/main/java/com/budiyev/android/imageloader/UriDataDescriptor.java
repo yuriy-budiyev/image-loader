@@ -28,7 +28,20 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 final class UriDataDescriptor extends IdentifiableDataDescriptor<Uri> {
+    private final boolean mStorageCachingEnabled;
+
     public UriDataDescriptor(@NonNull Uri data, @Nullable Size requiredSize) {
         super(data, data.toString(), requiredSize);
+        mStorageCachingEnabled = !InternalUtils.isUriLocal(data);
+    }
+
+    @Override
+    public boolean isStorageCachingEnabled() {
+        return mStorageCachingEnabled;
+    }
+
+    @Override
+    public boolean isMemoryCachingEnabled() {
+        return true;
     }
 }

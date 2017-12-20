@@ -30,4 +30,14 @@ final class UrlDataDescriptor extends IdentifiableDataDescriptor<String> {
     public UrlDataDescriptor(@NonNull String data, @Nullable Size requiredSize) {
         super(data, data, requiredSize);
     }
+
+    @Override
+    public boolean isStorageCachingEnabled() {
+        return true;
+    }
+
+    @Override
+    public boolean isMemoryCachingEnabled() {
+        return true;
+    }
 }

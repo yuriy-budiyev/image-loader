@@ -32,4 +32,14 @@ final class ResourceDataDescriptor extends IdentifiableDataDescriptor<Integer> {
     public ResourceDataDescriptor(@NonNull Integer data, @Nullable Size requiredSize) {
         super(data, KEY_BASE_PREFIX + data.toString(), requiredSize);
     }
+
+    @Override
+    public boolean isStorageCachingEnabled() {
+        return false;
+    }
+
+    @Override
+    public boolean isMemoryCachingEnabled() {
+        return true;
+    }
 }

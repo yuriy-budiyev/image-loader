@@ -319,7 +319,7 @@ public final class LoadImageRequest<T> {
         String key = descriptor.getKey();
         ImageCache memoryCache = mMemoryCache;
         BitmapTransformation transformation = getTransformation();
-        if (key != null && memoryCache != null) {
+        if (key != null && memoryCache != null && descriptor.isMemoryCachingEnabled()) {
             if (transformation != null) {
                 image = memoryCache.get(key + transformation.getKey());
             } else {
@@ -382,11 +382,11 @@ public final class LoadImageRequest<T> {
             return;
         }
         ImageCache memoryCache = mMemoryCache;
-        if (memoryCache != null) {
+        if (memoryCache != null && descriptor.isMemoryCachingEnabled()) {
             memoryCache.remove(key);
         }
         ImageCache storageCache = mStorageCache;
-        if (storageCache != null) {
+        if (storageCache != null && descriptor.isStorageCachingEnabled()) {
             storageCache.remove(key);
         }
     }
