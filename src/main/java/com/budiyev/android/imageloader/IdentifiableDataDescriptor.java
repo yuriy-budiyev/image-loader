@@ -31,7 +31,12 @@ abstract class IdentifiableDataDescriptor<T> extends BaseDataDescriptor<T> {
 
     public IdentifiableDataDescriptor(@NonNull T data, @NonNull String keyBase, @Nullable Size requiredSize) {
         super(data, requiredSize);
-        mKey = DataUtils.generateSHA256(keyBase);
+        String hash = DataUtils.generateSHA256(keyBase);
+        if (requiredSize != null) {
+            mKey = hash + "_sampled_" + requiredSize.getWidth() + "x" + requiredSize.getHeight();
+        } else {
+            mKey = hash;
+        }
     }
 
     @Nullable
