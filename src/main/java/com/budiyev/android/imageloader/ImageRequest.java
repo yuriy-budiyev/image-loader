@@ -46,9 +46,9 @@ import android.support.annotation.WorkerThread;
 import android.view.View;
 
 /**
- * Load image request
+ * Image request
  */
-public final class LoadImageRequest<T> {
+public final class ImageRequest<T> {
     private static final long DEFAULT_FADE_DURATION = 200L;
     private final Context mContext;
     private final ExecutorService mExecutor;
@@ -71,7 +71,7 @@ public final class LoadImageRequest<T> {
     private long mFadeDuration = DEFAULT_FADE_DURATION;
     private float mCornerRadius;
 
-    LoadImageRequest(@NonNull Context context, @NonNull ExecutorService executor, @NonNull PauseLock pauseLock,
+    ImageRequest(@NonNull Context context, @NonNull ExecutorService executor, @NonNull PauseLock pauseLock,
             @NonNull Handler mainThreadHandler, @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache,
             @NonNull BitmapLoader<T> bitmapLoader, @NonNull DataDescriptorFactory<T> descriptorFactory) {
         mContext = context;
@@ -92,7 +92,7 @@ public final class LoadImageRequest<T> {
      * @see #descriptor
      */
     @NonNull
-    public LoadImageRequest<T> from(@NonNull T data) {
+    public ImageRequest<T> from(@NonNull T data) {
         mDescriptor = null;
         mData = data;
         return this;
@@ -104,7 +104,7 @@ public final class LoadImageRequest<T> {
      * @see #descriptor
      */
     @NonNull
-    public LoadImageRequest<T> size(@Px int requiredWidth, @Px int requiredHeight) {
+    public ImageRequest<T> size(@Px int requiredWidth, @Px int requiredHeight) {
         mDescriptor = null;
         mRequiredSize = new Size(requiredWidth, requiredHeight);
         return this;
@@ -120,7 +120,7 @@ public final class LoadImageRequest<T> {
      * @see #from
      */
     @NonNull
-    public LoadImageRequest<T> descriptor(@Nullable DataDescriptor<T> descriptor) {
+    public ImageRequest<T> descriptor(@Nullable DataDescriptor<T> descriptor) {
         mData = null;
         mRequiredSize = null;
         mDescriptor = descriptor;
@@ -132,7 +132,7 @@ public final class LoadImageRequest<T> {
      * for square image, will lead to circle result
      */
     @NonNull
-    public LoadImageRequest<T> roundCorners() {
+    public ImageRequest<T> roundCorners() {
         mCornerRadius = RoundedDrawable.MAX_RADIUS;
         return this;
     }
@@ -142,7 +142,7 @@ public final class LoadImageRequest<T> {
      * zero means that rounding is disabled
      */
     @NonNull
-    public LoadImageRequest<T> roundCorners(@FloatRange(from = 0f, to = Float.MAX_VALUE) float radius) {
+    public ImageRequest<T> roundCorners(@FloatRange(from = 0f, to = Float.MAX_VALUE) float radius) {
         mCornerRadius = radius;
         return this;
     }
@@ -151,7 +151,7 @@ public final class LoadImageRequest<T> {
      * Placeholder
      */
     @NonNull
-    public LoadImageRequest<T> placeholder(@Nullable Drawable placeholder) {
+    public ImageRequest<T> placeholder(@Nullable Drawable placeholder) {
         mPlaceholder = placeholder;
         return this;
     }
@@ -160,7 +160,7 @@ public final class LoadImageRequest<T> {
      * Placeholder
      */
     @NonNull
-    public LoadImageRequest<T> placeholder(@DrawableRes int resId) {
+    public ImageRequest<T> placeholder(@DrawableRes int resId) {
         mPlaceholder = mContext.getResources().getDrawable(resId);
         return this;
     }
@@ -169,7 +169,7 @@ public final class LoadImageRequest<T> {
      * Error drawable, that will be displayed when image, couldn't be loaded
      */
     @NonNull
-    public LoadImageRequest<T> errorDrawable(@Nullable Drawable errorDrawable) {
+    public ImageRequest<T> errorDrawable(@Nullable Drawable errorDrawable) {
         mErrorDrawable = errorDrawable;
         return this;
     }
@@ -178,7 +178,7 @@ public final class LoadImageRequest<T> {
      * Error drawable, that will be displayed when image, couldn't be loaded
      */
     @NonNull
-    public LoadImageRequest<T> errorDrawable(@DrawableRes int resId) {
+    public ImageRequest<T> errorDrawable(@DrawableRes int resId) {
         mErrorDrawable = mContext.getResources().getDrawable(resId);
         return this;
     }
@@ -190,7 +190,7 @@ public final class LoadImageRequest<T> {
      * @see BitmapTransformation
      */
     @NonNull
-    public LoadImageRequest<T> transform(@NonNull BitmapTransformation transformation) {
+    public ImageRequest<T> transform(@NonNull BitmapTransformation transformation) {
         List<BitmapTransformation> t = mTransformations;
         if (t == null) {
             t = new ArrayList<>();
@@ -207,7 +207,7 @@ public final class LoadImageRequest<T> {
      * @see BitmapTransformation
      */
     @NonNull
-    public LoadImageRequest<T> transform(@NonNull Collection<BitmapTransformation> transformations) {
+    public ImageRequest<T> transform(@NonNull Collection<BitmapTransformation> transformations) {
         List<BitmapTransformation> t = mTransformations;
         if (t == null) {
             t = new ArrayList<>();
@@ -222,7 +222,7 @@ public final class LoadImageRequest<T> {
      * supported on API 19+
      */
     @NonNull
-    public LoadImageRequest<T> fade() {
+    public ImageRequest<T> fade() {
         mFadeEnabled = true;
         mFadeDuration = DEFAULT_FADE_DURATION;
         return this;
@@ -233,7 +233,7 @@ public final class LoadImageRequest<T> {
      * supported on API 19+
      */
     @NonNull
-    public LoadImageRequest<T> noFade() {
+    public ImageRequest<T> noFade() {
         mFadeEnabled = false;
         return this;
     }
@@ -244,7 +244,7 @@ public final class LoadImageRequest<T> {
      * supported on API 19+
      */
     @NonNull
-    public LoadImageRequest<T> fade(long duration) {
+    public ImageRequest<T> fade(long duration) {
         mFadeEnabled = true;
         mFadeDuration = duration;
         return this;
@@ -254,7 +254,7 @@ public final class LoadImageRequest<T> {
      * Load callback
      */
     @NonNull
-    public LoadImageRequest<T> onLoaded(@Nullable LoadCallback<T> callback) {
+    public ImageRequest<T> onLoaded(@Nullable LoadCallback<T> callback) {
         mLoadCallback = callback;
         return this;
     }
@@ -263,7 +263,7 @@ public final class LoadImageRequest<T> {
      * Error callback
      */
     @NonNull
-    public LoadImageRequest<T> onError(@Nullable ErrorCallback<T> callback) {
+    public ImageRequest<T> onError(@Nullable ErrorCallback<T> callback) {
         mErrorCallback = callback;
         return this;
     }
@@ -272,7 +272,7 @@ public final class LoadImageRequest<T> {
      * Display callback
      */
     @NonNull
-    public LoadImageRequest<T> onDisplayed(@Nullable DisplayCallback<T> callback) {
+    public ImageRequest<T> onDisplayed(@Nullable DisplayCallback<T> callback) {
         mDisplayCallback = callback;
         return this;
     }
@@ -377,18 +377,7 @@ public final class LoadImageRequest<T> {
         if (descriptor == null) {
             return;
         }
-        String key = descriptor.getKey();
-        if (key == null) {
-            return;
-        }
-        ImageCache memoryCache = mMemoryCache;
-        if (memoryCache != null && descriptor.isMemoryCachingEnabled()) {
-            memoryCache.remove(key);
-        }
-        ImageCache storageCache = mStorageCache;
-        if (storageCache != null && descriptor.isStorageCachingEnabled()) {
-            storageCache.remove(key);
-        }
+        mExecutor.submit(new InvalidateAction(descriptor, mMemoryCache, mStorageCache));
     }
 
     @Nullable

@@ -79,8 +79,8 @@ public final class ImageLoader {
      * @return New load image request
      */
     @NonNull
-    public <T> LoadImageRequest<T> request(@NonNull BitmapLoader<T> loader) {
-        return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache, mStorageCache,
+    public <T> ImageRequest<T> request(@NonNull BitmapLoader<T> loader) {
+        return new ImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache, mStorageCache,
                 loader, mDataDescriptors.<T>common());
     }
 
@@ -216,54 +216,54 @@ public final class ImageLoader {
          * {@link Uri} image load request
          */
         @NonNull
-        public LoadImageRequest<Uri> uri() {
-            return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache,
-                    mStorageCache, mBitmapLoaders.uri(), mDataDescriptors.uri());
+        public ImageRequest<Uri> uri() {
+            return new ImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache, mStorageCache,
+                    mBitmapLoaders.uri(), mDataDescriptors.uri());
         }
 
         /**
          * URL image load request
          */
         @NonNull
-        public LoadImageRequest<String> url() {
-            return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache,
-                    mStorageCache, mBitmapLoaders.url(), mDataDescriptors.url());
+        public ImageRequest<String> url() {
+            return new ImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache, mStorageCache,
+                    mBitmapLoaders.url(), mDataDescriptors.url());
         }
 
         /**
          * {@link File} image load request
          */
         @NonNull
-        public LoadImageRequest<File> file() {
-            return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache,
-                    mStorageCache, mBitmapLoaders.file(), mDataDescriptors.file());
+        public ImageRequest<File> file() {
+            return new ImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache, mStorageCache,
+                    mBitmapLoaders.file(), mDataDescriptors.file());
         }
 
         /**
          * {@link FileDescriptor} image load request
          */
         @NonNull
-        public LoadImageRequest<FileDescriptor> fileDescriptor() {
-            return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache,
-                    mStorageCache, mBitmapLoaders.fileDescriptor(), mDataDescriptors.fileDescriptor());
+        public ImageRequest<FileDescriptor> fileDescriptor() {
+            return new ImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache, mStorageCache,
+                    mBitmapLoaders.fileDescriptor(), mDataDescriptors.fileDescriptor());
         }
 
         /**
          * Resource image load request
          */
         @NonNull
-        public LoadImageRequest<Integer> resource() {
-            return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache,
-                    mStorageCache, mBitmapLoaders.resource(), mDataDescriptors.resource());
+        public ImageRequest<Integer> resource() {
+            return new ImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache, mStorageCache,
+                    mBitmapLoaders.resource(), mDataDescriptors.resource());
         }
 
         /**
          * Byte array image load request
          */
         @NonNull
-        public LoadImageRequest<byte[]> byteArray() {
-            return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache,
-                    mStorageCache, mBitmapLoaders.byteArray(), mDataDescriptors.byteArray());
+        public ImageRequest<byte[]> byteArray() {
+            return new ImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache, mStorageCache,
+                    mBitmapLoaders.byteArray(), mDataDescriptors.byteArray());
         }
     }
 
