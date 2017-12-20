@@ -79,7 +79,7 @@ public final class ImageLoader {
     @NonNull
     public <T> LoadImageRequest<T> request(@NonNull BitmapLoader<T> loader) {
         return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache, mStorageCache,
-                loader);
+                loader, new CommonDataDescriptorFactory<T>());
     }
 
     /**
@@ -96,7 +96,6 @@ public final class ImageLoader {
      * Delete cached image for specified {@link DataDescriptor}
      *
      * @see DataDescriptor
-     * @see DataUtils#descriptor
      */
     public void invalidate(@NonNull DataDescriptor<?> descriptor) {
         String key = descriptor.getKey();
@@ -208,7 +207,7 @@ public final class ImageLoader {
         @NonNull
         public LoadImageRequest<Uri> uri() {
             return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache,
-                    mStorageCache, BitmapLoaderHolder.uri());
+                    mStorageCache, new UriBitmapLoader(), new UriDataDescriptorFactory());
         }
 
         /**
@@ -217,7 +216,7 @@ public final class ImageLoader {
         @NonNull
         public LoadImageRequest<String> url() {
             return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache,
-                    mStorageCache, BitmapLoaderHolder.url());
+                    mStorageCache, new UrlBitmapLoader(), new UrlDataDescriptorFactory());
         }
 
         /**
@@ -226,7 +225,7 @@ public final class ImageLoader {
         @NonNull
         public LoadImageRequest<File> file() {
             return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache,
-                    mStorageCache, BitmapLoaderHolder.file());
+                    mStorageCache, new FileBitmapLoader(), new FileDataDescriptorFactory());
         }
 
         /**
@@ -235,7 +234,8 @@ public final class ImageLoader {
         @NonNull
         public LoadImageRequest<FileDescriptor> fileDescriptor() {
             return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache,
-                    mStorageCache, BitmapLoaderHolder.fileDescriptor());
+                    mStorageCache, new FileDescriptorBitmapLoader(),
+                    new UnidentifiableDataDescriptorFactory<FileDescriptor>());
         }
 
         /**
@@ -244,7 +244,7 @@ public final class ImageLoader {
         @NonNull
         public LoadImageRequest<Integer> resource() {
             return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache,
-                    mStorageCache, BitmapLoaderHolder.resource());
+                    mStorageCache, new ResourceBitmapLoader(), new ResourceDataDescriptorFactory());
         }
 
         /**
@@ -253,7 +253,7 @@ public final class ImageLoader {
         @NonNull
         public LoadImageRequest<byte[]> byteArray() {
             return new LoadImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache,
-                    mStorageCache, BitmapLoaderHolder.byteArray());
+                    mStorageCache, new ByteArrayBitmapLoader(), new UnidentifiableDataDescriptorFactory<byte[]>());
         }
     }
 

@@ -53,10 +53,11 @@ public final class LoadImageRequest<T> {
     private final Context mContext;
     private final ExecutorService mExecutor;
     private final PauseLock mPauseLock;
+    private final Handler mMainThreadHandler;
     private final ImageCache mMemoryCache;
     private final ImageCache mStorageCache;
     private final BitmapLoader<T> mBitmapLoader;
-    private final Handler mMainThreadHandler;
+    private final DataDescriptorFactory<T> mDescriptorFactory;
     private T mData;
     private Size mRequiredSize;
     private DataDescriptor<T> mDescriptor;
@@ -72,7 +73,7 @@ public final class LoadImageRequest<T> {
 
     LoadImageRequest(@NonNull Context context, @NonNull ExecutorService executor, @NonNull PauseLock pauseLock,
             @NonNull Handler mainThreadHandler, @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache,
-            @NonNull BitmapLoader<T> bitmapLoader) {
+            @NonNull BitmapLoader<T> bitmapLoader, @NonNull DataDescriptorFactory<T> descriptorFactory) {
         mContext = context;
         mExecutor = executor;
         mPauseLock = pauseLock;
@@ -80,6 +81,7 @@ public final class LoadImageRequest<T> {
         mStorageCache = storageCache;
         mBitmapLoader = bitmapLoader;
         mMainThreadHandler = mainThreadHandler;
+        mDescriptorFactory = descriptorFactory;
     }
 
     /**
@@ -363,6 +365,25 @@ public final class LoadImageRequest<T> {
         action.execute(mExecutor);
     }
 
+    public void invalidate() {
+        DataDescriptor<T> descriptor = getDescriptor();
+        if (descriptor == null) {
+            return;
+        }
+        String key = descriptor.getKey();
+        if (key == null) {
+            return;
+        }
+        ImageCache memoryCache = mMemoryCache;
+        if (memoryCache != null) {
+            memoryCache.remove(key);
+        }
+        ImageCache storageCache = mStorageCache;
+        if (storageCache != null) {
+            storageCache.remove(key);
+        }
+    }
+
     @Nullable
     private DataDescriptor<T> getDescriptor() {
         DataDescriptor<T> descriptor = mDescriptor;
@@ -371,7 +392,7 @@ public final class LoadImageRequest<T> {
         }
         T data = mData;
         if (data != null) {
-            return new StringDataDescriptor<>(data, mRequiredSize);
+            return mDescriptorFactory.newDescriptor(data, mRequiredSize);
         }
         return null;
     }
