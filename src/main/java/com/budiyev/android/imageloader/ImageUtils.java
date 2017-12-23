@@ -32,9 +32,11 @@ import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 
 public final class ImageUtils {
@@ -47,7 +49,6 @@ public final class ImageUtils {
      * @see BitmapTransformation
      */
     @NonNull
-    @SuppressWarnings("unchecked")
     public static BitmapTransformation invertColors() {
         return new InvertColorsTransformation();
     }
@@ -58,9 +59,28 @@ public final class ImageUtils {
      * @see BitmapTransformation
      */
     @NonNull
-    @SuppressWarnings("unchecked")
     public static BitmapTransformation convertToGrayScale() {
         return new GrayScaleTransformation();
+    }
+
+    /**
+     * Apply color tint
+     *
+     * @see BitmapTransformation
+     */
+    @NonNull
+    public static BitmapTransformation tint(@ColorInt int color) {
+        return new TintTransformation(color, PorterDuff.Mode.SRC_ATOP);
+    }
+
+    /**
+     * Apply color tint
+     *
+     * @see BitmapTransformation
+     */
+    @NonNull
+    public static BitmapTransformation tint(@ColorInt int color, @NonNull PorterDuff.Mode mode) {
+        return new TintTransformation(color, mode);
     }
 
     /**
@@ -69,7 +89,7 @@ public final class ImageUtils {
      * @see BitmapTransformation
      */
     @NonNull
-    @SuppressWarnings("unchecked")
+
     public static BitmapTransformation mirrorHorizontally() {
         return new MirrorHorizontallyTransformation();
     }
@@ -80,7 +100,6 @@ public final class ImageUtils {
      * @see BitmapTransformation
      */
     @NonNull
-    @SuppressWarnings("unchecked")
     public static BitmapTransformation mirrorVertically() {
         return new MirrorVerticallyTransformation();
     }
@@ -92,7 +111,6 @@ public final class ImageUtils {
      * @see BitmapTransformation
      */
     @NonNull
-    @SuppressWarnings("unchecked")
     public static BitmapTransformation rotate(float rotationAngle) {
         return new RotateTransformation(rotationAngle);
     }
@@ -104,7 +122,6 @@ public final class ImageUtils {
      * @see BitmapTransformation
      */
     @NonNull
-    @SuppressWarnings("unchecked")
     public static BitmapTransformation roundCorners() {
         return new RoundCornersTransformation();
     }
@@ -117,7 +134,6 @@ public final class ImageUtils {
      * @see BitmapTransformation
      */
     @NonNull
-    @SuppressWarnings("unchecked")
     public static BitmapTransformation roundCorners(float cornerRadius) {
         return new RoundCornersTransformation(cornerRadius);
     }
@@ -128,7 +144,6 @@ public final class ImageUtils {
      * @see BitmapTransformation
      */
     @NonNull
-    @SuppressWarnings("unchecked")
     public static BitmapTransformation cropCenter() {
         return new CropCenterTransformation();
     }
@@ -140,7 +155,6 @@ public final class ImageUtils {
      * @see BitmapTransformation
      */
     @NonNull
-    @SuppressWarnings("unchecked")
     public static BitmapTransformation cropCenter(int resultWidth, int resultHeight) {
         return new CropCenterTransformation(resultWidth, resultHeight);
     }
@@ -152,7 +166,6 @@ public final class ImageUtils {
      * @see BitmapTransformation
      */
     @NonNull
-    @SuppressWarnings("unchecked")
     public static BitmapTransformation fitCenter(int resultWidth, int resultHeight) {
         return new FitCenterTransformation(resultWidth, resultHeight);
     }
@@ -163,7 +176,6 @@ public final class ImageUtils {
      * @see BitmapTransformation
      */
     @NonNull
-    @SuppressWarnings("unchecked")
     public static BitmapTransformation scaleToFit(int resultWidth, int resultHeight) {
         return new ScaleToFitTransformation(resultWidth, resultHeight, false);
     }
@@ -175,7 +187,6 @@ public final class ImageUtils {
      * @see BitmapTransformation
      */
     @NonNull
-    @SuppressWarnings("unchecked")
     public static BitmapTransformation scaleToFit(int resultWidth, int resultHeight, boolean upscale) {
         return new ScaleToFitTransformation(resultWidth, resultHeight, upscale);
     }
@@ -203,6 +214,30 @@ public final class ImageUtils {
         ColorMatrix colorMatrix = new ColorMatrix();
         colorMatrix.setSaturation(0f);
         return applyColorFilter(image, new ColorMatrixColorFilter(colorMatrix));
+    }
+
+    /**
+     * Convert image colors to gray-scale
+     *
+     * @param image Source image
+     * @return Converted image
+     */
+    @NonNull
+    public static Bitmap tint(@NonNull Bitmap image, @ColorInt int color) {
+        return tint(image, color, PorterDuff.Mode.SRC_ATOP);
+    }
+
+    /**
+     * Convert image colors to gray-scale
+     *
+     * @param image Source image
+     * @return Converted image
+     */
+    @NonNull
+    public static Bitmap tint(@NonNull Bitmap image, @ColorInt int color, @NonNull PorterDuff.Mode mode) {
+        ColorMatrix colorMatrix = new ColorMatrix();
+        colorMatrix.setSaturation(0f);
+        return applyColorFilter(image, new PorterDuffColorFilter(color, mode));
     }
 
     /**
@@ -478,6 +513,30 @@ public final class ImageUtils {
         @Override
         public String getKey() {
             return "_gray_scale";
+        }
+    }
+
+    private static final class TintTransformation implements BitmapTransformation {
+        private final int mColor;
+        private final PorterDuff.Mode mMode;
+        private final String mKey;
+
+        private TintTransformation(@ColorInt int color, @NonNull PorterDuff.Mode mode) {
+            mColor = color;
+            mMode = mode;
+            mKey = "_tint_" + color + "_" + mode;
+        }
+
+        @NonNull
+        @Override
+        public Bitmap transform(@NonNull Context context, @NonNull Bitmap bitmap) throws Throwable {
+            return tint(bitmap, mColor, mMode);
+        }
+
+        @NonNull
+        @Override
+        public String getKey() {
+            return mKey;
         }
     }
 
