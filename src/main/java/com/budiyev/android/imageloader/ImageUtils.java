@@ -66,6 +66,7 @@ public final class ImageUtils {
     /**
      * Apply color tint
      *
+     * @param color Color
      * @see BitmapTransformation
      */
     @NonNull
@@ -76,6 +77,8 @@ public final class ImageUtils {
     /**
      * Apply color tint
      *
+     * @param color Color
+     * @param mode  Mode
      * @see BitmapTransformation
      */
     @NonNull
