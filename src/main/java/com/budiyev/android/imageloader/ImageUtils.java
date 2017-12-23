@@ -92,7 +92,6 @@ public final class ImageUtils {
      * @see BitmapTransformation
      */
     @NonNull
-
     public static BitmapTransformation mirrorHorizontally() {
         return new MirrorHorizontallyTransformation();
     }
