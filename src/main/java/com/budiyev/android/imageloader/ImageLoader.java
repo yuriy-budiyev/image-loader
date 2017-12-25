@@ -69,6 +69,17 @@ public final class ImageLoader {
     /**
      * Create new load image request
      *
+     * @return Source data type selector
+     */
+    @NonNull
+    public RequestDataTypeSelector request() {
+        return new RequestDataTypeSelector(mContext, mExecutor, mPauseLock, mMainThreadHandler, mBitmapLoaders,
+                mDataDescriptors, mMemoryCache, mStorageCache);
+    }
+
+    /**
+     * Create new load image request
+     *
      * @param loader Bitmap loader for specified data type
      * @return New load image request
      */
@@ -81,12 +92,14 @@ public final class ImageLoader {
     /**
      * Create new load image request
      *
-     * @return Source data type selector
+     * @param loader  Bitmap loader
+     * @param factory Data descriptor factory
+     * @return New load image request
      */
     @NonNull
-    public RequestDataTypeSelector request() {
-        return new RequestDataTypeSelector(mContext, mExecutor, mPauseLock, mMainThreadHandler, mBitmapLoaders,
-                mDataDescriptors, mMemoryCache, mStorageCache);
+    public <T> ImageRequest<T> request(@NonNull BitmapLoader<T> loader, @NonNull DataDescriptorFactory<T> factory) {
+        return new ImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache, mStorageCache,
+                loader, factory);
     }
 
     /**

@@ -88,7 +88,7 @@ public final class ImageRequest<T> {
     /**
      * Source data,
      * default {@link DataDescriptor} will be used, {@code data}'s toString() method will be used
-     * for key generation, any characters allowed
+     * for key generation, any characters allowed, or custom data descriptor if descriptor factory is specified
      *
      * @see #descriptor
      */

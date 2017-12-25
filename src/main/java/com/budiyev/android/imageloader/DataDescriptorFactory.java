@@ -26,7 +26,17 @@ package com.budiyev.android.imageloader;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-interface DataDescriptorFactory<T> {
+/**
+ * Data descriptor factory
+ */
+public interface DataDescriptorFactory<T> {
+    /**
+     * Create new data descriptor
+     *
+     * @param data         Source data
+     * @param requiredSize Required image size
+     * @return New data descriptor for specified {@code data} and {@code requiredSize}
+     */
     @NonNull
     DataDescriptor<T> newDescriptor(@NonNull T data, @Nullable Size requiredSize);
 }
