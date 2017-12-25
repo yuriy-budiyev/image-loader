@@ -23,14 +23,11 @@
  */
 package com.budiyev.android.imageloader;
 
-import java.io.File;
-import java.io.FileDescriptor;
 import java.util.concurrent.ExecutorService;
 
 import android.app.Application;
 import android.content.ComponentCallbacks2;
 import android.content.Context;
-import android.net.Uri;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -38,7 +35,8 @@ import android.support.annotation.Nullable;
 /**
  * Image loader is a universal tool for loading bitmaps efficiently in Android
  *
- * @see Builder
+ * @see #with
+ * @see #builder
  */
 public final class ImageLoader {
     private final BitmapLoaders mBitmapLoaders = new BitmapLoaders();
@@ -56,17 +54,13 @@ public final class ImageLoader {
      * @see #with
      * @see #builder
      */
-    private ImageLoader(@NonNull Context context, @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache,
-            @Nullable ExecutorService executor) {
+    ImageLoader(@NonNull Context context, @NonNull ExecutorService executor, @Nullable ImageCache memoryCache,
+            @Nullable ImageCache storageCache) {
         mContext = context;
         mMainThreadHandler = new Handler(context.getMainLooper());
         mMemoryCache = memoryCache;
         mStorageCache = storageCache;
-        if (executor != null) {
-            mExecutor = executor;
-        } else {
-            mExecutor = new ImageLoaderExecutor(InternalUtils.getPoolSize());
-        }
+        mExecutor = executor;
         if (storageCache instanceof StorageImageCache) {
             ((StorageImageCache) storageCache).setExecutor(mExecutor);
         }
@@ -90,8 +84,8 @@ public final class ImageLoader {
      * @return Source data type selector
      */
     @NonNull
-    public DataTypeSelector request() {
-        return new DataTypeSelector(mContext, mExecutor, mPauseLock, mMainThreadHandler, mBitmapLoaders,
+    public RequestDataTypeSelector request() {
+        return new RequestDataTypeSelector(mContext, mExecutor, mPauseLock, mMainThreadHandler, mBitmapLoaders,
                 mDataDescriptors, mMemoryCache, mStorageCache);
     }
 
@@ -184,214 +178,7 @@ public final class ImageLoader {
      * Create new image loader builder instance
      */
     @NonNull
-    public static Builder builder(@NonNull Context context) {
-        return new Builder(context);
-    }
-
-    public static final class DataTypeSelector {
-        private final Context mContext;
-        private final ExecutorService mExecutor;
-        private final PauseLock mPauseLock;
-        private final Handler mMainThreadHandler;
-        private final BitmapLoaders mBitmapLoaders;
-        private final DataDescriptors mDataDescriptors;
-        private final ImageCache mMemoryCache;
-        private final ImageCache mStorageCache;
-
-        private DataTypeSelector(@NonNull Context context, @NonNull ExecutorService executor,
-                @NonNull PauseLock pauseLock, @NonNull Handler mainThreadHandler, @NonNull BitmapLoaders bitmapLoaders,
-                @NonNull DataDescriptors dataDescriptors, @NonNull ImageCache memoryCache,
-                @NonNull ImageCache storageCache) {
-            mContext = context;
-            mExecutor = executor;
-            mPauseLock = pauseLock;
-            mMainThreadHandler = mainThreadHandler;
-            mBitmapLoaders = bitmapLoaders;
-            mDataDescriptors = dataDescriptors;
-            mMemoryCache = memoryCache;
-            mStorageCache = storageCache;
-        }
-
-        /**
-         * {@link Uri} image load request
-         */
-        @NonNull
-        public ImageRequest<Uri> uri() {
-            return new ImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache, mStorageCache,
-                    mBitmapLoaders.uri(), mDataDescriptors.uri());
-        }
-
-        /**
-         * URL image load request
-         */
-        @NonNull
-        public ImageRequest<String> url() {
-            return new ImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache, mStorageCache,
-                    mBitmapLoaders.url(), mDataDescriptors.url());
-        }
-
-        /**
-         * {@link File} image load request
-         */
-        @NonNull
-        public ImageRequest<File> file() {
-            return new ImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache, mStorageCache,
-                    mBitmapLoaders.file(), mDataDescriptors.file());
-        }
-
-        /**
-         * {@link FileDescriptor} image load request
-         */
-        @NonNull
-        public ImageRequest<FileDescriptor> fileDescriptor() {
-            return new ImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache, mStorageCache,
-                    mBitmapLoaders.fileDescriptor(), mDataDescriptors.fileDescriptor());
-        }
-
-        /**
-         * Resource image load request
-         */
-        @NonNull
-        public ImageRequest<Integer> resource() {
-            return new ImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache, mStorageCache,
-                    mBitmapLoaders.resource(), mDataDescriptors.resource());
-        }
-
-        /**
-         * Byte array image load request
-         */
-        @NonNull
-        public ImageRequest<byte[]> byteArray() {
-            return new ImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache, mStorageCache,
-                    mBitmapLoaders.byteArray(), mDataDescriptors.byteArray());
-        }
-    }
-
-    /**
-     * Image loader builder
-     */
-    public static final class Builder {
-        private final Context mContext;
-        private ImageCache mMemoryCache;
-        private ImageCache mStorageCache;
-        private ExecutorService mExecutor;
-
-        private Builder(@NonNull Context context) {
-            mContext = context;
-        }
-
-        /**
-         * Default memory cache
-         */
-        @NonNull
-        public Builder memoryCache() {
-            mMemoryCache = new MemoryImageCache();
-            return this;
-        }
-
-        /**
-         * Memory cache with specified maximum size
-         */
-        @NonNull
-        public Builder memoryCache(int maxSize) {
-            mMemoryCache = new MemoryImageCache(maxSize);
-            return this;
-        }
-
-        /**
-         * Custom memory cache
-         */
-        @NonNull
-        public Builder memoryCache(@Nullable ImageCache memoryCache) {
-            mMemoryCache = memoryCache;
-            return this;
-        }
-
-        /**
-         * Default storage cache,
-         * located in subdirectory of {@link Context#getExternalCacheDir}
-         */
-        @NonNull
-        public Builder storageCache() {
-            mStorageCache = new StorageImageCache(mContext);
-            return this;
-        }
-
-        /**
-         * Default storage cache with specified maximum size,
-         * located in subdirectory of {@link Context#getExternalCacheDir}
-         */
-        @NonNull
-        public Builder storageCache(long maxSize) {
-            mStorageCache = new StorageImageCache(mContext, maxSize);
-            return this;
-        }
-
-        /**
-         * Default storage cache with specified maximum size and compress mode,
-         * located in subdirectory of {@link Context#getExternalCacheDir}
-         *
-         * @see CompressMode
-         */
-        @NonNull
-        public Builder storageCache(@NonNull CompressMode compressMode, long maxSize) {
-            mStorageCache = new StorageImageCache(mContext, compressMode, maxSize);
-            return this;
-        }
-
-        /**
-         * Storage cache with specified directory
-         */
-        @NonNull
-        public Builder storageCache(@NonNull File directory) {
-            mStorageCache = new StorageImageCache(directory);
-            return this;
-        }
-
-        /**
-         * Storage cache with specified directory and maximum size
-         */
-        @NonNull
-        public Builder storageCache(@NonNull File directory, long maxSize) {
-            mStorageCache = new StorageImageCache(directory, maxSize);
-            return this;
-        }
-
-        /**
-         * Storage cache with specified directory, maximum size and compress mode
-         *
-         * @see CompressMode
-         */
-        @NonNull
-        public Builder storageCache(@NonNull File directory, @NonNull CompressMode compressMode, long maxSize) {
-            mStorageCache = new StorageImageCache(directory, compressMode, maxSize);
-            return this;
-        }
-
-        /**
-         * Custom storage cache
-         */
-        @NonNull
-        public Builder storageCache(@Nullable ImageCache storageCache) {
-            mStorageCache = storageCache;
-            return this;
-        }
-
-        /**
-         * Custom executor
-         */
-        @NonNull
-        public Builder executor(@Nullable ExecutorService executor) {
-            mExecutor = executor;
-            return this;
-        }
-
-        /**
-         * Create new image loader instance with specified parameters
-         */
-        @NonNull
-        public ImageLoader build() {
-            return new ImageLoader(mContext, mMemoryCache, mStorageCache, mExecutor);
-        }
+    public static ImageLoaderBuilder builder(@NonNull Context context) {
+        return new ImageLoaderBuilder(context);
     }
 }
