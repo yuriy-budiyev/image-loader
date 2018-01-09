@@ -40,8 +40,7 @@ import android.widget.ImageView;
 
 /**
  * Simple image view that will draw corners over an image/drawable;
- * Image size independent rounding. To make corners appear transparent,
- * set corner color same as color of image view background.
+ * set corners color same as color of image view background.
  */
 public class RoundedImageView extends ImageView {
     private static final int NO_ROUNDING = 0;

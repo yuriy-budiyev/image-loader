@@ -140,11 +140,7 @@ public final class ImageRequest<T> {
 
     /**
      * Display image with rounded corners using specified corner radius (in pixels),
-     * zero means that rounding is disabled.
-     * Note that visible corner radius depends on image size and target image view scale type.
-     * For size-independent rounding, instead of this method, use {@link RoundedImageView}
-     * which will draw corners over it's image bitmap or drawable; to make corners appear transparent,
-     * set corner color same as color of image view background.
+     * zero means that rounding is disabled
      */
     @NonNull
     public ImageRequest<T> roundCorners(@FloatRange(from = 0f, to = Float.MAX_VALUE) float radius) {
