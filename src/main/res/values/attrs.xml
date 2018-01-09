@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="RoundedImageView">
+        <attr format="dimension" name="cornerRadius"/>
+        <attr format="color" name="cornerColor"/>
+    </declare-styleable>
+</resources>
