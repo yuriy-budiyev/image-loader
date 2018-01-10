@@ -30,7 +30,7 @@ abstract class BaseDataDescriptor<T> implements DataDescriptor<T> {
     private final T mData;
     private final Size mRequiredSize;
 
-    public BaseDataDescriptor(@NonNull T data, @Nullable Size requiredSize) {
+    protected BaseDataDescriptor(@NonNull T data, @Nullable Size requiredSize) {
         mData = data;
         mRequiredSize = requiredSize;
     }
