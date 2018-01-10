@@ -158,6 +158,10 @@ public final class ImageLoaderBuilder {
         if (executor == null) {
             executor = new ImageLoaderExecutor(InternalUtils.getPoolSize());
         }
-        return new ImageLoader(mContext, executor, mMemoryCache, mStorageCache);
+        ImageCache storageCache = mStorageCache;
+        if (storageCache instanceof StorageImageCache) {
+            ((StorageImageCache) storageCache).setExecutor(executor);
+        }
+        return new ImageLoader(mContext, executor, mMemoryCache, storageCache);
     }
 }

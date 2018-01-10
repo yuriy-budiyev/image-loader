@@ -53,9 +53,6 @@ public final class ImageLoader {
             @Nullable ImageCache storageCache) {
         mMemoryCache = memoryCache;
         mStorageCache = storageCache;
-        if (storageCache instanceof StorageImageCache) {
-            ((StorageImageCache) storageCache).setExecutor(executor);
-        }
         mImageRequestFactory = new ImageRequestFactory(context, executor, mPauseLock, memoryCache, storageCache);
     }
 
