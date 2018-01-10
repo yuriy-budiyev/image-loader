@@ -138,7 +138,8 @@ public final class ImageRequest<T> {
 
     /**
      * Display image with rounded corners using specified corner radius (in pixels),
-     * zero means that rounding is disabled
+     * zero means that rounding is disabled; note that visible rounding depends on image size
+     * and image view scale type
      */
     @NonNull
     public ImageRequest<T> roundCorners(@FloatRange(from = 0f, to = Float.MAX_VALUE) float radius) {
