@@ -67,7 +67,12 @@ public final class ImageLoader {
     }
 
     /**
-     * Create new load image request
+     * Create new load image request,
+     * note that default data descriptor will be used with {@link ImageRequest#from}
+     * and {@link ImageRequest#size} methods, source data's toString() method result will be
+     * used for key generation, make sure that toString() implementation of your data class is
+     * suitable for key generation, recommended to use {@link ImageRequest#descriptor} method to provide
+     * unique key and some other characteristics of your custom data type instead
      *
      * @param loader Bitmap loader for specified data type
      * @return New load image request
