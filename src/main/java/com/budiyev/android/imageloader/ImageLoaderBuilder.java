@@ -40,7 +40,7 @@ public final class ImageLoaderBuilder {
     private ExecutorService mExecutor;
 
     ImageLoaderBuilder(@NonNull Context context) {
-        mContext = context;
+        mContext = context.getApplicationContext();
     }
 
     /**
