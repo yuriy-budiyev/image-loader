@@ -31,30 +31,40 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 /**
  * Image request source data type selector
  */
 public final class RequestDataTypeSelector {
+    private final BitmapLoader<Uri> mUriBitmapLoader = new UriBitmapLoader();
+    private final BitmapLoader<String> mUrlBitmapLoader = new UrlBitmapLoader();
+    private final BitmapLoader<File> mFileBitmapLoader = new FileBitmapLoader();
+    private final BitmapLoader<FileDescriptor> mFileDescriptorBitmapLoader = new FileDescriptorBitmapLoader();
+    private final BitmapLoader<Integer> mResourceBitmapLoader = new ResourceBitmapLoader();
+    private final BitmapLoader<byte[]> mByteArrayBitmapLoader = new ByteArrayBitmapLoader();
+    private final DataDescriptorFactory<Uri> mUriDataDescriptorFactory = new UriDataDescriptorFactory();
+    private final DataDescriptorFactory<String> mUrlDataDescriptorFactory = new UrlDataDescriptorFactory();
+    private final DataDescriptorFactory<File> mFileDataDescriptorFactory = new FileDataDescriptorFactory();
+    private final DataDescriptorFactory<FileDescriptor> mFileDescriptorDataDescriptorFactory =
+            new UnidentifiableDataDescriptorFactory<>();
+    private final DataDescriptorFactory<Integer> mResourceDataDescriptorFactory = new ResourceDataDescriptorFactory();
+    private final DataDescriptorFactory<byte[]> mByteArrayDataDescriptorFactory =
+            new UnidentifiableDataDescriptorFactory<>();
+    private final DataDescriptorFactory<Object> mCommonDataDescriptorFactory = new CommonDataDescriptorFactory();
     private final Context mContext;
     private final ExecutorService mExecutor;
     private final PauseLock mPauseLock;
     private final Handler mMainThreadHandler;
-    private final BitmapLoaders mBitmapLoaders;
-    private final DataDescriptors mDataDescriptors;
     private final ImageCache mMemoryCache;
     private final ImageCache mStorageCache;
 
     RequestDataTypeSelector(@NonNull Context context, @NonNull ExecutorService executor, @NonNull PauseLock pauseLock,
-            @NonNull Handler mainThreadHandler, @NonNull BitmapLoaders bitmapLoaders,
-            @NonNull DataDescriptors dataDescriptors, @NonNull ImageCache memoryCache,
-            @NonNull ImageCache storageCache) {
+            @NonNull Handler mainThreadHandler, @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache) {
         mContext = context;
         mExecutor = executor;
         mPauseLock = pauseLock;
         mMainThreadHandler = mainThreadHandler;
-        mBitmapLoaders = bitmapLoaders;
-        mDataDescriptors = dataDescriptors;
         mMemoryCache = memoryCache;
         mStorageCache = storageCache;
     }
@@ -65,7 +75,7 @@ public final class RequestDataTypeSelector {
     @NonNull
     public ImageRequest<Uri> uri() {
         return new ImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache, mStorageCache,
-                mBitmapLoaders.uri(), mDataDescriptors.uri());
+                mUriBitmapLoader, mUriDataDescriptorFactory);
     }
 
     /**
@@ -74,7 +84,7 @@ public final class RequestDataTypeSelector {
     @NonNull
     public ImageRequest<String> url() {
         return new ImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache, mStorageCache,
-                mBitmapLoaders.url(), mDataDescriptors.url());
+                mUrlBitmapLoader, mUrlDataDescriptorFactory);
     }
 
     /**
@@ -83,7 +93,7 @@ public final class RequestDataTypeSelector {
     @NonNull
     public ImageRequest<File> file() {
         return new ImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache, mStorageCache,
-                mBitmapLoaders.file(), mDataDescriptors.file());
+                mFileBitmapLoader, mFileDataDescriptorFactory);
     }
 
     /**
@@ -92,7 +102,7 @@ public final class RequestDataTypeSelector {
     @NonNull
     public ImageRequest<FileDescriptor> fileDescriptor() {
         return new ImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache, mStorageCache,
-                mBitmapLoaders.fileDescriptor(), mDataDescriptors.fileDescriptor());
+                mFileDescriptorBitmapLoader, mFileDescriptorDataDescriptorFactory);
     }
 
     /**
@@ -101,7 +111,7 @@ public final class RequestDataTypeSelector {
     @NonNull
     public ImageRequest<Integer> resource() {
         return new ImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache, mStorageCache,
-                mBitmapLoaders.resource(), mDataDescriptors.resource());
+                mResourceBitmapLoader, mResourceDataDescriptorFactory);
     }
 
     /**
@@ -110,6 +120,13 @@ public final class RequestDataTypeSelector {
     @NonNull
     public ImageRequest<byte[]> byteArray() {
         return new ImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache, mStorageCache,
-                mBitmapLoaders.byteArray(), mDataDescriptors.byteArray());
+                mByteArrayBitmapLoader, mByteArrayDataDescriptorFactory);
+    }
+
+    @NonNull
+    @SuppressWarnings("unchecked")
+    <T> ImageRequest<T> common(@NonNull BitmapLoader<T> loader) {
+        return new ImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache, mStorageCache,
+                loader, (DataDescriptorFactory<T>) mCommonDataDescriptorFactory);
     }
 }

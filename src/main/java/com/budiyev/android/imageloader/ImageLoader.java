@@ -39,14 +39,13 @@ import android.support.annotation.Nullable;
  * @see #builder
  */
 public final class ImageLoader {
-    private final BitmapLoaders mBitmapLoaders = new BitmapLoaders();
-    private final DataDescriptors mDataDescriptors = new DataDescriptors();
     private final PauseLock mPauseLock = new PauseLock();
     private final Context mContext;
     private final Handler mMainThreadHandler;
     private final ImageCache mMemoryCache;
     private final ImageCache mStorageCache;
     private final ExecutorService mExecutor;
+    private final RequestDataTypeSelector mDataTypeSelector;
 
     /**
      * Image Loader
@@ -64,6 +63,8 @@ public final class ImageLoader {
         if (storageCache instanceof StorageImageCache) {
             ((StorageImageCache) storageCache).setExecutor(mExecutor);
         }
+        mDataTypeSelector = new RequestDataTypeSelector(context, executor, mPauseLock, mMainThreadHandler, memoryCache,
+                storageCache);
     }
 
     /**
@@ -73,8 +74,7 @@ public final class ImageLoader {
      */
     @NonNull
     public RequestDataTypeSelector request() {
-        return new RequestDataTypeSelector(mContext, mExecutor, mPauseLock, mMainThreadHandler, mBitmapLoaders,
-                mDataDescriptors, mMemoryCache, mStorageCache);
+        return mDataTypeSelector;
     }
 
     /**
@@ -85,8 +85,7 @@ public final class ImageLoader {
      */
     @NonNull
     public <T> ImageRequest<T> request(@NonNull BitmapLoader<T> loader) {
-        return new ImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache, mStorageCache,
-                loader, mDataDescriptors.<T>common());
+        return mDataTypeSelector.common(loader);
     }
 
     /**
