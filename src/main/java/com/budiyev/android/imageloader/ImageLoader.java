@@ -58,8 +58,6 @@ public final class ImageLoader {
 
     /**
      * Create new load image request
-     *
-     * @return Source data type selector
      */
     @NonNull
     public ImageRequestFactory request() {
