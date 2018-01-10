@@ -32,7 +32,7 @@ import android.support.annotation.WorkerThread;
 final class SyncLoadImageAction<T> extends BaseLoadImageAction<T> {
     private Bitmap mImage;
 
-    protected SyncLoadImageAction(@NonNull Context context, @NonNull DataDescriptor<T> descriptor,
+    public SyncLoadImageAction(@NonNull Context context, @NonNull DataDescriptor<T> descriptor,
             @NonNull BitmapLoader<T> bitmapLoader, @Nullable BitmapTransformation transformation,
             @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache, @Nullable LoadCallback<T> loadCallback,
             @Nullable ErrorCallback<T> errorCallback, @NonNull PauseLock pauseLock) {
