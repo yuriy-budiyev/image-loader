@@ -70,7 +70,7 @@ public final class ImageLoader {
      * and {@link ImageRequest#size} methods, source data's toString() method result will be
      * used for key generation, make sure that toString() implementation of your data class is
      * suitable for key generation, recommended to use {@link ImageRequest#descriptor} method to provide
-     * unique key and some other characteristics of your custom data type instead
+     * unique key and some other parameters instead
      *
      * @param loader Bitmap loader for specified data type
      * @return New load image request
