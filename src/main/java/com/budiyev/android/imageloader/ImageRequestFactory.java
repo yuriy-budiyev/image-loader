@@ -36,7 +36,7 @@ import android.support.annotation.Nullable;
 /**
  * Image request source data type selector
  */
-public final class RequestDataTypeSelector {
+public final class ImageRequestFactory {
     private final BitmapLoader<Uri> mUriBitmapLoader = new UriBitmapLoader();
     private final BitmapLoader<String> mUrlBitmapLoader = new UrlBitmapLoader();
     private final BitmapLoader<File> mFileBitmapLoader = new FileBitmapLoader();
@@ -59,12 +59,12 @@ public final class RequestDataTypeSelector {
     private final ImageCache mMemoryCache;
     private final ImageCache mStorageCache;
 
-    RequestDataTypeSelector(@NonNull Context context, @NonNull ExecutorService executor, @NonNull PauseLock pauseLock,
-            @NonNull Handler mainThreadHandler, @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache) {
+    ImageRequestFactory(@NonNull Context context, @NonNull ExecutorService executor, @NonNull PauseLock pauseLock,
+            @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache) {
         mContext = context;
         mExecutor = executor;
         mPauseLock = pauseLock;
-        mMainThreadHandler = mainThreadHandler;
+        mMainThreadHandler = new Handler(context.getMainLooper());
         mMemoryCache = memoryCache;
         mStorageCache = storageCache;
     }
@@ -125,8 +125,14 @@ public final class RequestDataTypeSelector {
 
     @NonNull
     @SuppressWarnings("unchecked")
-    <T> ImageRequest<T> common(@NonNull BitmapLoader<T> loader) {
+    <T> ImageRequest<T> custom(@NonNull BitmapLoader<T> loader) {
         return new ImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache, mStorageCache,
                 loader, (DataDescriptorFactory<T>) mCommonDataDescriptorFactory);
+    }
+
+    @NonNull
+    <T> ImageRequest<T> custom(@NonNull BitmapLoader<T> loader, @NonNull DataDescriptorFactory<T> factory) {
+        return new ImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache, mStorageCache,
+                loader, factory);
     }
 }

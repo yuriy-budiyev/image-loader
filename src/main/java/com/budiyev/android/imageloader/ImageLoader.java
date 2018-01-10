@@ -28,7 +28,6 @@ import java.util.concurrent.ExecutorService;
 import android.app.Application;
 import android.content.ComponentCallbacks2;
 import android.content.Context;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -40,12 +39,9 @@ import android.support.annotation.Nullable;
  */
 public final class ImageLoader {
     private final PauseLock mPauseLock = new PauseLock();
-    private final Context mContext;
-    private final Handler mMainThreadHandler;
     private final ImageCache mMemoryCache;
     private final ImageCache mStorageCache;
-    private final ExecutorService mExecutor;
-    private final RequestDataTypeSelector mDataTypeSelector;
+    private final ImageRequestFactory mImageRequestFactory;
 
     /**
      * Image Loader
@@ -55,16 +51,12 @@ public final class ImageLoader {
      */
     ImageLoader(@NonNull Context context, @NonNull ExecutorService executor, @Nullable ImageCache memoryCache,
             @Nullable ImageCache storageCache) {
-        mContext = context;
-        mMainThreadHandler = new Handler(context.getMainLooper());
         mMemoryCache = memoryCache;
         mStorageCache = storageCache;
-        mExecutor = executor;
         if (storageCache instanceof StorageImageCache) {
-            ((StorageImageCache) storageCache).setExecutor(mExecutor);
+            ((StorageImageCache) storageCache).setExecutor(executor);
         }
-        mDataTypeSelector = new RequestDataTypeSelector(context, executor, mPauseLock, mMainThreadHandler, memoryCache,
-                storageCache);
+        mImageRequestFactory = new ImageRequestFactory(context, executor, mPauseLock, memoryCache, storageCache);
     }
 
     /**
@@ -73,8 +65,8 @@ public final class ImageLoader {
      * @return Source data type selector
      */
     @NonNull
-    public RequestDataTypeSelector request() {
-        return mDataTypeSelector;
+    public ImageRequestFactory request() {
+        return mImageRequestFactory;
     }
 
     /**
@@ -85,7 +77,7 @@ public final class ImageLoader {
      */
     @NonNull
     public <T> ImageRequest<T> request(@NonNull BitmapLoader<T> loader) {
-        return mDataTypeSelector.common(loader);
+        return mImageRequestFactory.custom(loader);
     }
 
     /**
@@ -97,8 +89,7 @@ public final class ImageLoader {
      */
     @NonNull
     public <T> ImageRequest<T> request(@NonNull BitmapLoader<T> loader, @NonNull DataDescriptorFactory<T> factory) {
-        return new ImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache, mStorageCache,
-                loader, factory);
+        return mImageRequestFactory.custom(loader, factory);
     }
 
     /**
