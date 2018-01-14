@@ -34,7 +34,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 /**
- * Image request source data type selector
+ * Image request factory
  */
 public final class ImageRequestFactory {
     private final BitmapLoader<Uri> mUriBitmapLoader = new UriBitmapLoader();
