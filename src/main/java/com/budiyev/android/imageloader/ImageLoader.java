@@ -75,6 +75,24 @@ public final class ImageLoader {
         registerDataType(byte[].class, new ByteArrayDataDescriptorFactory(), new ByteArrayBitmapLoader());
     }
 
+    /**
+     * Create new image request
+     * <br><br>
+     * <b>Data types, supported by default:</b>
+     * <ul>
+     * <li>{@link Uri} - Android URI</li>
+     * <li>{@link File} - File</li>
+     * <li>{@link String} - URL</li>
+     * <li>{@link Integer} - Android resource</li>
+     * <li>{@link FileDescriptor} - File descriptor</li>
+     * <li>{@code byte[]} - Byte array</li>
+     * </ul>
+     *
+     * @param data Source data, any registered data type
+     * @return New image request for specified data
+     * @throws IllegalArgumentException if specified data type is not registered
+     * @see #registerDataType
+     */
     @NonNull
     @SuppressWarnings("unchecked")
     public <T> ImageRequest<T> from(@NonNull T data) {
@@ -88,6 +106,12 @@ public final class ImageLoader {
                 bitmapLoader, descriptorFactory, data);
     }
 
+    /**
+     * Delete all cached images for specified data
+     *
+     * @param data Data
+     * @throws IllegalArgumentException if specified data type is not registered
+     */
     public void invalidate(@NonNull Object data) {
         String dataClassName = data.getClass().getName();
         DataDescriptorFactory<Object> descriptorFactory = mDescriptorFactories.get(dataClassName);
@@ -153,6 +177,16 @@ public final class ImageLoader {
         clearStorageCache();
     }
 
+    /**
+     * Register data type
+     *
+     * @param dataClass         Source data class
+     * @param descriptorFactory Data descriptor factory for specified data class
+     * @param bitmapLoader      Bitmap loader factory for specified data class
+     * @see DataDescriptorFactory
+     * @see DataDescriptor
+     * @see BitmapLoader
+     */
     @SuppressWarnings("unchecked")
     public <T> void registerDataType(@NonNull Class<T> dataClass, @NonNull DataDescriptorFactory<T> descriptorFactory,
             @NonNull BitmapLoader<T> bitmapLoader) {
@@ -161,6 +195,11 @@ public final class ImageLoader {
         mBitmapLoaders.put(dataClassName, (BitmapLoader<Object>) bitmapLoader);
     }
 
+    /**
+     * Unregister data type
+     *
+     * @param dataClass Source data class
+     */
     public void unregisterDataType(@NonNull Class<?> dataClass) {
         String dataClassName = dataClass.getName();
         mDescriptorFactories.remove(dataClassName);

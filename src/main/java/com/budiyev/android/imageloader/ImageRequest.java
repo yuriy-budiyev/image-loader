@@ -96,6 +96,9 @@ public final class ImageRequest<T> {
         return this;
     }
 
+    /**
+     * Cache mode
+     */
     @NonNull
     public ImageRequest<T> cacheMode(@Nullable CacheMode mode) {
         mCacheMode = mode;
