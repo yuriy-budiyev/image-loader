@@ -16,7 +16,7 @@ Image loader library for Android.
 ### Usage
 ```gradle
 dependencies {
-    implementation 'com.budiyev.android:image-loader:2.0.9'
+    implementation 'com.budiyev.android:image-loader:2.1.0'
 }
 ```
 ### Basic usage sample
@@ -29,15 +29,9 @@ public class MainActivity extends AppCompatActivity {
         ImageView view = findViewById(R.id.image_view);
 
         ImageLoader.with(this)
-                /*Create new load request,
-                  optionally, specify custom bitmap loader to be able to
-                  load bitmaps from any data type you need*/
-                .request()
-                /*Select source data type (if custom bitmap loader isn't specified),
-                  supported: Android URIs, string URLs, files, file descriptors,
-                  resources and byte arrays*/
-                .url()
-                /*Set source data*/
+                /*Create new load request for specified data.
+                  Data types supported by default: Android URIs, string URLs, files, file descriptors,
+                  resources and byte arrays.*/
                 .from("https://some.url/image")
                 /*Required image size (to load sampled bitmaps)*/
                 .size(1000, 1000)

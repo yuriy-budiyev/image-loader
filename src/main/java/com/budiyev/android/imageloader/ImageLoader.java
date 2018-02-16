@@ -122,6 +122,35 @@ public final class ImageLoader {
     }
 
     /**
+     * Register data type
+     *
+     * @param dataClass         Source data class
+     * @param descriptorFactory Data descriptor factory for specified data class
+     * @param bitmapLoader      Bitmap loader factory for specified data class
+     * @see DataDescriptorFactory
+     * @see DataDescriptor
+     * @see BitmapLoader
+     */
+    @SuppressWarnings("unchecked")
+    public <T> void registerDataType(@NonNull Class<T> dataClass, @NonNull DataDescriptorFactory<T> descriptorFactory,
+            @NonNull BitmapLoader<T> bitmapLoader) {
+        String dataClassName = dataClass.getName();
+        mDescriptorFactories.put(dataClassName, (DataDescriptorFactory<Object>) descriptorFactory);
+        mBitmapLoaders.put(dataClassName, (BitmapLoader<Object>) bitmapLoader);
+    }
+
+    /**
+     * Unregister data type
+     *
+     * @param dataClass Source data class
+     */
+    public void unregisterDataType(@NonNull Class<?> dataClass) {
+        String dataClassName = dataClass.getName();
+        mDescriptorFactories.remove(dataClassName);
+        mBitmapLoaders.remove(dataClassName);
+    }
+
+    /**
      * Whether loading is currently paused
      */
     public boolean isLoadingPaused() {
@@ -175,35 +204,6 @@ public final class ImageLoader {
     public void clearAllCaches() {
         clearMemoryCache();
         clearStorageCache();
-    }
-
-    /**
-     * Register data type
-     *
-     * @param dataClass         Source data class
-     * @param descriptorFactory Data descriptor factory for specified data class
-     * @param bitmapLoader      Bitmap loader factory for specified data class
-     * @see DataDescriptorFactory
-     * @see DataDescriptor
-     * @see BitmapLoader
-     */
-    @SuppressWarnings("unchecked")
-    public <T> void registerDataType(@NonNull Class<T> dataClass, @NonNull DataDescriptorFactory<T> descriptorFactory,
-            @NonNull BitmapLoader<T> bitmapLoader) {
-        String dataClassName = dataClass.getName();
-        mDescriptorFactories.put(dataClassName, (DataDescriptorFactory<Object>) descriptorFactory);
-        mBitmapLoaders.put(dataClassName, (BitmapLoader<Object>) bitmapLoader);
-    }
-
-    /**
-     * Unregister data type
-     *
-     * @param dataClass Source data class
-     */
-    public void unregisterDataType(@NonNull Class<?> dataClass) {
-        String dataClassName = dataClass.getName();
-        mDescriptorFactories.remove(dataClassName);
-        mBitmapLoaders.remove(dataClassName);
     }
 
     /**
