@@ -35,6 +35,6 @@ final class FileDataDescriptor extends IdentifiableDataDescriptor<File> {
     @NonNull
     @Override
     public CacheMode getCacheMode() {
-        return CacheMode.FULL;
+        return CacheMode.MEMORY;
     }
 }
