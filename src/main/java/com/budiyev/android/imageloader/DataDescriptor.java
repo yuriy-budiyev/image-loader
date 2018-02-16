@@ -28,7 +28,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 /**
- * Data descriptor, provides data and key that identifies this data
+ * Data descriptor, provides data and key that identifies this data,
+ * implementations should be immutable
  */
 public interface DataDescriptor<T> {
     /**

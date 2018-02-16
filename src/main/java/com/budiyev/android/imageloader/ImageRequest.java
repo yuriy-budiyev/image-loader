@@ -61,8 +61,7 @@ public final class ImageRequest<T> {
     private final ImageCache mMemoryCache;
     private final ImageCache mStorageCache;
     private final BitmapLoader<T> mBitmapLoader;
-    private final DataDescriptorFactory<T> mDescriptorFactory;
-    private final T mData;
+    private final DataDescriptor<T> mDescriptor;
     private Size mRequiredSize;
     private CacheMode mCacheMode;
     private LoadCallback<T> mLoadCallback;
@@ -74,11 +73,11 @@ public final class ImageRequest<T> {
     private boolean mFadeEnabled = true;
     private long mFadeDuration = DEFAULT_FADE_DURATION;
     private float mCornerRadius;
+    private boolean mExecuted;
 
     ImageRequest(@NonNull Context context, @NonNull ExecutorService executor, @NonNull PauseLock pauseLock,
             @NonNull Handler mainThreadHandler, @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache,
-            @NonNull BitmapLoader<T> bitmapLoader, @NonNull DataDescriptorFactory<T> descriptorFactory,
-            @NonNull T data) {
+            @NonNull BitmapLoader<T> bitmapLoader, @NonNull DataDescriptor<T> descriptor) {
         mContext = context;
         mExecutor = executor;
         mPauseLock = pauseLock;
@@ -86,8 +85,7 @@ public final class ImageRequest<T> {
         mStorageCache = storageCache;
         mBitmapLoader = bitmapLoader;
         mMainThreadHandler = mainThreadHandler;
-        mDescriptorFactory = descriptorFactory;
-        mData = data;
+        mDescriptor = descriptor;
     }
 
     /**
@@ -284,9 +282,9 @@ public final class ImageRequest<T> {
     @Nullable
     @WorkerThread
     public Bitmap loadSync() {
-        return new SyncLoadImageAction<>(mContext, mDescriptorFactory.newDescriptor(mData), mRequiredSize, mCacheMode,
-                mBitmapLoader, getTransformation(), mMemoryCache, mStorageCache, mLoadCallback, mErrorCallback,
-                mPauseLock).execute();
+        checkAndSetExecutedState();
+        return new SyncLoadImageAction<>(mContext, mDescriptor, mRequiredSize, mCacheMode, mBitmapLoader,
+                getTransformation(), mMemoryCache, mStorageCache, mLoadCallback, mErrorCallback, mPauseLock).execute();
     }
 
     /**
@@ -294,9 +292,9 @@ public final class ImageRequest<T> {
      */
     @AnyThread
     public void load() {
-        new LoadImageAction<>(mContext, mDescriptorFactory.newDescriptor(mData), mRequiredSize, mCacheMode,
-                mBitmapLoader, getTransformation(), mMemoryCache, mStorageCache, mLoadCallback, mErrorCallback,
-                mPauseLock).execute(mExecutor);
+        checkAndSetExecutedState();
+        new LoadImageAction<>(mContext, mDescriptor, mRequiredSize, mCacheMode, mBitmapLoader, getTransformation(),
+                mMemoryCache, mStorageCache, mLoadCallback, mErrorCallback, mPauseLock).execute(mExecutor);
     }
 
     /**
@@ -304,7 +302,8 @@ public final class ImageRequest<T> {
      */
     @MainThread
     public void load(@NonNull View view) {
-        DataDescriptor<T> descriptor = mDescriptorFactory.newDescriptor(mData);
+        checkAndSetExecutedState();
+        DataDescriptor<T> descriptor = mDescriptor;
         Bitmap image = null;
         String key = descriptor.getKey();
         ImageCache memoryCache = mMemoryCache;
@@ -365,8 +364,10 @@ public final class ImageRequest<T> {
     /**
      * Remove cached version of requested image asynchronously
      */
+    @AnyThread
     public void invalidate() {
-        mExecutor.submit(new InvalidateAction(mDescriptorFactory.newDescriptor(mData), mMemoryCache, mStorageCache));
+        checkAndSetExecutedState();
+        mExecutor.submit(new InvalidateAction(mDescriptor, mMemoryCache, mStorageCache));
     }
 
     @Nullable
@@ -381,5 +382,12 @@ public final class ImageRequest<T> {
         } else {
             return null;
         }
+    }
+
+    private void checkAndSetExecutedState() {
+        if (mExecuted) {
+            throw new IllegalStateException("Request can be executed only once");
+        }
+        mExecuted = true;
     }
 }

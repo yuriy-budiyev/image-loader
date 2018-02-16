@@ -103,7 +103,7 @@ public final class ImageLoader {
             throw new IllegalArgumentException("Unsupported data type: " + dataClassName);
         }
         return new ImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache, mStorageCache,
-                bitmapLoader, descriptorFactory, data);
+                bitmapLoader, descriptorFactory.newDescriptor(data));
     }
 
     /**
