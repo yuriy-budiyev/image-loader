@@ -89,10 +89,6 @@ public final class ImageLoader {
     }
 
     public void invalidate(@NonNull Object data) {
-        invalidate(data, null);
-    }
-
-    public void invalidate(@NonNull Object data, @Nullable Size size) {
         String dataClassName = data.getClass().getName();
         DataDescriptorFactory<Object> descriptorFactory = mDescriptorFactories.get(dataClassName);
         if (descriptorFactory == null) {
