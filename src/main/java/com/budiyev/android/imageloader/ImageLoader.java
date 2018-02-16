@@ -185,6 +185,12 @@ public final class ImageLoader {
         mBitmapLoaders.put(dataClassName, (BitmapLoader<Object>) bitmapLoader);
     }
 
+    public void unregisterDataType(@NonNull Class<?> dataClass) {
+        String dataClassName = dataClass.getName();
+        mDescriptorFactories.remove(dataClassName);
+        mBitmapLoaders.remove(dataClassName);
+    }
+
     /**
      * Get default image loader instance,
      * automatically cares about memory and storage caching

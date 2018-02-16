@@ -252,9 +252,12 @@ public final class DataUtils {
 
     private static void calculateSampleSize(@NonNull BitmapFactory.Options options, int requiredWidth,
             int requiredHeight) {
-        int sampleSize = 1;
         int width = options.outWidth;
         int height = options.outHeight;
+        if (width <= requiredWidth || height <= requiredHeight) {
+            return;
+        }
+        int sampleSize = 1;
         int threshold = Math.max(requiredWidth, requiredHeight) / 4;
         while (Math.abs(width - requiredWidth) > threshold && Math.abs(height - requiredHeight) > threshold) {
             width /= 2;
