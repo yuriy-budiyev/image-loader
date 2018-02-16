@@ -34,7 +34,6 @@ import android.content.ComponentCallbacks2;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Handler;
-import android.support.annotation.AnyThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -77,7 +76,6 @@ public final class ImageLoader {
     }
 
     @NonNull
-    @AnyThread
     @SuppressWarnings("unchecked")
     public <T> ImageRequest<T> from(@NonNull T data) {
         String dataClassName = data.getClass().getName();
@@ -179,7 +177,6 @@ public final class ImageLoader {
         clearStorageCache();
     }
 
-    @AnyThread
     @SuppressWarnings("unchecked")
     public <T> void registerDataType(@NonNull Class<T> dataClass, @NonNull DataDescriptorFactory<T> descriptorFactory,
             @NonNull BitmapLoader<T> bitmapLoader) {
