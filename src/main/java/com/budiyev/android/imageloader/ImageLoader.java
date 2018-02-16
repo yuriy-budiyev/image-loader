@@ -51,8 +51,8 @@ public final class ImageLoader {
     private final ImageCache mMemoryCache;
     private final ImageCache mStorageCache;
     private final PauseLock mPauseLock = new PauseLock();
-    private final Map<Class<?>, DataDescriptorFactory<Object>> mDescriptorFactories = new ConcurrentHashMap<>();
-    private final Map<Class<?>, BitmapLoader<Object>> mBitmapLoaders = new ConcurrentHashMap<>();
+    private final Map<String, DataDescriptorFactory<Object>> mDescriptorFactories = new ConcurrentHashMap<>();
+    private final Map<String, BitmapLoader<Object>> mBitmapLoaders = new ConcurrentHashMap<>();
 
     /**
      * Image Loader
@@ -76,33 +76,29 @@ public final class ImageLoader {
         registerDataType(byte[].class, new UnidentifiableDataDescriptorFactory<byte[]>(), new ByteArrayBitmapLoader());
     }
 
-    @AnyThread
-    @SuppressWarnings("unchecked")
-    public <T> void registerDataType(@NonNull Class<T> dataClass, @NonNull DataDescriptorFactory<T> descriptorFactory,
-            @NonNull BitmapLoader<T> bitmapLoader) {
-        mDescriptorFactories.put(dataClass, (DataDescriptorFactory<Object>) descriptorFactory);
-        mBitmapLoaders.put(dataClass, (BitmapLoader<Object>) bitmapLoader);
-    }
-
     @NonNull
     @AnyThread
     @SuppressWarnings("unchecked")
     public <T> ImageRequest<T> from(@NonNull T data) {
-        Class<?> dataClass = data.getClass();
-        DataDescriptorFactory<T> descriptorFactory = (DataDescriptorFactory<T>) mDescriptorFactories.get(dataClass);
-        BitmapLoader<T> bitmapLoader = (BitmapLoader<T>) mBitmapLoaders.get(dataClass);
+        String dataClassName = data.getClass().getName();
+        DataDescriptorFactory<T> descriptorFactory = (DataDescriptorFactory<T>) mDescriptorFactories.get(dataClassName);
+        BitmapLoader<T> bitmapLoader = (BitmapLoader<T>) mBitmapLoaders.get(dataClassName);
         if (descriptorFactory == null || bitmapLoader == null) {
-            throw new IllegalArgumentException("Unsupported data type: " + dataClass.getName());
+            throw new IllegalArgumentException("Unsupported data type: " + dataClassName);
         }
         return new ImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache, mStorageCache,
                 bitmapLoader, descriptorFactory, data);
     }
 
+    public void invalidate(@NonNull Object data) {
+        invalidate(data, null);
+    }
+
     public void invalidate(@NonNull Object data, @Nullable Size size) {
-        Class<?> dataClass = data.getClass();
-        DataDescriptorFactory<Object> descriptorFactory = mDescriptorFactories.get(dataClass);
+        String dataClassName = data.getClass().getName();
+        DataDescriptorFactory<Object> descriptorFactory = mDescriptorFactories.get(dataClassName);
         if (descriptorFactory == null) {
-            throw new IllegalArgumentException("Unsupported data type: " + dataClass.getName());
+            throw new IllegalArgumentException("Unsupported data type: " + dataClassName);
         }
         invalidate(descriptorFactory.newDescriptor(data, size));
     }
@@ -181,6 +177,15 @@ public final class ImageLoader {
     public void clearAllCaches() {
         clearMemoryCache();
         clearStorageCache();
+    }
+
+    @AnyThread
+    @SuppressWarnings("unchecked")
+    public <T> void registerDataType(@NonNull Class<T> dataClass, @NonNull DataDescriptorFactory<T> descriptorFactory,
+            @NonNull BitmapLoader<T> bitmapLoader) {
+        String dataClassName = dataClass.getName();
+        mDescriptorFactories.put(dataClassName, (DataDescriptorFactory<Object>) descriptorFactory);
+        mBitmapLoaders.put(dataClassName, (BitmapLoader<Object>) bitmapLoader);
     }
 
     /**
