@@ -23,25 +23,10 @@
  */
 package com.budiyev.android.imageloader;
 
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import android.support.annotation.NonNull;
 
-final class ImageLoaderThreadFactory implements ThreadFactory {
-    private final AtomicInteger mCounter = new AtomicInteger(1);
-
-    @NonNull
-    @Override
-    public Thread newThread(@NonNull Runnable r) {
-        mCounter.compareAndSet(Integer.MAX_VALUE, 0);
-        Thread t = new Thread(r, "ImageLoader thread #" + mCounter.getAndIncrement());
-        if (t.getPriority() != Thread.MIN_PRIORITY) {
-            t.setPriority(Thread.MIN_PRIORITY);
-        }
-        if (t.isDaemon()) {
-            t.setDaemon(false);
-        }
-        return t;
+final class ByteArrayDataDescriptor extends UnidentifiableDataDescriptor<byte[]> {
+    public ByteArrayDataDescriptor(@NonNull byte[] data) {
+        super(data);
     }
 }

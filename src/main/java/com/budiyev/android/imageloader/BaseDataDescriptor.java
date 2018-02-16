@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017 Yuriy Budiyev [yuriy.budiyev@yandex.ru]
+ * Copyright (c) 2018 Yuriy Budiyev [yuriy.budiyev@yandex.ru]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,8 +34,7 @@ abstract class BaseDataDescriptor<T> implements DataDescriptor<T> {
 
     @NonNull
     @Override
-    public T getData() {
+    public final T getData() {
         return mData;
     }
-
 }

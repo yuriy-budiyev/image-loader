@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017 Yuriy Budiyev [yuriy.budiyev@yandex.ru]
+ * Copyright (c) 2018 Yuriy Budiyev [yuriy.budiyev@yandex.ru]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,12 +23,12 @@
  */
 package com.budiyev.android.imageloader;
 
+import java.io.FileDescriptor;
+
 import android.support.annotation.NonNull;
 
-final class UnidentifiableDataDescriptorFactory<T> implements DataDescriptorFactory<T> {
-    @NonNull
-    @Override
-    public DataDescriptor<T> newDescriptor(@NonNull T data) {
-        return new UnidentifiableDataDescriptor<>(data);
+final class FileDescriptorDataDescriptor extends UnidentifiableDataDescriptor<FileDescriptor> {
+    public FileDescriptorDataDescriptor(@NonNull FileDescriptor data) {
+        super(data);
     }
 }

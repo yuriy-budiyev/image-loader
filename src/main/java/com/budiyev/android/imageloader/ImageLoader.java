@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017 Yuriy Budiyev [yuriy.budiyev@yandex.ru]
+ * Copyright (c) 2018 Yuriy Budiyev [yuriy.budiyev@yandex.ru]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -69,10 +69,10 @@ public final class ImageLoader {
         registerDataType(Uri.class, new UriDataDescriptorFactory(), new UriBitmapLoader());
         registerDataType(File.class, new FileDataDescriptorFactory(), new FileBitmapLoader());
         registerDataType(String.class, new UrlDataDescriptorFactory(), new UrlBitmapLoader());
-        registerDataType(FileDescriptor.class, new UnidentifiableDataDescriptorFactory<FileDescriptor>(),
-                new FileDescriptorBitmapLoader());
         registerDataType(Integer.class, new ResourceDataDescriptorFactory(), new ResourceBitmapLoader());
-        registerDataType(byte[].class, new UnidentifiableDataDescriptorFactory<byte[]>(), new ByteArrayBitmapLoader());
+        registerDataType(FileDescriptor.class, new FileDescriptorDataDescriptorFactory(),
+                new FileDescriptorBitmapLoader());
+        registerDataType(byte[].class, new ByteArrayDataDescriptorFactory(), new ByteArrayBitmapLoader());
     }
 
     @NonNull

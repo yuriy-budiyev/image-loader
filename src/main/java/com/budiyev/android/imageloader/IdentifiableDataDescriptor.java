@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017 Yuriy Budiyev [yuriy.budiyev@yandex.ru]
+ * Copyright (c) 2018 Yuriy Budiyev [yuriy.budiyev@yandex.ru]
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,6 @@
 package com.budiyev.android.imageloader;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 abstract class IdentifiableDataDescriptor<T> extends BaseDataDescriptor<T> {
     private final String mKey;
@@ -34,9 +33,9 @@ abstract class IdentifiableDataDescriptor<T> extends BaseDataDescriptor<T> {
         mKey = DataUtils.generateSHA256(keyBase);
     }
 
-    @Nullable
+    @NonNull
     @Override
-    public String getKey() {
+    public final String getKey() {
         return mKey;
     }
 }
