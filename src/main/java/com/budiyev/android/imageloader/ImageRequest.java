@@ -48,6 +48,9 @@ import android.view.View;
 
 /**
  * Image request
+ * <br>
+ * Note that all methods of this class should be called on the same thread as {@link ImageLoader#from} method
+ * that created this request
  */
 public final class ImageRequest<T> {
     private static final long DEFAULT_FADE_DURATION = 200L;
