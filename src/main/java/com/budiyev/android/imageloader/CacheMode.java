@@ -63,5 +63,3 @@ public enum CacheMode {
         return mStorageCacheEnabled;
     }
 }
-
-
