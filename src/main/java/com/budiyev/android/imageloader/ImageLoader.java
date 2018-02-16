@@ -111,6 +111,7 @@ public final class ImageLoader {
      *
      * @param data Data
      * @throws IllegalArgumentException if specified data type is not registered
+     * @see #registerDataType
      */
     public void invalidate(@NonNull Object data) {
         String dataClassName = data.getClass().getName();
@@ -130,6 +131,7 @@ public final class ImageLoader {
      * @see DataDescriptorFactory
      * @see DataDescriptor
      * @see BitmapLoader
+     * @see #unregisterDataType
      */
     @SuppressWarnings("unchecked")
     public <T> void registerDataType(@NonNull Class<T> dataClass, @NonNull DataDescriptorFactory<T> descriptorFactory,
