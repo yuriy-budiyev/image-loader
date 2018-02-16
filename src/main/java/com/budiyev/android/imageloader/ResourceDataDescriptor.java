@@ -24,13 +24,10 @@
 package com.budiyev.android.imageloader;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 final class ResourceDataDescriptor extends IdentifiableDataDescriptor<Integer> {
-    public static final String KEY_BASE_PREFIX = "resource_";
-
-    public ResourceDataDescriptor(@NonNull Integer data, @Nullable Size requiredSize) {
-        super(data, KEY_BASE_PREFIX + data.toString(), requiredSize);
+    public ResourceDataDescriptor(@NonNull Integer data) {
+        super(data, data.toString());
     }
 
     @Override

@@ -55,16 +55,6 @@ public interface DataDescriptor<T> {
     String getKey();
 
     /**
-     * Optional required image size, if not specified full sized image should be loaded,
-     * note that key should be unique for each size
-     *
-     * @return Required image size
-     */
-    @Nullable
-    @AnyThread
-    Size getRequiredSize();
-
-    /**
      * Whether if loaded image should be cached in storage
      */
     @AnyThread

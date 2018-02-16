@@ -25,12 +25,11 @@ package com.budiyev.android.imageloader;
 
 import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 final class UriDataDescriptorFactory implements DataDescriptorFactory<Uri> {
     @NonNull
     @Override
-    public DataDescriptor<Uri> newDescriptor(@NonNull Uri data, @Nullable Size requiredSize) {
-        return new UriDataDescriptor(data, requiredSize);
+    public DataDescriptor<Uri> newDescriptor(@NonNull Uri data) {
+        return new UriDataDescriptor(data);
     }
 }

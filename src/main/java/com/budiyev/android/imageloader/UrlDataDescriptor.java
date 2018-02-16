@@ -24,11 +24,10 @@
 package com.budiyev.android.imageloader;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 final class UrlDataDescriptor extends IdentifiableDataDescriptor<String> {
-    public UrlDataDescriptor(@NonNull String data, @Nullable Size requiredSize) {
-        super(data, data, requiredSize);
+    public UrlDataDescriptor(@NonNull String data) {
+        super(data, data);
     }
 
     @Override

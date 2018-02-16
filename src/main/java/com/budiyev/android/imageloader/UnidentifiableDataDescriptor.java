@@ -27,8 +27,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 final class UnidentifiableDataDescriptor<T> extends BaseDataDescriptor<T> {
-    public UnidentifiableDataDescriptor(@NonNull T data, @Nullable Size requiredSize) {
-        super(data, requiredSize);
+    public UnidentifiableDataDescriptor(@NonNull T data) {
+        super(data);
     }
 
     @Nullable

@@ -98,7 +98,7 @@ public final class ImageLoader {
         if (descriptorFactory == null) {
             throw new IllegalArgumentException("Unsupported data type: " + dataClassName);
         }
-        invalidate(descriptorFactory.newDescriptor(data, size));
+        invalidate(descriptorFactory.newDescriptor(data));
     }
 
     /**

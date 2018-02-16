@@ -351,7 +351,7 @@ public final class ImageRequest<T> {
 
     @NonNull
     private DataDescriptor<T> getDescriptor() {
-        return mDescriptorFactory.newDescriptor(mData, mRequiredSize);
+        return mDescriptorFactory.newDescriptor(mData);
     }
 
     @Nullable

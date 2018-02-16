@@ -24,12 +24,11 @@
 package com.budiyev.android.imageloader;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 final class UrlDataDescriptorFactory implements DataDescriptorFactory<String> {
     @NonNull
     @Override
-    public DataDescriptor<String> newDescriptor(@NonNull String data, @Nullable Size requiredSize) {
-        return new UrlDataDescriptor(data, requiredSize);
+    public DataDescriptor<String> newDescriptor(@NonNull String data) {
+        return new UrlDataDescriptor(data);
     }
 }

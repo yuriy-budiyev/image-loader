@@ -29,14 +29,9 @@ import android.support.annotation.Nullable;
 abstract class IdentifiableDataDescriptor<T> extends BaseDataDescriptor<T> {
     private final String mKey;
 
-    protected IdentifiableDataDescriptor(@NonNull T data, @NonNull String keyBase, @Nullable Size requiredSize) {
-        super(data, requiredSize);
-        String hash = DataUtils.generateSHA256(keyBase);
-        if (requiredSize != null) {
-            mKey = hash + "_sampled_" + requiredSize.getWidth() + "x" + requiredSize.getHeight();
-        } else {
-            mKey = hash;
-        }
+    protected IdentifiableDataDescriptor(@NonNull T data, @NonNull String keyBase) {
+        super(data);
+        mKey = DataUtils.generateSHA256(keyBase);
     }
 
     @Nullable

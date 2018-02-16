@@ -188,7 +188,7 @@ abstract class BaseLoadImageAction<T> {
         }
         // Load new image
         try {
-            image = mBitmapLoader.load(context, data, descriptor.getRequiredSize());
+            image = mBitmapLoader.load(context, data, null);
         } catch (Throwable error) {
             processError(context, data, error);
             return;
