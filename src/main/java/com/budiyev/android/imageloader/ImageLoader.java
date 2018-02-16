@@ -94,16 +94,7 @@ public final class ImageLoader {
         if (descriptorFactory == null) {
             throw new IllegalArgumentException("Unsupported data type: " + dataClassName);
         }
-        invalidate(descriptorFactory.newDescriptor(data));
-    }
-
-    /**
-     * Delete cached image for specified {@link DataDescriptor}
-     *
-     * @see DataDescriptor
-     */
-    public void invalidate(@NonNull DataDescriptor<?> descriptor) {
-        InternalUtils.invalidate(mMemoryCache, mStorageCache, descriptor);
+        InternalUtils.invalidate(mMemoryCache, mStorageCache, descriptorFactory.newDescriptor(data));
     }
 
     /**
