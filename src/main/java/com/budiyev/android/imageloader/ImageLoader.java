@@ -34,6 +34,7 @@ import android.content.ComponentCallbacks2;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Handler;
+import android.support.annotation.AnyThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -67,14 +68,15 @@ public final class ImageLoader {
         mMemoryCache = memoryCache;
         mStorageCache = storageCache;
         registerDataType(Uri.class, new UriDataDescriptorFactory(), new UriBitmapLoader());
-        registerDataType(String.class, new UrlDataDescriptorFactory(), new UrlBitmapLoader());
         registerDataType(File.class, new FileDataDescriptorFactory(), new FileBitmapLoader());
+        registerDataType(String.class, new UrlDataDescriptorFactory(), new UrlBitmapLoader());
         registerDataType(FileDescriptor.class, new UnidentifiableDataDescriptorFactory<FileDescriptor>(),
                 new FileDescriptorBitmapLoader());
         registerDataType(Integer.class, new ResourceDataDescriptorFactory(), new ResourceBitmapLoader());
         registerDataType(byte[].class, new UnidentifiableDataDescriptorFactory<byte[]>(), new ByteArrayBitmapLoader());
     }
 
+    @AnyThread
     @SuppressWarnings("unchecked")
     public <T> void registerDataType(@NonNull Class<T> dataClass, @NonNull DataDescriptorFactory<T> descriptorFactory,
             @NonNull BitmapLoader<T> bitmapLoader) {
@@ -83,6 +85,7 @@ public final class ImageLoader {
     }
 
     @NonNull
+    @AnyThread
     @SuppressWarnings("unchecked")
     public <T> ImageRequest<T> from(@NonNull T data) {
         Class<?> dataClass = data.getClass();
