@@ -284,8 +284,9 @@ public final class ImageRequest<T> {
     @Nullable
     @WorkerThread
     public Bitmap loadSync() {
-        return new SyncLoadImageAction<>(mContext, getDescriptor(), mRequiredSize, mCacheMode, mBitmapLoader,
-                getTransformation(), mMemoryCache, mStorageCache, mLoadCallback, mErrorCallback, mPauseLock).execute();
+        return new SyncLoadImageAction<>(mContext, mDescriptorFactory.newDescriptor(mData), mRequiredSize, mCacheMode,
+                mBitmapLoader, getTransformation(), mMemoryCache, mStorageCache, mLoadCallback, mErrorCallback,
+                mPauseLock).execute();
     }
 
     /**
@@ -293,8 +294,9 @@ public final class ImageRequest<T> {
      */
     @AnyThread
     public void load() {
-        new LoadImageAction<>(mContext, getDescriptor(), mRequiredSize, mCacheMode, mBitmapLoader, getTransformation(),
-                mMemoryCache, mStorageCache, mLoadCallback, mErrorCallback, mPauseLock).execute(mExecutor);
+        new LoadImageAction<>(mContext, mDescriptorFactory.newDescriptor(mData), mRequiredSize, mCacheMode,
+                mBitmapLoader, getTransformation(), mMemoryCache, mStorageCache, mLoadCallback, mErrorCallback,
+                mPauseLock).execute(mExecutor);
     }
 
     /**
@@ -302,7 +304,7 @@ public final class ImageRequest<T> {
      */
     @MainThread
     public void load(@NonNull View view) {
-        DataDescriptor<T> descriptor = getDescriptor();
+        DataDescriptor<T> descriptor = mDescriptorFactory.newDescriptor(mData);
         Bitmap image = null;
         String key = descriptor.getKey();
         ImageCache memoryCache = mMemoryCache;
@@ -364,12 +366,7 @@ public final class ImageRequest<T> {
      * Remove cached version of requested image asynchronously
      */
     public void invalidate() {
-        mExecutor.submit(new InvalidateAction(getDescriptor(), mMemoryCache, mStorageCache));
-    }
-
-    @NonNull
-    private DataDescriptor<T> getDescriptor() {
-        return mDescriptorFactory.newDescriptor(mData);
+        mExecutor.submit(new InvalidateAction(mDescriptorFactory.newDescriptor(mData), mMemoryCache, mStorageCache));
     }
 
     @Nullable
