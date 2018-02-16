@@ -59,9 +59,8 @@ public final class ImageRequest<T> {
     private final ImageCache mStorageCache;
     private final BitmapLoader<T> mBitmapLoader;
     private final DataDescriptorFactory<T> mDescriptorFactory;
-    private T mData;
+    private final T mData;
     private Size mRequiredSize;
-    private DataDescriptor<T> mDescriptor;
     private LoadCallback<T> mLoadCallback;
     private ErrorCallback<T> mErrorCallback;
     private DisplayCallback<T> mDisplayCallback;
@@ -74,7 +73,8 @@ public final class ImageRequest<T> {
 
     ImageRequest(@NonNull Context context, @NonNull ExecutorService executor, @NonNull PauseLock pauseLock,
             @NonNull Handler mainThreadHandler, @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache,
-            @NonNull BitmapLoader<T> bitmapLoader, @NonNull DataDescriptorFactory<T> descriptorFactory) {
+            @NonNull BitmapLoader<T> bitmapLoader, @NonNull DataDescriptorFactory<T> descriptorFactory,
+            @NonNull T data) {
         mContext = context;
         mExecutor = executor;
         mPauseLock = pauseLock;
@@ -83,46 +83,15 @@ public final class ImageRequest<T> {
         mBitmapLoader = bitmapLoader;
         mMainThreadHandler = mainThreadHandler;
         mDescriptorFactory = descriptorFactory;
-    }
-
-    /**
-     * Source data
-     *
-     * @see #descriptor
-     */
-    @NonNull
-    public ImageRequest<T> from(@NonNull T data) {
-        mDescriptor = null;
         mData = data;
-        return this;
     }
 
     /**
-     * Required image size, affects only when source data set through {@link #from} method
-     *
-     * @see #descriptor
+     * Required image size
      */
     @NonNull
     public ImageRequest<T> size(@Px int requiredWidth, @Px int requiredHeight) {
-        mDescriptor = null;
         mRequiredSize = new Size(requiredWidth, requiredHeight);
-        return this;
-    }
-
-    /**
-     * Source data descriptor,
-     * note that this method and {@link #from} can't be used together and override each other,
-     * also, required image size, specified through {@link #size} doesn't make sense when this method is used,
-     * required size should be returned from {@link DataDescriptor#getRequiredSize}
-     *
-     * @see DataDescriptor
-     * @see #from
-     */
-    @NonNull
-    public ImageRequest<T> descriptor(@Nullable DataDescriptor<T> descriptor) {
-        mData = null;
-        mRequiredSize = null;
-        mDescriptor = descriptor;
         return this;
     }
 
@@ -302,11 +271,7 @@ public final class ImageRequest<T> {
     @Nullable
     @WorkerThread
     public Bitmap loadSync() {
-        DataDescriptor<T> descriptor = getDescriptor();
-        if (descriptor == null) {
-            return null;
-        }
-        return new SyncLoadImageAction<>(mContext, descriptor, mBitmapLoader, getTransformation(), mMemoryCache,
+        return new SyncLoadImageAction<>(mContext, getDescriptor(), mBitmapLoader, getTransformation(), mMemoryCache,
                 mStorageCache, mLoadCallback, mErrorCallback, mPauseLock).execute();
     }
 
@@ -315,12 +280,8 @@ public final class ImageRequest<T> {
      */
     @AnyThread
     public void load() {
-        DataDescriptor<T> descriptor = getDescriptor();
-        if (descriptor == null) {
-            return;
-        }
-        new LoadImageAction<>(mContext, descriptor, mBitmapLoader, getTransformation(), mMemoryCache, mStorageCache,
-                mLoadCallback, mErrorCallback, mPauseLock).execute(mExecutor);
+        new LoadImageAction<>(mContext, getDescriptor(), mBitmapLoader, getTransformation(), mMemoryCache,
+                mStorageCache, mLoadCallback, mErrorCallback, mPauseLock).execute(mExecutor);
     }
 
     /**
@@ -329,9 +290,6 @@ public final class ImageRequest<T> {
     @MainThread
     public void load(@NonNull View view) {
         DataDescriptor<T> descriptor = getDescriptor();
-        if (descriptor == null) {
-            return;
-        }
         Bitmap image = null;
         String key = descriptor.getKey();
         ImageCache memoryCache = mMemoryCache;
@@ -385,29 +343,15 @@ public final class ImageRequest<T> {
     /**
      * Remove cached version of requested image
      *
-     * @see #from
      * @see #size
-     * @see #descriptor
      */
     public void invalidate() {
-        DataDescriptor<T> descriptor = getDescriptor();
-        if (descriptor == null) {
-            return;
-        }
-        mExecutor.submit(new InvalidateAction(descriptor, mMemoryCache, mStorageCache));
+        mExecutor.submit(new InvalidateAction(getDescriptor(), mMemoryCache, mStorageCache));
     }
 
-    @Nullable
+    @NonNull
     private DataDescriptor<T> getDescriptor() {
-        DataDescriptor<T> descriptor = mDescriptor;
-        if (descriptor != null) {
-            return descriptor;
-        }
-        T data = mData;
-        if (data != null) {
-            return mDescriptorFactory.newDescriptor(data, mRequiredSize);
-        }
-        return null;
+        return mDescriptorFactory.newDescriptor(mData, mRequiredSize);
     }
 
     @Nullable

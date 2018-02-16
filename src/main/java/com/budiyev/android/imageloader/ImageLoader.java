@@ -23,11 +23,17 @@
  */
 package com.budiyev.android.imageloader;
 
+import java.io.File;
+import java.io.FileDescriptor;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 
 import android.app.Application;
 import android.content.ComponentCallbacks2;
 import android.content.Context;
+import android.net.Uri;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -38,10 +44,14 @@ import android.support.annotation.Nullable;
  * @see #builder
  */
 public final class ImageLoader {
-    private final PauseLock mPauseLock = new PauseLock();
+    private final Context mContext;
+    private final ExecutorService mExecutor;
+    private final Handler mMainThreadHandler;
     private final ImageCache mMemoryCache;
     private final ImageCache mStorageCache;
-    private final ImageRequestFactory mImageRequestFactory;
+    private final PauseLock mPauseLock = new PauseLock();
+    private final Map<Class<?>, DataDescriptorFactory<Object>> mDescriptorFactories = new ConcurrentHashMap<>();
+    private final Map<Class<?>, BitmapLoader<Object>> mBitmapLoaders = new ConcurrentHashMap<>();
 
     /**
      * Image Loader
@@ -51,45 +61,38 @@ public final class ImageLoader {
      */
     ImageLoader(@NonNull Context context, @NonNull ExecutorService executor, @Nullable ImageCache memoryCache,
             @Nullable ImageCache storageCache) {
+        mContext = context;
+        mExecutor = executor;
+        mMainThreadHandler = new Handler(context.getMainLooper());
         mMemoryCache = memoryCache;
         mStorageCache = storageCache;
-        mImageRequestFactory = new ImageRequestFactory(context, executor, mPauseLock, memoryCache, storageCache);
+        registerDataType(Uri.class, new UriDataDescriptorFactory(), new UriBitmapLoader());
+        registerDataType(String.class, new UrlDataDescriptorFactory(), new UrlBitmapLoader());
+        registerDataType(File.class, new FileDataDescriptorFactory(), new FileBitmapLoader());
+        registerDataType(FileDescriptor.class, new UnidentifiableDataDescriptorFactory<FileDescriptor>(),
+                new FileDescriptorBitmapLoader());
+        registerDataType(Integer.class, new ResourceDataDescriptorFactory(), new ResourceBitmapLoader());
+        registerDataType(byte[].class, new UnidentifiableDataDescriptorFactory<byte[]>(), new ByteArrayBitmapLoader());
     }
 
-    /**
-     * Create new load image request
-     */
-    @NonNull
-    public ImageRequestFactory request() {
-        return mImageRequestFactory;
+    @SuppressWarnings("unchecked")
+    public <T> void registerDataType(@NonNull Class<T> dataClass, @NonNull DataDescriptorFactory<T> descriptorFactory,
+            @NonNull BitmapLoader<T> bitmapLoader) {
+        mDescriptorFactories.put(dataClass, (DataDescriptorFactory<Object>) descriptorFactory);
+        mBitmapLoaders.put(dataClass, (BitmapLoader<Object>) bitmapLoader);
     }
 
-    /**
-     * Create new load image request,
-     * note that default data descriptor will be used with {@link ImageRequest#from}
-     * and {@link ImageRequest#size} methods, source data's toString() method result will be
-     * used for key generation, make sure that toString() implementation of your data class is
-     * suitable for key generation, recommended to use {@link ImageRequest#descriptor} method to provide
-     * unique key and some other parameters instead
-     *
-     * @param loader Bitmap loader for specified data type
-     * @return New load image request
-     */
     @NonNull
-    public <T> ImageRequest<T> request(@NonNull BitmapLoader<T> loader) {
-        return mImageRequestFactory.custom(loader);
-    }
-
-    /**
-     * Create new load image request
-     *
-     * @param loader  Bitmap loader
-     * @param factory Data descriptor factory
-     * @return New load image request
-     */
-    @NonNull
-    public <T> ImageRequest<T> request(@NonNull BitmapLoader<T> loader, @NonNull DataDescriptorFactory<T> factory) {
-        return mImageRequestFactory.custom(loader, factory);
+    @SuppressWarnings("unchecked")
+    public <T> ImageRequest<T> from(@NonNull T data) {
+        Class<?> dataClass = data.getClass();
+        DataDescriptorFactory<T> descriptorFactory = (DataDescriptorFactory<T>) mDescriptorFactories.get(dataClass);
+        BitmapLoader<T> bitmapLoader = (BitmapLoader<T>) mBitmapLoaders.get(dataClass);
+        if (descriptorFactory == null || bitmapLoader == null) {
+            throw new IllegalArgumentException("Unsupported data type: " + dataClass.getName());
+        }
+        return new ImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache, mStorageCache,
+                bitmapLoader, descriptorFactory, data);
     }
 
     /**
