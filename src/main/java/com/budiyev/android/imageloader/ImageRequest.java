@@ -278,6 +278,7 @@ public final class ImageRequest<T> {
      * Load image synchronously (on current thread)
      *
      * @return Loaded image or {@code null} if image could not be loaded or source data hasn't been specified
+     * @throws IllegalStateException if request has already executed
      */
     @Nullable
     @WorkerThread
@@ -289,6 +290,8 @@ public final class ImageRequest<T> {
 
     /**
      * Load image
+     *
+     * @throws IllegalStateException if request has already executed
      */
     @AnyThread
     public void load() {
@@ -299,6 +302,8 @@ public final class ImageRequest<T> {
 
     /**
      * Load image and display it in the specified {@code view}
+     *
+     * @throws IllegalStateException if request has already executed
      */
     @MainThread
     public void load(@NonNull View view) {
@@ -363,6 +368,8 @@ public final class ImageRequest<T> {
 
     /**
      * Remove cached version of requested image asynchronously
+     *
+     * @throws IllegalStateException if request has already executed
      */
     @AnyThread
     public void invalidate() {
