@@ -100,7 +100,7 @@ public final class ImageRequest<T> {
     }
 
     /**
-     * Cache mode
+     * Cache mode, overrides data type specific mode
      */
     @NonNull
     public ImageRequest<T> cacheMode(@Nullable CacheMode mode) {
