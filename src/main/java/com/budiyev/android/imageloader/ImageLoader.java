@@ -98,6 +98,15 @@ public final class ImageLoader {
                 bitmapLoader, descriptorFactory, data);
     }
 
+    public void invalidate(@NonNull Object data, @Nullable Size size) {
+        Class<?> dataClass = data.getClass();
+        DataDescriptorFactory<Object> descriptorFactory = mDescriptorFactories.get(dataClass);
+        if (descriptorFactory == null) {
+            throw new IllegalArgumentException("Unsupported data type: " + dataClass.getName());
+        }
+        invalidate(descriptorFactory.newDescriptor(data, size));
+    }
+
     /**
      * Delete cached image for specified {@link DataDescriptor}
      *
