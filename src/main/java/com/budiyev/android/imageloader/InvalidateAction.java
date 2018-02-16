@@ -42,18 +42,7 @@ final class InvalidateAction implements Callable<Void> {
 
     @Override
     public Void call() throws Exception {
-        DataDescriptor<?> descriptor = mDescriptor;
-        String key = descriptor.getKey();
-        if (key != null) {
-            ImageCache memoryCache = mMemoryCache;
-            if (memoryCache != null && descriptor.isMemoryCachingEnabled()) {
-                memoryCache.remove(key);
-            }
-            ImageCache storageCache = mStorageCache;
-            if (storageCache != null && descriptor.isStorageCachingEnabled()) {
-                storageCache.remove(key);
-            }
-        }
+        InternalUtils.invalidate(mMemoryCache, mStorageCache, mDescriptor);
         return null;
     }
 }

@@ -37,13 +37,9 @@ final class UnidentifiableDataDescriptor<T> extends BaseDataDescriptor<T> {
         return null;
     }
 
+    @NonNull
     @Override
-    public boolean isStorageCachingEnabled() {
-        return false;
-    }
-
-    @Override
-    public boolean isMemoryCachingEnabled() {
-        return false;
+    public CacheMode getCacheMode() {
+        return CacheMode.NONE;
     }
 }

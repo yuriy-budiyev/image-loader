@@ -55,14 +55,12 @@ public interface DataDescriptor<T> {
     String getKey();
 
     /**
-     * Whether if loaded image should be cached in storage
+     * Caching mode for images that is loaded from this data descriptor data type,
+     * can be overridden with {@link ImageRequest#cacheMode}
+     *
+     * @return Cache mode
      */
+    @Nullable
     @AnyThread
-    boolean isStorageCachingEnabled();
-
-    /**
-     * Whether if loaded image should be cached in memory
-     */
-    @AnyThread
-    boolean isMemoryCachingEnabled();
+    CacheMode getCacheMode();
 }

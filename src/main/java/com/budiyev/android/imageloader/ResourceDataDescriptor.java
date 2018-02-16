@@ -30,13 +30,9 @@ final class ResourceDataDescriptor extends IdentifiableDataDescriptor<Integer> {
         super(data, data.toString());
     }
 
+    @NonNull
     @Override
-    public boolean isStorageCachingEnabled() {
-        return false;
-    }
-
-    @Override
-    public boolean isMemoryCachingEnabled() {
-        return true;
+    public CacheMode getCacheMode() {
+        return CacheMode.MEMORY;
     }
 }

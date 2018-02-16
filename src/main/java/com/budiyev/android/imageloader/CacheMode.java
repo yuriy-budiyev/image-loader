@@ -23,16 +23,45 @@
  */
 package com.budiyev.android.imageloader;
 
-import android.support.annotation.NonNull;
+/**
+ * Cache mode
+ */
+public enum CacheMode {
+    /**
+     * Both memory and storage caches will be used in loading process
+     */
+    FULL(true, true),
 
-final class UrlDataDescriptor extends IdentifiableDataDescriptor<String> {
-    public UrlDataDescriptor(@NonNull String data) {
-        super(data, data);
+    /**
+     * Only memory cache will be used in loading process
+     */
+    MEMORY(true, false),
+
+    /**
+     * Only storage caches will be used in loading process
+     */
+    STORAGE(false, true),
+
+    /**
+     * No caching
+     */
+    NONE(false, false);
+
+    private final boolean mMemoryCacheEnabled;
+    private final boolean mStorageCacheEnabled;
+
+    CacheMode(boolean memoryCacheEnabled, boolean storageCacheEnabled) {
+        mMemoryCacheEnabled = memoryCacheEnabled;
+        mStorageCacheEnabled = storageCacheEnabled;
     }
 
-    @NonNull
-    @Override
-    public CacheMode getCacheMode() {
-        return CacheMode.FULL;
+    boolean isMemoryCacheEnabled() {
+        return mMemoryCacheEnabled;
+    }
+
+    boolean isStorageCacheEnabled() {
+        return mStorageCacheEnabled;
     }
 }
+
+

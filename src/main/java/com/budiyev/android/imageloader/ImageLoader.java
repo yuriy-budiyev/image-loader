@@ -107,18 +107,7 @@ public final class ImageLoader {
      * @see DataDescriptor
      */
     public void invalidate(@NonNull DataDescriptor<?> descriptor) {
-        String key = descriptor.getKey();
-        if (key == null) {
-            return;
-        }
-        ImageCache memoryCache = mMemoryCache;
-        if (memoryCache != null && descriptor.isMemoryCachingEnabled()) {
-            memoryCache.remove(key);
-        }
-        ImageCache storageCache = mStorageCache;
-        if (storageCache != null && descriptor.isStorageCachingEnabled()) {
-            storageCache.remove(key);
-        }
+        InternalUtils.invalidate(mMemoryCache, mStorageCache, descriptor);
     }
 
     /**

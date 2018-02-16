@@ -56,6 +56,21 @@ final class InternalUtils {
     private InternalUtils() {
     }
 
+    public static void invalidate(@Nullable ImageCache memoryCache, @Nullable ImageCache storageCache,
+            @NonNull DataDescriptor<?> descriptor) {
+        String key = descriptor.getKey();
+        if (key == null) {
+            return;
+        }
+        CacheMode cacheMode = descriptor.getCacheMode();
+        if (memoryCache != null && (cacheMode == null || cacheMode.isMemoryCacheEnabled())) {
+            memoryCache.remove(key);
+        }
+        if (storageCache != null && (cacheMode == null || cacheMode.isStorageCacheEnabled())) {
+            storageCache.remove(key);
+        }
+    }
+
     public static void close(@Nullable Closeable closeable) {
         if (closeable == null) {
             return;

@@ -25,22 +25,19 @@ package com.budiyev.android.imageloader;
 
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 final class UriDataDescriptor extends IdentifiableDataDescriptor<Uri> {
-    private final boolean mStorageCachingEnabled;
+    private final CacheMode mCacheMode;
 
     public UriDataDescriptor(@NonNull Uri data) {
         super(data, data.toString());
-        mStorageCachingEnabled = !InternalUtils.isUriLocal(data);
+        mCacheMode = InternalUtils.isUriLocal(data) ? CacheMode.MEMORY : CacheMode.FULL;
     }
 
+    @Nullable
     @Override
-    public boolean isStorageCachingEnabled() {
-        return mStorageCachingEnabled;
-    }
-
-    @Override
-    public boolean isMemoryCachingEnabled() {
-        return true;
+    public CacheMode getCacheMode() {
+        return mCacheMode;
     }
 }

@@ -32,13 +32,9 @@ final class FileDataDescriptor extends IdentifiableDataDescriptor<File> {
         super(data, data.getAbsolutePath());
     }
 
+    @NonNull
     @Override
-    public boolean isStorageCachingEnabled() {
-        return false;
-    }
-
-    @Override
-    public boolean isMemoryCachingEnabled() {
-        return true;
+    public CacheMode getCacheMode() {
+        return CacheMode.FULL;
     }
 }

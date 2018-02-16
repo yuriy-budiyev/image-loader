@@ -33,11 +33,12 @@ final class SyncLoadImageAction<T> extends BaseLoadImageAction<T> {
     private Bitmap mImage;
 
     public SyncLoadImageAction(@NonNull Context context, @NonNull DataDescriptor<T> descriptor,
-            @NonNull BitmapLoader<T> bitmapLoader, @Nullable BitmapTransformation transformation,
-            @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache, @Nullable LoadCallback<T> loadCallback,
+            @Nullable Size requiredSize, @Nullable CacheMode cacheMode, @NonNull BitmapLoader<T> bitmapLoader,
+            @Nullable BitmapTransformation transformation, @Nullable ImageCache memoryCache,
+            @Nullable ImageCache storageCache, @Nullable LoadCallback<T> loadCallback,
             @Nullable ErrorCallback<T> errorCallback, @NonNull PauseLock pauseLock) {
-        super(context, descriptor, bitmapLoader, transformation, memoryCache, storageCache, loadCallback, errorCallback,
-                pauseLock);
+        super(context, descriptor, requiredSize, cacheMode, bitmapLoader, transformation, memoryCache, storageCache,
+                loadCallback, errorCallback, pauseLock);
     }
 
     @Nullable
