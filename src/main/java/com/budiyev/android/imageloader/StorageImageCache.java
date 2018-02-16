@@ -163,8 +163,11 @@ final class StorageImageCache implements ImageCache {
 
     @Override
     public void remove(@NonNull String key) {
-        File file = getFile(key);
-        if (file.exists()) {
+        File[] files = mDirectory.listFiles(new RemoveFileFilter(key));
+        if (files == null || files.length == 0) {
+            return;
+        }
+        for (File file : files) {
             file.delete();
         }
     }
@@ -258,6 +261,19 @@ final class StorageImageCache implements ImageCache {
         @Override
         public boolean accept(File pathname) {
             return pathname.isFile();
+        }
+    }
+
+    private static final class RemoveFileFilter implements FileFilter {
+        private final String mName;
+
+        private RemoveFileFilter(@NonNull String name) {
+            mName = name.toLowerCase();
+        }
+
+        @Override
+        public boolean accept(File pathname) {
+            return pathname.isFile() && pathname.getName().toLowerCase().startsWith(mName);
         }
     }
 
