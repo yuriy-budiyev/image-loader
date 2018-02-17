@@ -292,6 +292,7 @@ public final class ImageRequest<T> {
      * Load image asynchronously
      *
      * @throws IllegalStateException if request has already been executed
+     * @see #onLoaded
      */
     @AnyThread
     public void load() {
