@@ -277,7 +277,7 @@ public final class ImageRequest<T> {
     /**
      * Load image synchronously (on current thread)
      *
-     * @return Loaded image or {@code null} if image could not be loaded or source data hasn't been specified
+     * @return Loaded image or {@code null} if image could not be loaded
      * @throws IllegalStateException if request has already been executed
      */
     @Nullable
