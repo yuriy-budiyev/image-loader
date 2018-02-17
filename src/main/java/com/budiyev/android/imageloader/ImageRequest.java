@@ -50,7 +50,7 @@ import android.view.View;
  * Image request
  * <br>
  * Note that all methods of this class should be called on the same thread as {@link ImageLoader#from} method
- * that created this request
+ * that created this request. Each request can be executed only once.
  */
 public final class ImageRequest<T> {
     private static final long DEFAULT_FADE_DURATION = 200L;
@@ -278,7 +278,7 @@ public final class ImageRequest<T> {
      * Load image synchronously (on current thread)
      *
      * @return Loaded image or {@code null} if image could not be loaded or source data hasn't been specified
-     * @throws IllegalStateException if request has already executed
+     * @throws IllegalStateException if request has already been executed
      */
     @Nullable
     @WorkerThread
@@ -291,7 +291,7 @@ public final class ImageRequest<T> {
     /**
      * Load image
      *
-     * @throws IllegalStateException if request has already executed
+     * @throws IllegalStateException if request has already been executed
      */
     @AnyThread
     public void load() {
@@ -303,7 +303,7 @@ public final class ImageRequest<T> {
     /**
      * Load image and display it in the specified {@code view}
      *
-     * @throws IllegalStateException if request has already executed
+     * @throws IllegalStateException if request has already been executed
      */
     @MainThread
     public void load(@NonNull View view) {
@@ -367,9 +367,9 @@ public final class ImageRequest<T> {
     }
 
     /**
-     * Remove cached version of requested image asynchronously
+     * Delete all cached images for specified data asynchronously
      *
-     * @throws IllegalStateException if request has already executed
+     * @throws IllegalStateException if request has already been executed
      */
     @AnyThread
     public void invalidate() {
