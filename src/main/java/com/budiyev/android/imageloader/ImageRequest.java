@@ -289,7 +289,7 @@ public final class ImageRequest<T> {
     }
 
     /**
-     * Load image
+     * Load image asynchronously
      *
      * @throws IllegalStateException if request has already been executed
      */
@@ -301,7 +301,7 @@ public final class ImageRequest<T> {
     }
 
     /**
-     * Load image and display it in the specified {@code view}
+     * Load image asynchronously and display it in the specified {@code view}
      *
      * @throws IllegalStateException if request has already been executed
      */
