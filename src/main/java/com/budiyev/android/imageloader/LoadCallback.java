@@ -36,8 +36,8 @@ public interface LoadCallback<T> {
      * Called when image is loaded
      *
      * @param context Context
-     * @param data    Data
-     * @param image   Image
+     * @param data    Source data
+     * @param image   Image, that is loaded from {@code data}
      */
     @AnyThread
     void onLoaded(@NonNull Context context, @NonNull T data, @NonNull Bitmap image);

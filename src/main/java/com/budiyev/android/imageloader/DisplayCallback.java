@@ -35,13 +35,12 @@ import android.view.View;
 public interface DisplayCallback<T> {
     /**
      * Called when {@code image} displayed on {@code view},
-     * if {@link BitmapTransformation} specified, processed image will be transferred here,
      * if fade effect is on, this method will be called after fade is done
      *
      * @param context Context
-     * @param data    Data
-     * @param image   Image
-     * @param view    View
+     * @param data    Source data
+     * @param image   Image, that is loaded from {@code data}
+     * @param view    View, into which {@code image} is displayed
      */
     @MainThread
     void onDisplayed(@NonNull Context context, @NonNull T data, @NonNull Bitmap image, @NonNull View view);

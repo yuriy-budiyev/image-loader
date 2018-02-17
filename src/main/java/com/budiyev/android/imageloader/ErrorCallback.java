@@ -36,7 +36,7 @@ public interface ErrorCallback<T> {
      * Called when {@link BitmapLoader} was unable to load {@link Bitmap}
      *
      * @param context Context
-     * @param data    Data
+     * @param data    Source data
      * @param error   Throwable, that has been thrown by {@link BitmapLoader#load} or
      *                {@link BitmapTransformation#transform} methods or {@link ImageNotLoadedException}
      *                if {@link BitmapLoader} returned {@code null}

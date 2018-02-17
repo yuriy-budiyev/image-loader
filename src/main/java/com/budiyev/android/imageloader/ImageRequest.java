@@ -50,7 +50,7 @@ import android.view.View;
  * Image request
  * <br>
  * Note that all methods of this class should be called on the same thread as {@link ImageLoader#from} method
- * that created this request. Each request can be executed only once.
+ * that created this request
  */
 public final class ImageRequest<T> {
     private static final long DEFAULT_FADE_DURATION = 200L;
@@ -73,7 +73,6 @@ public final class ImageRequest<T> {
     private boolean mFadeEnabled = true;
     private long mFadeDuration = DEFAULT_FADE_DURATION;
     private float mCornerRadius;
-    private boolean mExecuted;
 
     ImageRequest(@NonNull Context context, @NonNull ExecutorService executor, @NonNull PauseLock pauseLock,
             @NonNull Handler mainThreadHandler, @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache,
@@ -283,7 +282,6 @@ public final class ImageRequest<T> {
     @Nullable
     @WorkerThread
     public Bitmap loadSync() {
-        checkAndSetExecutedState();
         return new SyncLoadImageAction<>(mContext, mDescriptor, mRequiredSize, mCacheMode, mBitmapLoader,
                 getTransformation(), mMemoryCache, mStorageCache, mLoadCallback, mErrorCallback, mPauseLock).execute();
     }
@@ -296,7 +294,6 @@ public final class ImageRequest<T> {
      */
     @AnyThread
     public void load() {
-        checkAndSetExecutedState();
         new LoadImageAction<>(mContext, mDescriptor, mRequiredSize, mCacheMode, mBitmapLoader, getTransformation(),
                 mMemoryCache, mStorageCache, mLoadCallback, mErrorCallback, mPauseLock).execute(mExecutor);
     }
@@ -308,7 +305,6 @@ public final class ImageRequest<T> {
      */
     @MainThread
     public void load(@NonNull View view) {
-        checkAndSetExecutedState();
         DataDescriptor<T> descriptor = mDescriptor;
         Bitmap image = null;
         String key = descriptor.getKey();
@@ -374,7 +370,6 @@ public final class ImageRequest<T> {
      */
     @AnyThread
     public void invalidate() {
-        checkAndSetExecutedState();
         mExecutor.submit(new InvalidateAction(mDescriptor, mMemoryCache, mStorageCache));
     }
 
@@ -390,12 +385,5 @@ public final class ImageRequest<T> {
         } else {
             return null;
         }
-    }
-
-    private void checkAndSetExecutedState() {
-        if (mExecuted) {
-            throw new IllegalStateException("Request can be executed only once");
-        }
-        mExecuted = true;
     }
 }
