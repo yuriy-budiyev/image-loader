@@ -37,7 +37,7 @@ import android.support.annotation.Nullable;
 import android.view.View;
 
 final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
-    private final WeakReference<Resources> mResources;
+    private final Resources mResources;
     private final WeakReference<View> mView;
     private final Handler mMainThreadHandler;
     private final DisplayCallback mDisplayCallback;
@@ -56,7 +56,7 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
             boolean fadeEnabled, long fadeDuration, float cornerRadius) {
         super(descriptor, bitmapLoader, requiredSize, cacheMode, transformation, memoryCache, storageCache,
                 loadCallback, errorCallback, pauseLock);
-        mResources = new WeakReference<>(resources);
+        mResources = resources;
         mView = new WeakReference<>(view);
         mDisplayCallback = displayCallback;
         mPlaceholder = placeholder;
@@ -74,7 +74,7 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
 
     @Override
     protected void onImageLoaded(@NonNull Bitmap image) {
-        if (isCancelled() || mView.get() == null || mResources.get() == null) {
+        if (isCancelled() || mView.get() == null) {
             return;
         }
         mMainThreadHandler.post(new SetImageAction(image));
@@ -90,7 +90,6 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
     @Override
     protected void onCancelled() {
         mView.clear();
-        mResources.clear();
     }
 
     private final class SetErrorDrawableAction implements Runnable {
@@ -125,12 +124,11 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
                 return;
             }
             View view = mView.get();
-            Resources resources = mResources.get();
-            if (view == null || resources == null ||
-                    InternalUtils.getDisplayImageAction(view) != DisplayImageAction.this) {
+            if (view == null || InternalUtils.getDisplayImageAction(view) != DisplayImageAction.this) {
                 return;
             }
             Bitmap image = mImage;
+            Resources resources = mResources;
             DisplayCallback displayCallback = mDisplayCallback;
             float cornerRadius = mCornerRadius;
             boolean roundCorners = cornerRadius > 0 || cornerRadius == RoundedDrawable.MAX_RADIUS;
