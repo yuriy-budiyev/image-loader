@@ -51,6 +51,17 @@ public class MainActivity extends AppCompatActivity {
                 /*Load image into view*/
                 .load(view);
                 /*Also, load, error and display callbacks can be specified for each request*/
+
+        // Load image asynchronously without displaying it
+        ImageLoader.with(this).from("https://some.url/image").onLoaded(new LoadCallback() {
+            @Override
+            public void onLoaded(@NonNull Bitmap image) {
+                // Do something with image here
+            }
+        }).load();
+
+        // Load image synchronously (on current thread), should be executed on a worker thread
+        //Bitmap image = ImageLoader.with(this).from("https://some.url/image").loadSync();                 
     }
 }
 ```
