@@ -60,18 +60,14 @@ final class PauseLock {
         }
     }
 
-    public boolean await() {
-        boolean interrupted = false;
+    public void await() throws InterruptedException {
         mLock.lock();
         try {
             if (mPaused) {
                 mCondition.await();
             }
-        } catch (InterruptedException e) {
-            interrupted = true;
         } finally {
             mLock.unlock();
         }
-        return interrupted;
     }
 }

@@ -162,7 +162,9 @@ abstract class BaseLoadImageAction<T> {
     @WorkerThread
     protected final void loadImage() {
         while (!mCancelled && !mPauseLock.shouldInterruptEarly() && mPauseLock.isPaused()) {
-            if (mPauseLock.await()) {
+            try {
+                mPauseLock.await();
+            } catch (InterruptedException e) {
                 return;
             }
         }
