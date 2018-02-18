@@ -34,7 +34,7 @@ public interface LoadCallback {
     /**
      * Called when image is loaded
      *
-     * @param image Image, that is loaded from {@code data}
+     * @param image Loaded image
      */
     @AnyThread
     void onLoaded(@NonNull Bitmap image);

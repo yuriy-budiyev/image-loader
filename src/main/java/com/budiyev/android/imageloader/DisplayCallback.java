@@ -36,7 +36,7 @@ public interface DisplayCallback {
      * Called when {@code image} displayed on {@code view},
      * if fade effect is on, this method will be called after fade is done
      *
-     * @param image Image, that is loaded from {@code data}
+     * @param image Loaded image
      * @param view  View, into which {@code image} is displayed
      */
     @MainThread
