@@ -23,7 +23,6 @@
  */
 package com.budiyev.android.imageloader;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
@@ -32,7 +31,7 @@ import android.support.annotation.Nullable;
 final class ByteArrayBitmapLoader implements BitmapLoader<byte[]> {
     @Nullable
     @Override
-    public Bitmap load(@NonNull Context context, @NonNull byte[] data, @Nullable Size size) throws Throwable {
+    public Bitmap load(@NonNull byte[] data, @Nullable Size size) throws Throwable {
         Bitmap bitmap;
         if (size != null) {
             bitmap = DataUtils.loadSampledBitmapFromByteArray(data, size.getWidth(), size.getHeight());

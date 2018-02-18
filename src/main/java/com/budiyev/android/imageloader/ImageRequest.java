@@ -29,7 +29,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
-import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -54,7 +53,7 @@ import android.view.View;
  */
 public final class ImageRequest<T> {
     private static final long DEFAULT_FADE_DURATION = 200L;
-    private final Context mContext;
+    private final Resources mResources;
     private final ExecutorService mExecutor;
     private final PauseLock mPauseLock;
     private final Handler mMainThreadHandler;
@@ -74,10 +73,10 @@ public final class ImageRequest<T> {
     private long mFadeDuration = DEFAULT_FADE_DURATION;
     private float mCornerRadius;
 
-    ImageRequest(@NonNull Context context, @NonNull ExecutorService executor, @NonNull PauseLock pauseLock,
+    ImageRequest(@NonNull Resources resources, @NonNull ExecutorService executor, @NonNull PauseLock pauseLock,
             @NonNull Handler mainThreadHandler, @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache,
             @NonNull BitmapLoader<T> bitmapLoader, @NonNull DataDescriptor<T> descriptor) {
-        mContext = context;
+        mResources = resources;
         mExecutor = executor;
         mPauseLock = pauseLock;
         mMemoryCache = memoryCache;
@@ -140,7 +139,7 @@ public final class ImageRequest<T> {
      */
     @NonNull
     public ImageRequest<T> placeholder(@DrawableRes int resId) {
-        mPlaceholder = mContext.getResources().getDrawable(resId);
+        mPlaceholder = mResources.getDrawable(resId);
         return this;
     }
 
@@ -158,7 +157,7 @@ public final class ImageRequest<T> {
      */
     @NonNull
     public ImageRequest<T> errorDrawable(@DrawableRes int resId) {
-        mErrorDrawable = mContext.getResources().getDrawable(resId);
+        mErrorDrawable = mResources.getDrawable(resId);
         return this;
     }
 
@@ -281,8 +280,8 @@ public final class ImageRequest<T> {
     @Nullable
     @WorkerThread
     public Bitmap loadSync() {
-        return new SyncLoadImageAction<>(mContext, mDescriptor, mRequiredSize, mCacheMode, mBitmapLoader,
-                getTransformation(), mMemoryCache, mStorageCache, mLoadCallback, mErrorCallback, mPauseLock).execute();
+        return new SyncLoadImageAction<>(mDescriptor, mRequiredSize, mCacheMode, mBitmapLoader, getTransformation(),
+                mMemoryCache, mStorageCache, mLoadCallback, mErrorCallback, mPauseLock).execute();
     }
 
     /**
@@ -292,8 +291,8 @@ public final class ImageRequest<T> {
      */
     @AnyThread
     public void load() {
-        new LoadImageAction<>(mContext, mDescriptor, mRequiredSize, mCacheMode, mBitmapLoader, getTransformation(),
-                mMemoryCache, mStorageCache, mLoadCallback, mErrorCallback, mPauseLock).execute(mExecutor);
+        new LoadImageAction<>(mDescriptor, mRequiredSize, mCacheMode, mBitmapLoader, getTransformation(), mMemoryCache,
+                mStorageCache, mLoadCallback, mErrorCallback, mPauseLock).execute(mExecutor);
     }
 
     /**
@@ -321,22 +320,21 @@ public final class ImageRequest<T> {
             }
         }
         T data = descriptor.getData();
-        Context context = mContext;
+        Resources resources = mResources;
         LoadCallback<T> loadCallback = mLoadCallback;
         DisplayCallback<T> displayCallback = mDisplayCallback;
         float cornerRadius = mCornerRadius;
         if (image != null) {
             if (loadCallback != null) {
-                loadCallback.onLoaded(context, data, image);
+                loadCallback.onLoaded(data, image);
             }
-            Resources resources = context.getResources();
             if (cornerRadius > 0 || cornerRadius == RoundedDrawable.MAX_RADIUS) {
                 InternalUtils.setDrawable(new RoundedDrawable(resources, image, cornerRadius), view);
             } else {
                 InternalUtils.setBitmap(resources, image, view);
             }
             if (displayCallback != null) {
-                displayCallback.onDisplayed(context, data, image, view);
+                displayCallback.onDisplayed(data, image, view);
             }
             return;
         }
@@ -352,7 +350,7 @@ public final class ImageRequest<T> {
             placeholder = new ColorDrawable(Color.TRANSPARENT);
         }
         DisplayImageAction<T> action =
-                new DisplayImageAction<>(context, descriptor, mRequiredSize, cacheMode, mBitmapLoader, transformation,
+                new DisplayImageAction<>(resources, descriptor, mRequiredSize, cacheMode, mBitmapLoader, transformation,
                         placeholder, mErrorDrawable, view, memoryCache, mStorageCache, loadCallback, mErrorCallback,
                         displayCallback, mPauseLock, mMainThreadHandler, mFadeEnabled, mFadeDuration, cornerRadius);
         InternalUtils.setDrawable(new PlaceholderDrawable(placeholder, action), view);

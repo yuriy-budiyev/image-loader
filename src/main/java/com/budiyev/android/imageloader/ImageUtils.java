@@ -23,7 +23,6 @@
  */
 package com.budiyev.android.imageloader;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
@@ -493,7 +492,7 @@ public final class ImageUtils {
     private static final class InvertColorsTransformation implements BitmapTransformation {
         @NonNull
         @Override
-        public Bitmap transform(@NonNull Context context, @NonNull Bitmap bitmap) throws Throwable {
+        public Bitmap transform(@NonNull Bitmap bitmap) throws Throwable {
             return invertColors(bitmap);
         }
 
@@ -507,7 +506,7 @@ public final class ImageUtils {
     private static final class GrayScaleTransformation implements BitmapTransformation {
         @NonNull
         @Override
-        public Bitmap transform(@NonNull Context context, @NonNull Bitmap bitmap) throws Throwable {
+        public Bitmap transform(@NonNull Bitmap bitmap) throws Throwable {
             return convertToGrayScale(bitmap);
         }
 
@@ -531,7 +530,7 @@ public final class ImageUtils {
 
         @NonNull
         @Override
-        public Bitmap transform(@NonNull Context context, @NonNull Bitmap bitmap) throws Throwable {
+        public Bitmap transform(@NonNull Bitmap bitmap) throws Throwable {
             return tint(bitmap, mColor, mMode);
         }
 
@@ -545,7 +544,7 @@ public final class ImageUtils {
     private static final class MirrorHorizontallyTransformation implements BitmapTransformation {
         @NonNull
         @Override
-        public Bitmap transform(@NonNull Context context, @NonNull Bitmap bitmap) throws Throwable {
+        public Bitmap transform(@NonNull Bitmap bitmap) throws Throwable {
             return mirrorHorizontally(bitmap);
         }
 
@@ -559,7 +558,7 @@ public final class ImageUtils {
     private static final class MirrorVerticallyTransformation implements BitmapTransformation {
         @NonNull
         @Override
-        public Bitmap transform(@NonNull Context context, @NonNull Bitmap bitmap) throws Throwable {
+        public Bitmap transform(@NonNull Bitmap bitmap) throws Throwable {
             return mirrorVertically(bitmap);
         }
 
@@ -582,7 +581,7 @@ public final class ImageUtils {
 
         @NonNull
         @Override
-        public Bitmap transform(@NonNull Context context, @NonNull Bitmap bitmap) throws Throwable {
+        public Bitmap transform(@NonNull Bitmap bitmap) throws Throwable {
             return rotate(bitmap, mAngle);
         }
 
@@ -609,7 +608,7 @@ public final class ImageUtils {
 
         @NonNull
         @Override
-        public Bitmap transform(@NonNull Context context, @NonNull Bitmap bitmap) throws Throwable {
+        public Bitmap transform(@NonNull Bitmap bitmap) throws Throwable {
             float radius = mRadius;
             if (radius == -1f) {
                 radius = Math.min(bitmap.getWidth(), bitmap.getHeight()) / 2f;
@@ -643,7 +642,7 @@ public final class ImageUtils {
 
         @NonNull
         @Override
-        public Bitmap transform(@NonNull Context context, @NonNull Bitmap bitmap) throws Throwable {
+        public Bitmap transform(@NonNull Bitmap bitmap) throws Throwable {
             if (mWidth > 0 && mHeight > 0) {
                 return cropCenter(bitmap, mWidth, mHeight);
             } else {
@@ -672,7 +671,7 @@ public final class ImageUtils {
 
         @NonNull
         @Override
-        public Bitmap transform(@NonNull Context context, @NonNull Bitmap bitmap) throws Throwable {
+        public Bitmap transform(@NonNull Bitmap bitmap) throws Throwable {
             return fitCenter(bitmap, mWidth, mHeight);
         }
 
@@ -698,7 +697,7 @@ public final class ImageUtils {
 
         @NonNull
         @Override
-        public Bitmap transform(@NonNull Context context, @NonNull Bitmap bitmap) throws Throwable {
+        public Bitmap transform(@NonNull Bitmap bitmap) throws Throwable {
             return scaleToFit(bitmap, mWidth, mHeight, mUpscale);
         }
 

@@ -25,7 +25,6 @@ package com.budiyev.android.imageloader;
 
 import java.lang.ref.WeakReference;
 
-import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -38,6 +37,7 @@ import android.support.annotation.Nullable;
 import android.view.View;
 
 final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
+    private final Resources mResources;
     private final Handler mMainThreadHandler;
     private final DisplayCallback<T> mDisplayCallback;
     private final WeakReference<View> mView;
@@ -47,7 +47,7 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
     private final long mFadeDuration;
     private final float mCornerRadius;
 
-    public DisplayImageAction(@NonNull Context context, @NonNull DataDescriptor<T> descriptor,
+    public DisplayImageAction(@NonNull Resources resources, @NonNull DataDescriptor<T> descriptor,
             @Nullable Size requiredSize, @Nullable CacheMode cacheMode, @NonNull BitmapLoader<T> bitmapLoader,
             @Nullable BitmapTransformation transformation, @NonNull Drawable placeholder,
             @Nullable Drawable errorDrawable, @NonNull View view, @Nullable ImageCache memoryCache,
@@ -55,8 +55,9 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
             @Nullable ErrorCallback<T> errorCallback, @Nullable DisplayCallback<T> displayCallback,
             @NonNull PauseLock pauseLock, @NonNull Handler mainThreadHandler, boolean fadeEnabled, long fadeDuration,
             float cornerRadius) {
-        super(context, descriptor, requiredSize, cacheMode, bitmapLoader, transformation, memoryCache, storageCache,
+        super(descriptor, requiredSize, cacheMode, bitmapLoader, transformation, memoryCache, storageCache,
                 loadCallback, errorCallback, pauseLock);
+        mResources = resources;
         mDisplayCallback = displayCallback;
         mView = new WeakReference<>(view);
         mPlaceholder = placeholder;
@@ -128,8 +129,7 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
                 return;
             }
             Bitmap image = mImage;
-            Context context = getContext();
-            Resources resources = context.getResources();
+            Resources resources = mResources;
             T data = getDescriptor().getData();
             DisplayCallback<T> displayCallback = mDisplayCallback;
             float cornerRadius = mCornerRadius;
@@ -138,8 +138,7 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
                 InternalUtils.setDrawable(new FadeDrawable(mPlaceholder,
                         roundCorners ? new RoundedDrawable(resources, image, cornerRadius) :
                                 new BitmapDrawable(resources, image), mFadeDuration, mMainThreadHandler,
-                        displayCallback != null ? new FadeCallback<>(context, displayCallback, data, image, view) :
-                                null), view);
+                        displayCallback != null ? new FadeCallback<>(displayCallback, data, image, view) : null), view);
             } else {
                 if (roundCorners) {
                     InternalUtils.setDrawable(new RoundedDrawable(resources, image, cornerRadius), view);
@@ -147,22 +146,20 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
                     InternalUtils.setBitmap(resources, image, view);
                 }
                 if (displayCallback != null) {
-                    displayCallback.onDisplayed(context, data, image, view);
+                    displayCallback.onDisplayed(data, image, view);
                 }
             }
         }
     }
 
     private static final class FadeCallback<T> implements FadeDrawable.FadeCallback {
-        private final Context mContext;
         private final DisplayCallback<T> mDisplayCallback;
         private final T mData;
         private final Bitmap mImage;
         private final View mView;
 
-        private FadeCallback(@NonNull Context context, @NonNull DisplayCallback<T> displayCallback, @NonNull T data,
-                @NonNull Bitmap image, @NonNull View view) {
-            mContext = context;
+        private FadeCallback(@NonNull DisplayCallback<T> displayCallback, @NonNull T data, @NonNull Bitmap image,
+                @NonNull View view) {
             mDisplayCallback = displayCallback;
             mData = data;
             mImage = image;
@@ -171,7 +168,7 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
 
         @Override
         public void onDone() {
-            mDisplayCallback.onDisplayed(mContext, mData, mImage, mView);
+            mDisplayCallback.onDisplayed(mData, mImage, mView);
         }
     }
 }

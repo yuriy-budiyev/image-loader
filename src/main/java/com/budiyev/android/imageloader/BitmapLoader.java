@@ -23,7 +23,6 @@
  */
 package com.budiyev.android.imageloader;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -33,9 +32,8 @@ public interface BitmapLoader<T> {
     /**
      * Load {@link Bitmap} from source data
      *
-     * @param context Context
-     * @param data    Data
-     * @param size    Required image size
+     * @param data Data
+     * @param size Required image size
      * @return Loaded bitmap or {@code null} if unable to load it, in that case,
      * {@link ErrorCallback#onError} will be called with {@link ImageNotLoadedException}.
      * @throws Throwable if unable to load {@link Bitmap}, this exception will be transferred
@@ -45,5 +43,5 @@ public interface BitmapLoader<T> {
      */
     @Nullable
     @WorkerThread
-    Bitmap load(@NonNull Context context, @NonNull T data, @Nullable Size size) throws Throwable;
+    Bitmap load(@NonNull T data, @Nullable Size size) throws Throwable;
 }

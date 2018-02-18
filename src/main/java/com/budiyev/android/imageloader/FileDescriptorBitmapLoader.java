@@ -27,7 +27,6 @@ import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
@@ -36,7 +35,7 @@ import android.support.annotation.Nullable;
 final class FileDescriptorBitmapLoader implements BitmapLoader<FileDescriptor> {
     @Nullable
     @Override
-    public Bitmap load(@NonNull Context context, @NonNull FileDescriptor data, @Nullable Size size) throws Throwable {
+    public Bitmap load(@NonNull FileDescriptor data, @Nullable Size size) throws Throwable {
         if (size != null) {
             return DataUtils.loadSampledBitmapFromFileDescriptor(data, size.getWidth(), size.getHeight());
         } else {

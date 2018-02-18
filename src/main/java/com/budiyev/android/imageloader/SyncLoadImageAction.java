@@ -23,7 +23,6 @@
  */
 package com.budiyev.android.imageloader;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -32,12 +31,12 @@ import android.support.annotation.WorkerThread;
 final class SyncLoadImageAction<T> extends BaseLoadImageAction<T> {
     private Bitmap mImage;
 
-    public SyncLoadImageAction(@NonNull Context context, @NonNull DataDescriptor<T> descriptor,
-            @Nullable Size requiredSize, @Nullable CacheMode cacheMode, @NonNull BitmapLoader<T> bitmapLoader,
+    public SyncLoadImageAction(@NonNull DataDescriptor<T> descriptor, @Nullable Size requiredSize,
+            @Nullable CacheMode cacheMode, @NonNull BitmapLoader<T> bitmapLoader,
             @Nullable BitmapTransformation transformation, @Nullable ImageCache memoryCache,
             @Nullable ImageCache storageCache, @Nullable LoadCallback<T> loadCallback,
             @Nullable ErrorCallback<T> errorCallback, @NonNull PauseLock pauseLock) {
-        super(context, descriptor, requiredSize, cacheMode, bitmapLoader, transformation, memoryCache, storageCache,
+        super(descriptor, requiredSize, cacheMode, bitmapLoader, transformation, memoryCache, storageCache,
                 loadCallback, errorCallback, pauseLock);
     }
 

@@ -23,7 +23,6 @@
  */
 package com.budiyev.android.imageloader;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.annotation.AnyThread;
 import android.support.annotation.NonNull;
@@ -36,14 +35,13 @@ public interface BitmapTransformation {
     /**
      * Process loaded bitmap before displaying
      *
-     * @param context Context
-     * @param bitmap  Bitmap, loaded from source data
+     * @param bitmap Bitmap, loaded from source data
      * @return Processed bitmap
      * @see ImageUtils
      */
     @NonNull
     @WorkerThread
-    Bitmap transform(@NonNull Context context, @NonNull Bitmap bitmap) throws Throwable;
+    Bitmap transform(@NonNull Bitmap bitmap) throws Throwable;
 
     /**
      * Unique key that identifies concrete transformation

@@ -25,7 +25,6 @@ package com.budiyev.android.imageloader;
 
 import java.io.InputStream;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
@@ -34,7 +33,7 @@ import android.support.annotation.Nullable;
 final class UrlBitmapLoader implements BitmapLoader<String> {
     @Nullable
     @Override
-    public Bitmap load(@NonNull Context context, @NonNull String data, @Nullable Size size) throws Throwable {
+    public Bitmap load(@NonNull String data, @Nullable Size size) throws Throwable {
         if (size != null) {
             return DataUtils.loadSampledBitmapFromUrl(data, size.getWidth(), size.getHeight());
         } else {

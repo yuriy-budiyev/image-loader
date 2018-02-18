@@ -25,7 +25,6 @@ package com.budiyev.android.imageloader;
 
 import java.util.List;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
@@ -44,10 +43,10 @@ final class BitmapTransformationGroup implements BitmapTransformation {
 
     @NonNull
     @Override
-    public Bitmap transform(@NonNull Context context, @NonNull Bitmap bitmap) throws Throwable {
+    public Bitmap transform(@NonNull Bitmap bitmap) throws Throwable {
         boolean first = true;
         for (BitmapTransformation t : mTransformations) {
-            Bitmap processed = t.transform(context, bitmap);
+            Bitmap processed = t.transform(bitmap);
             if (bitmap != processed) {
                 if (!first && !bitmap.isRecycled()) {
                     bitmap.recycle();

@@ -23,7 +23,6 @@
  */
 package com.budiyev.android.imageloader;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
@@ -35,12 +34,11 @@ public interface ErrorCallback<T> {
     /**
      * Called when {@link BitmapLoader} was unable to load {@link Bitmap}
      *
-     * @param context Context
-     * @param data    Source data
-     * @param error   Throwable, that has been thrown by {@link BitmapLoader#load} or
-     *                {@link BitmapTransformation#transform} methods or {@link ImageNotLoadedException}
-     *                if {@link BitmapLoader} returned {@code null}
+     * @param data  Source data
+     * @param error Throwable, that has been thrown by {@link BitmapLoader#load} or
+     *              {@link BitmapTransformation#transform} methods or {@link ImageNotLoadedException}
+     *              if {@link BitmapLoader} returned {@code null}
      */
     @WorkerThread
-    void onError(@NonNull Context context, @NonNull T data, @NonNull Throwable error);
+    void onError(@NonNull T data, @NonNull Throwable error);
 }

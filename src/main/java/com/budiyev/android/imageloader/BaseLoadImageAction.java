@@ -27,7 +27,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.annotation.AnyThread;
 import android.support.annotation.NonNull;
@@ -35,7 +34,6 @@ import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 
 abstract class BaseLoadImageAction<T> {
-    private final Context mContext;
     private final DataDescriptor<T> mDescriptor;
     private final Size mRequiredSize;
     private final CacheMode mCacheMode;
@@ -50,12 +48,11 @@ abstract class BaseLoadImageAction<T> {
     private volatile boolean mCancelled;
     private volatile boolean mCalled;
 
-    protected BaseLoadImageAction(@NonNull Context context, @NonNull DataDescriptor<T> descriptor,
-            @Nullable Size requiredSize, @Nullable CacheMode cacheMode, @NonNull BitmapLoader<T> bitmapLoader,
+    protected BaseLoadImageAction(@NonNull DataDescriptor<T> descriptor, @Nullable Size requiredSize,
+            @Nullable CacheMode cacheMode, @NonNull BitmapLoader<T> bitmapLoader,
             @Nullable BitmapTransformation transformation, @Nullable ImageCache memoryCache,
             @Nullable ImageCache storageCache, @Nullable LoadCallback<T> loadCallback,
             @Nullable ErrorCallback<T> errorCallback, @NonNull PauseLock pauseLock) {
-        mContext = context;
         mDescriptor = descriptor;
         mRequiredSize = requiredSize;
         if (cacheMode == null) {
@@ -103,11 +100,6 @@ abstract class BaseLoadImageAction<T> {
             future.cancel(false);
         }
         onCancelled();
-    }
-
-    @NonNull
-    protected final Context getContext() {
-        return mContext;
     }
 
     @NonNull
@@ -171,7 +163,6 @@ abstract class BaseLoadImageAction<T> {
         if (mCancelled || mPauseLock.shouldInterruptEarly()) {
             return;
         }
-        Context context = mContext;
         DataDescriptor<T> descriptor = mDescriptor;
         CacheMode cacheMode = mCacheMode;
         String key = descriptor.getKey();
@@ -180,21 +171,21 @@ abstract class BaseLoadImageAction<T> {
             key += "_sampled_" + requiredSize.getWidth() + "x" + requiredSize.getHeight();
         }
         T data = descriptor.getData();
-        Bitmap image = null;
+        Bitmap image;
         // Memory cache
         ImageCache memoryCache = mMemoryCache;
         if (cacheMode.isMemoryCacheEnabled() && key != null && memoryCache != null) {
             BitmapTransformation transformation = mTransformation;
             if (transformation != null) {
                 image = memoryCache.get(key + transformation.getKey());
-            }
-            if (image != null) {
-                processImage(context, descriptor, image, true);
-                return;
+                if (image != null) {
+                    processImage(descriptor, image, true);
+                    return;
+                }
             }
             image = memoryCache.get(key);
             if (image != null) {
-                processImage(context, descriptor, image, false);
+                processImage(descriptor, image, false);
                 return;
             }
         }
@@ -207,7 +198,7 @@ abstract class BaseLoadImageAction<T> {
         if (storageCachingEnabled && key != null && storageCache != null) {
             image = storageCache.get(key);
             if (image != null) {
-                processImage(context, descriptor, image, false);
+                processImage(descriptor, image, false);
                 return;
             }
         }
@@ -216,16 +207,16 @@ abstract class BaseLoadImageAction<T> {
         }
         // Load new image
         try {
-            image = mBitmapLoader.load(context, data, requiredSize);
+            image = mBitmapLoader.load(data, requiredSize);
         } catch (Throwable error) {
-            processError(context, data, error);
+            processError(data, error);
             return;
         }
         if (image == null) {
-            processError(context, data, new ImageNotLoadedException());
+            processError(data, new ImageNotLoadedException());
             return;
         }
-        processImage(context, descriptor, image, false);
+        processImage(descriptor, image, false);
         if (mCancelled) {
             return;
         }
@@ -235,8 +226,7 @@ abstract class BaseLoadImageAction<T> {
     }
 
     @WorkerThread
-    private void processImage(@NonNull Context context, @NonNull DataDescriptor<T> descriptor, @NonNull Bitmap image,
-            boolean transformed) {
+    private void processImage(@NonNull DataDescriptor<T> descriptor, @NonNull Bitmap image, boolean transformed) {
         if (mCancelled) {
             return;
         }
@@ -249,9 +239,9 @@ abstract class BaseLoadImageAction<T> {
                 key += transformation.getKey();
             }
             try {
-                image = transformation.transform(context, image);
+                image = transformation.transform(image);
             } catch (Throwable error) {
-                processError(context, data, error);
+                processError(data, error);
                 return;
             }
         }
@@ -267,19 +257,19 @@ abstract class BaseLoadImageAction<T> {
         }
         LoadCallback<T> loadCallback = mLoadCallback;
         if (loadCallback != null) {
-            loadCallback.onLoaded(context, data, image);
+            loadCallback.onLoaded(data, image);
         }
         onImageLoaded(image);
     }
 
     @WorkerThread
-    private void processError(@NonNull Context context, @NonNull T data, @NonNull Throwable error) {
+    private void processError(@NonNull T data, @NonNull Throwable error) {
         if (mCancelled) {
             return;
         }
         ErrorCallback<T> errorCallback = mErrorCallback;
         if (errorCallback != null) {
-            errorCallback.onError(context, data, error);
+            errorCallback.onError(data, error);
         }
         onError(error);
     }

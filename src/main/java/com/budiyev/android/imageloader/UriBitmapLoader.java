@@ -33,10 +33,17 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 final class UriBitmapLoader implements BitmapLoader<Uri> {
+    private final Context mContext;
+
+    public UriBitmapLoader(@NonNull Context context) {
+        mContext = context;
+    }
+
     @Nullable
     @Override
-    public Bitmap load(@NonNull Context context, @NonNull Uri data, @Nullable Size size) throws Throwable {
+    public Bitmap load(@NonNull Uri data, @Nullable Size size) throws Throwable {
         Bitmap bitmap;
+        Context context = mContext;
         if (size != null) {
             bitmap = DataUtils.loadSampledBitmapFromUri(context, data, size.getWidth(), size.getHeight());
         } else {

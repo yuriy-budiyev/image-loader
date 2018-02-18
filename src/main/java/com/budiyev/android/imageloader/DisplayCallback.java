@@ -23,7 +23,6 @@
  */
 package com.budiyev.android.imageloader;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
@@ -37,11 +36,10 @@ public interface DisplayCallback<T> {
      * Called when {@code image} displayed on {@code view},
      * if fade effect is on, this method will be called after fade is done
      *
-     * @param context Context
-     * @param data    Source data
-     * @param image   Image, that is loaded from {@code data}
-     * @param view    View, into which {@code image} is displayed
+     * @param data  Source data
+     * @param image Image, that is loaded from {@code data}
+     * @param view  View, into which {@code image} is displayed
      */
     @MainThread
-    void onDisplayed(@NonNull Context context, @NonNull T data, @NonNull Bitmap image, @NonNull View view);
+    void onDisplayed(@NonNull T data, @NonNull Bitmap image, @NonNull View view);
 }

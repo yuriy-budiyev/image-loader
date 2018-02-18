@@ -31,10 +31,16 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 final class ResourceBitmapLoader implements BitmapLoader<Integer> {
+    private final Context mContext;
+
+    public ResourceBitmapLoader(@NonNull Context context) {
+        mContext = context;
+    }
+
     @Nullable
     @Override
-    public Bitmap load(@NonNull Context context, @NonNull Integer data, @Nullable Size size) throws Throwable {
-        Resources resources = context.getResources();
+    public Bitmap load(@NonNull Integer data, @Nullable Size size) throws Throwable {
+        Resources resources = mContext.getResources();
         if (size != null) {
             return DataUtils.loadSampledBitmapFromResource(resources, data, size.getWidth(), size.getHeight());
         } else {

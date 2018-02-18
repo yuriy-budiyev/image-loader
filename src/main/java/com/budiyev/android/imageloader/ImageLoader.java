@@ -66,10 +66,10 @@ public final class ImageLoader {
         mMainThreadHandler = new Handler(context.getMainLooper());
         mMemoryCache = memoryCache;
         mStorageCache = storageCache;
-        registerDataType(Uri.class, new UriDataDescriptorFactory(), new UriBitmapLoader());
+        registerDataType(Uri.class, new UriDataDescriptorFactory(), new UriBitmapLoader(context));
         registerDataType(File.class, new FileDataDescriptorFactory(), new FileBitmapLoader());
         registerDataType(String.class, new UrlDataDescriptorFactory(), new UrlBitmapLoader());
-        registerDataType(Integer.class, new ResourceDataDescriptorFactory(), new ResourceBitmapLoader());
+        registerDataType(Integer.class, new ResourceDataDescriptorFactory(), new ResourceBitmapLoader(context));
         registerDataType(FileDescriptor.class, new FileDescriptorDataDescriptorFactory(),
                 new FileDescriptorBitmapLoader());
         registerDataType(byte[].class, new ByteArrayDataDescriptorFactory(), new ByteArrayBitmapLoader());
@@ -102,8 +102,8 @@ public final class ImageLoader {
         if (descriptorFactory == null || bitmapLoader == null) {
             throw new IllegalArgumentException("Unsupported data type: " + dataClassName);
         }
-        return new ImageRequest<>(mContext, mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache, mStorageCache,
-                bitmapLoader, descriptorFactory.newDescriptor(data));
+        return new ImageRequest<>(mContext.getResources(), mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache,
+                mStorageCache, bitmapLoader, descriptorFactory.newDescriptor(data));
     }
 
     /**
