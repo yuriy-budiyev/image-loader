@@ -38,7 +38,7 @@ public enum CacheMode {
     MEMORY(true, false),
 
     /**
-     * Only storage caches will be used in loading process
+     * Only storage cache will be used in loading process
      */
     STORAGE(false, true),
 
