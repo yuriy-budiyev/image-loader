@@ -16,7 +16,7 @@ Image loader library for Android.
 ### Usage
 ```gradle
 dependencies {
-    implementation 'com.budiyev.android:image-loader:2.1.1'
+    implementation 'com.budiyev.android:image-loader:2.2.0'
 }
 ```
 ### Basic usage sample
