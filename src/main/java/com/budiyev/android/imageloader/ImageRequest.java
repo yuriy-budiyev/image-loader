@@ -280,7 +280,7 @@ public final class ImageRequest<T> {
     @Nullable
     @WorkerThread
     public Bitmap loadSync() {
-        return new SyncLoadImageAction<>(mDescriptor, mRequiredSize, mCacheMode, mBitmapLoader, getTransformation(),
+        return new SyncLoadImageAction<>(mDescriptor, mBitmapLoader, mRequiredSize, mCacheMode, getTransformation(),
                 mMemoryCache, mStorageCache, mLoadCallback, mErrorCallback, mPauseLock).execute();
     }
 
@@ -292,7 +292,7 @@ public final class ImageRequest<T> {
      */
     @AnyThread
     public void load() {
-        new LoadImageAction<>(mDescriptor, mRequiredSize, mCacheMode, mBitmapLoader, getTransformation(), mMemoryCache,
+        new LoadImageAction<>(mDescriptor, mBitmapLoader, mRequiredSize, mCacheMode, getTransformation(), mMemoryCache,
                 mStorageCache, mLoadCallback, mErrorCallback, mPauseLock).execute(mExecutor);
     }
 
@@ -351,7 +351,7 @@ public final class ImageRequest<T> {
             placeholder = new ColorDrawable(Color.TRANSPARENT);
         }
         DisplayImageAction<T> action =
-                new DisplayImageAction<>(resources, view, descriptor, mRequiredSize, cacheMode, mBitmapLoader,
+                new DisplayImageAction<>(resources, view, descriptor, mBitmapLoader, mRequiredSize, cacheMode,
                         transformation, placeholder, mErrorDrawable, memoryCache, mStorageCache, loadCallback,
                         mErrorCallback, displayCallback, mPauseLock, mMainThreadHandler, mFadeEnabled, mFadeDuration,
                         cornerRadius);

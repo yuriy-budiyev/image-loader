@@ -31,12 +31,11 @@ import android.support.annotation.WorkerThread;
 final class SyncLoadImageAction<T> extends BaseLoadImageAction<T> {
     private Bitmap mImage;
 
-    public SyncLoadImageAction(@NonNull DataDescriptor<T> descriptor, @Nullable Size requiredSize,
-            @Nullable CacheMode cacheMode, @NonNull BitmapLoader<T> bitmapLoader,
-            @Nullable BitmapTransformation transformation, @Nullable ImageCache memoryCache,
-            @Nullable ImageCache storageCache, @Nullable LoadCallback loadCallback,
+    public SyncLoadImageAction(@NonNull DataDescriptor<T> descriptor, @NonNull BitmapLoader<T> bitmapLoader,
+            @Nullable Size requiredSize, @Nullable CacheMode cacheMode, @Nullable BitmapTransformation transformation,
+            @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache, @Nullable LoadCallback loadCallback,
             @Nullable ErrorCallback errorCallback, @NonNull PauseLock pauseLock) {
-        super(descriptor, requiredSize, cacheMode, bitmapLoader, transformation, memoryCache, storageCache,
+        super(descriptor, bitmapLoader, requiredSize, cacheMode, transformation, memoryCache, storageCache,
                 loadCallback, errorCallback, pauseLock);
     }
 

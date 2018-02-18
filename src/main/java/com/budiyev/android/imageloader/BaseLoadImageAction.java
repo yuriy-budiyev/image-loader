@@ -35,9 +35,9 @@ import android.support.annotation.WorkerThread;
 
 abstract class BaseLoadImageAction<T> {
     private final DataDescriptor<T> mDescriptor;
-    private final Size mRequiredSize;
-    private final CacheMode mCacheMode;
     private final BitmapLoader<T> mBitmapLoader;
+    private final CacheMode mCacheMode;
+    private final Size mRequiredSize;
     private final BitmapTransformation mTransformation;
     private final PauseLock mPauseLock;
     private final ImageCache mMemoryCache;
@@ -48,12 +48,12 @@ abstract class BaseLoadImageAction<T> {
     private volatile boolean mCancelled;
     private volatile boolean mCalled;
 
-    protected BaseLoadImageAction(@NonNull DataDescriptor<T> descriptor, @Nullable Size requiredSize,
-            @Nullable CacheMode cacheMode, @NonNull BitmapLoader<T> bitmapLoader,
-            @Nullable BitmapTransformation transformation, @Nullable ImageCache memoryCache,
-            @Nullable ImageCache storageCache, @Nullable LoadCallback loadCallback,
+    protected BaseLoadImageAction(@NonNull DataDescriptor<T> descriptor, @NonNull BitmapLoader<T> bitmapLoader,
+            @Nullable Size requiredSize, @Nullable CacheMode cacheMode, @Nullable BitmapTransformation transformation,
+            @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache, @Nullable LoadCallback loadCallback,
             @Nullable ErrorCallback errorCallback, @NonNull PauseLock pauseLock) {
         mDescriptor = descriptor;
+        mBitmapLoader = bitmapLoader;
         mRequiredSize = requiredSize;
         if (cacheMode == null) {
             cacheMode = descriptor.getCacheMode();
@@ -62,7 +62,6 @@ abstract class BaseLoadImageAction<T> {
             }
         }
         mCacheMode = cacheMode;
-        mBitmapLoader = bitmapLoader;
         mTransformation = transformation;
         mPauseLock = pauseLock;
         mMemoryCache = memoryCache;
