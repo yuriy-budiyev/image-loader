@@ -37,29 +37,28 @@ import android.support.annotation.Nullable;
 import android.view.View;
 
 final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
-    private final Resources mResources;
+    private final WeakReference<Resources> mResources;
+    private final WeakReference<View> mView;
     private final Handler mMainThreadHandler;
     private final DisplayCallback<T> mDisplayCallback;
-    private final WeakReference<View> mView;
     private final Drawable mPlaceholder;
     private final Drawable mErrorDrawable;
     private final boolean mFadeEnabled;
     private final long mFadeDuration;
     private final float mCornerRadius;
 
-    public DisplayImageAction(@NonNull Resources resources, @NonNull DataDescriptor<T> descriptor,
+    public DisplayImageAction(@NonNull Resources resources, @NonNull View view, @NonNull DataDescriptor<T> descriptor,
             @Nullable Size requiredSize, @Nullable CacheMode cacheMode, @NonNull BitmapLoader<T> bitmapLoader,
             @Nullable BitmapTransformation transformation, @NonNull Drawable placeholder,
-            @Nullable Drawable errorDrawable, @NonNull View view, @Nullable ImageCache memoryCache,
-            @Nullable ImageCache storageCache, @Nullable LoadCallback<T> loadCallback,
-            @Nullable ErrorCallback<T> errorCallback, @Nullable DisplayCallback<T> displayCallback,
-            @NonNull PauseLock pauseLock, @NonNull Handler mainThreadHandler, boolean fadeEnabled, long fadeDuration,
-            float cornerRadius) {
+            @Nullable Drawable errorDrawable, @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache,
+            @Nullable LoadCallback<T> loadCallback, @Nullable ErrorCallback<T> errorCallback,
+            @Nullable DisplayCallback<T> displayCallback, @NonNull PauseLock pauseLock,
+            @NonNull Handler mainThreadHandler, boolean fadeEnabled, long fadeDuration, float cornerRadius) {
         super(descriptor, requiredSize, cacheMode, bitmapLoader, transformation, memoryCache, storageCache,
                 loadCallback, errorCallback, pauseLock);
-        mResources = resources;
-        mDisplayCallback = displayCallback;
+        mResources = new WeakReference<>(resources);
         mView = new WeakReference<>(view);
+        mDisplayCallback = displayCallback;
         mPlaceholder = placeholder;
         mErrorDrawable = errorDrawable;
         mMainThreadHandler = mainThreadHandler;
@@ -75,7 +74,7 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
 
     @Override
     protected void onImageLoaded(@NonNull Bitmap image) {
-        if (isCancelled() || mView.get() == null) {
+        if (isCancelled() || mView.get() == null || mResources.get() == null) {
             return;
         }
         mMainThreadHandler.post(new SetImageAction(image));
@@ -91,6 +90,7 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
     @Override
     protected void onCancelled() {
         mView.clear();
+        mResources.clear();
     }
 
     private final class SetErrorDrawableAction implements Runnable {
@@ -125,11 +125,12 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
                 return;
             }
             View view = mView.get();
-            if (view == null || InternalUtils.getDisplayImageAction(view) != DisplayImageAction.this) {
+            Resources resources = mResources.get();
+            if (view == null || resources == null ||
+                    InternalUtils.getDisplayImageAction(view) != DisplayImageAction.this) {
                 return;
             }
             Bitmap image = mImage;
-            Resources resources = mResources;
             T data = getDescriptor().getData();
             DisplayCallback<T> displayCallback = mDisplayCallback;
             float cornerRadius = mCornerRadius;

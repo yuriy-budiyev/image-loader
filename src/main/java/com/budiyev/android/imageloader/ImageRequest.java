@@ -288,6 +288,7 @@ public final class ImageRequest<T> {
      * Load image asynchronously
      *
      * @see #onLoaded
+     * @see LoadCallback
      */
     @AnyThread
     public void load() {
@@ -350,9 +351,10 @@ public final class ImageRequest<T> {
             placeholder = new ColorDrawable(Color.TRANSPARENT);
         }
         DisplayImageAction<T> action =
-                new DisplayImageAction<>(resources, descriptor, mRequiredSize, cacheMode, mBitmapLoader, transformation,
-                        placeholder, mErrorDrawable, view, memoryCache, mStorageCache, loadCallback, mErrorCallback,
-                        displayCallback, mPauseLock, mMainThreadHandler, mFadeEnabled, mFadeDuration, cornerRadius);
+                new DisplayImageAction<>(resources, view, descriptor, mRequiredSize, cacheMode, mBitmapLoader,
+                        transformation, placeholder, mErrorDrawable, memoryCache, mStorageCache, loadCallback,
+                        mErrorCallback, displayCallback, mPauseLock, mMainThreadHandler, mFadeEnabled, mFadeDuration,
+                        cornerRadius);
         InternalUtils.setDrawable(new PlaceholderDrawable(placeholder, action), view);
         action.execute(mExecutor);
     }
