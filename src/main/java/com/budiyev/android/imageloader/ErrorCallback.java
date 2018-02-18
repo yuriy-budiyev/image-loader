@@ -30,15 +30,14 @@ import android.support.annotation.WorkerThread;
 /**
  * Error callback
  */
-public interface ErrorCallback<T> {
+public interface ErrorCallback {
     /**
      * Called when {@link BitmapLoader} was unable to load {@link Bitmap}
      *
-     * @param data  Source data
      * @param error Throwable, that has been thrown by {@link BitmapLoader#load} or
      *              {@link BitmapTransformation#transform} methods or {@link ImageNotLoadedException}
      *              if {@link BitmapLoader} returned {@code null}
      */
     @WorkerThread
-    void onError(@NonNull T data, @NonNull Throwable error);
+    void onError(@NonNull Throwable error);
 }

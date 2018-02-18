@@ -31,15 +31,14 @@ import android.view.View;
 /**
  * Display callback
  */
-public interface DisplayCallback<T> {
+public interface DisplayCallback {
     /**
      * Called when {@code image} displayed on {@code view},
      * if fade effect is on, this method will be called after fade is done
      *
-     * @param data  Source data
      * @param image Image, that is loaded from {@code data}
      * @param view  View, into which {@code image} is displayed
      */
     @MainThread
-    void onDisplayed(@NonNull T data, @NonNull Bitmap image, @NonNull View view);
+    void onDisplayed(@NonNull Bitmap image, @NonNull View view);
 }

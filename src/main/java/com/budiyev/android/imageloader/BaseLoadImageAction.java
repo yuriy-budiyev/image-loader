@@ -42,8 +42,8 @@ abstract class BaseLoadImageAction<T> {
     private final PauseLock mPauseLock;
     private final ImageCache mMemoryCache;
     private final ImageCache mStorageCache;
-    private final LoadCallback<T> mLoadCallback;
-    private final ErrorCallback<T> mErrorCallback;
+    private final LoadCallback mLoadCallback;
+    private final ErrorCallback mErrorCallback;
     private volatile Future<?> mFuture;
     private volatile boolean mCancelled;
     private volatile boolean mCalled;
@@ -51,8 +51,8 @@ abstract class BaseLoadImageAction<T> {
     protected BaseLoadImageAction(@NonNull DataDescriptor<T> descriptor, @Nullable Size requiredSize,
             @Nullable CacheMode cacheMode, @NonNull BitmapLoader<T> bitmapLoader,
             @Nullable BitmapTransformation transformation, @Nullable ImageCache memoryCache,
-            @Nullable ImageCache storageCache, @Nullable LoadCallback<T> loadCallback,
-            @Nullable ErrorCallback<T> errorCallback, @NonNull PauseLock pauseLock) {
+            @Nullable ImageCache storageCache, @Nullable LoadCallback loadCallback,
+            @Nullable ErrorCallback errorCallback, @NonNull PauseLock pauseLock) {
         mDescriptor = descriptor;
         mRequiredSize = requiredSize;
         if (cacheMode == null) {
@@ -138,12 +138,12 @@ abstract class BaseLoadImageAction<T> {
     }
 
     @Nullable
-    protected final LoadCallback<T> getLoadCallback() {
+    protected final LoadCallback getLoadCallback() {
         return mLoadCallback;
     }
 
     @Nullable
-    protected final ErrorCallback<T> getErrorCallback() {
+    protected final ErrorCallback getErrorCallback() {
         return mErrorCallback;
     }
 
@@ -179,13 +179,13 @@ abstract class BaseLoadImageAction<T> {
             if (transformation != null) {
                 image = memoryCache.get(key + transformation.getKey());
                 if (image != null) {
-                    processImage(descriptor, image, true);
+                    processImage(key, image, true);
                     return;
                 }
             }
             image = memoryCache.get(key);
             if (image != null) {
-                processImage(descriptor, image, false);
+                processImage(key, image, false);
                 return;
             }
         }
@@ -198,7 +198,7 @@ abstract class BaseLoadImageAction<T> {
         if (storageCachingEnabled && key != null && storageCache != null) {
             image = storageCache.get(key);
             if (image != null) {
-                processImage(descriptor, image, false);
+                processImage(key, image, false);
                 return;
             }
         }
@@ -209,14 +209,14 @@ abstract class BaseLoadImageAction<T> {
         try {
             image = mBitmapLoader.load(data, requiredSize);
         } catch (Throwable error) {
-            processError(data, error);
+            processError(error);
             return;
         }
         if (image == null) {
-            processError(data, new ImageNotLoadedException());
+            processError(new ImageNotLoadedException());
             return;
         }
-        processImage(descriptor, image, false);
+        processImage(key, image, false);
         if (mCancelled) {
             return;
         }
@@ -226,12 +226,10 @@ abstract class BaseLoadImageAction<T> {
     }
 
     @WorkerThread
-    private void processImage(@NonNull DataDescriptor<T> descriptor, @NonNull Bitmap image, boolean transformed) {
+    private void processImage(@Nullable String key, @NonNull Bitmap image, boolean transformed) {
         if (mCancelled) {
             return;
         }
-        T data = descriptor.getData();
-        String key = descriptor.getKey();
         BitmapTransformation transformation = mTransformation;
         boolean memoryCachingEnabled = mCacheMode.isMemoryCacheEnabled();
         if (!transformed && transformation != null) {
@@ -241,7 +239,7 @@ abstract class BaseLoadImageAction<T> {
             try {
                 image = transformation.transform(image);
             } catch (Throwable error) {
-                processError(data, error);
+                processError(error);
                 return;
             }
         }
@@ -255,21 +253,21 @@ abstract class BaseLoadImageAction<T> {
                 memoryCache.put(key, image);
             }
         }
-        LoadCallback<T> loadCallback = mLoadCallback;
+        LoadCallback loadCallback = mLoadCallback;
         if (loadCallback != null) {
-            loadCallback.onLoaded(data, image);
+            loadCallback.onLoaded(image);
         }
         onImageLoaded(image);
     }
 
     @WorkerThread
-    private void processError(@NonNull T data, @NonNull Throwable error) {
+    private void processError(@NonNull Throwable error) {
         if (mCancelled) {
             return;
         }
-        ErrorCallback<T> errorCallback = mErrorCallback;
+        ErrorCallback errorCallback = mErrorCallback;
         if (errorCallback != null) {
-            errorCallback.onError(data, error);
+            errorCallback.onError(error);
         }
         onError(error);
     }

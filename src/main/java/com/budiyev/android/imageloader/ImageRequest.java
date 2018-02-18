@@ -63,9 +63,9 @@ public final class ImageRequest<T> {
     private final DataDescriptor<T> mDescriptor;
     private Size mRequiredSize;
     private CacheMode mCacheMode;
-    private LoadCallback<T> mLoadCallback;
-    private ErrorCallback<T> mErrorCallback;
-    private DisplayCallback<T> mDisplayCallback;
+    private LoadCallback mLoadCallback;
+    private ErrorCallback mErrorCallback;
+    private DisplayCallback mDisplayCallback;
     private List<BitmapTransformation> mTransformations;
     private Drawable mPlaceholder;
     private Drawable mErrorDrawable;
@@ -249,7 +249,7 @@ public final class ImageRequest<T> {
      * Load callback
      */
     @NonNull
-    public ImageRequest<T> onLoaded(@Nullable LoadCallback<T> callback) {
+    public ImageRequest<T> onLoaded(@Nullable LoadCallback callback) {
         mLoadCallback = callback;
         return this;
     }
@@ -258,7 +258,7 @@ public final class ImageRequest<T> {
      * Error callback
      */
     @NonNull
-    public ImageRequest<T> onError(@Nullable ErrorCallback<T> callback) {
+    public ImageRequest<T> onError(@Nullable ErrorCallback callback) {
         mErrorCallback = callback;
         return this;
     }
@@ -267,7 +267,7 @@ public final class ImageRequest<T> {
      * Display callback
      */
     @NonNull
-    public ImageRequest<T> onDisplayed(@Nullable DisplayCallback<T> callback) {
+    public ImageRequest<T> onDisplayed(@Nullable DisplayCallback callback) {
         mDisplayCallback = callback;
         return this;
     }
@@ -322,12 +322,12 @@ public final class ImageRequest<T> {
         }
         T data = descriptor.getData();
         Resources resources = mResources;
-        LoadCallback<T> loadCallback = mLoadCallback;
-        DisplayCallback<T> displayCallback = mDisplayCallback;
+        LoadCallback loadCallback = mLoadCallback;
+        DisplayCallback displayCallback = mDisplayCallback;
         float cornerRadius = mCornerRadius;
         if (image != null) {
             if (loadCallback != null) {
-                loadCallback.onLoaded(data, image);
+                loadCallback.onLoaded(image);
             }
             if (cornerRadius > 0 || cornerRadius == RoundedDrawable.MAX_RADIUS) {
                 InternalUtils.setDrawable(new RoundedDrawable(resources, image, cornerRadius), view);
@@ -335,7 +335,7 @@ public final class ImageRequest<T> {
                 InternalUtils.setBitmap(resources, image, view);
             }
             if (displayCallback != null) {
-                displayCallback.onDisplayed(data, image, view);
+                displayCallback.onDisplayed(image, view);
             }
             return;
         }

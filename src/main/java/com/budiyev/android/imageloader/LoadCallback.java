@@ -30,13 +30,12 @@ import android.support.annotation.NonNull;
 /**
  * Load callback
  */
-public interface LoadCallback<T> {
+public interface LoadCallback {
     /**
      * Called when image is loaded
      *
-     * @param data  Source data
      * @param image Image, that is loaded from {@code data}
      */
     @AnyThread
-    void onLoaded(@NonNull T data, @NonNull Bitmap image);
+    void onLoaded(@NonNull Bitmap image);
 }

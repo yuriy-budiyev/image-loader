@@ -40,7 +40,7 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
     private final WeakReference<Resources> mResources;
     private final WeakReference<View> mView;
     private final Handler mMainThreadHandler;
-    private final DisplayCallback<T> mDisplayCallback;
+    private final DisplayCallback mDisplayCallback;
     private final Drawable mPlaceholder;
     private final Drawable mErrorDrawable;
     private final boolean mFadeEnabled;
@@ -51,9 +51,9 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
             @Nullable Size requiredSize, @Nullable CacheMode cacheMode, @NonNull BitmapLoader<T> bitmapLoader,
             @Nullable BitmapTransformation transformation, @NonNull Drawable placeholder,
             @Nullable Drawable errorDrawable, @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache,
-            @Nullable LoadCallback<T> loadCallback, @Nullable ErrorCallback<T> errorCallback,
-            @Nullable DisplayCallback<T> displayCallback, @NonNull PauseLock pauseLock,
-            @NonNull Handler mainThreadHandler, boolean fadeEnabled, long fadeDuration, float cornerRadius) {
+            @Nullable LoadCallback loadCallback, @Nullable ErrorCallback errorCallback,
+            @Nullable DisplayCallback displayCallback, @NonNull PauseLock pauseLock, @NonNull Handler mainThreadHandler,
+            boolean fadeEnabled, long fadeDuration, float cornerRadius) {
         super(descriptor, requiredSize, cacheMode, bitmapLoader, transformation, memoryCache, storageCache,
                 loadCallback, errorCallback, pauseLock);
         mResources = new WeakReference<>(resources);
@@ -131,15 +131,14 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
                 return;
             }
             Bitmap image = mImage;
-            T data = getDescriptor().getData();
-            DisplayCallback<T> displayCallback = mDisplayCallback;
+            DisplayCallback displayCallback = mDisplayCallback;
             float cornerRadius = mCornerRadius;
             boolean roundCorners = cornerRadius > 0 || cornerRadius == RoundedDrawable.MAX_RADIUS;
             if (mFadeEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 InternalUtils.setDrawable(new FadeDrawable(mPlaceholder,
                         roundCorners ? new RoundedDrawable(resources, image, cornerRadius) :
                                 new BitmapDrawable(resources, image), mFadeDuration, mMainThreadHandler,
-                        displayCallback != null ? new FadeCallback<>(displayCallback, data, image, view) : null), view);
+                        displayCallback != null ? new FadeCallback<>(displayCallback, image, view) : null), view);
             } else {
                 if (roundCorners) {
                     InternalUtils.setDrawable(new RoundedDrawable(resources, image, cornerRadius), view);
@@ -147,29 +146,26 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
                     InternalUtils.setBitmap(resources, image, view);
                 }
                 if (displayCallback != null) {
-                    displayCallback.onDisplayed(data, image, view);
+                    displayCallback.onDisplayed(image, view);
                 }
             }
         }
     }
 
     private static final class FadeCallback<T> implements FadeDrawable.FadeCallback {
-        private final DisplayCallback<T> mDisplayCallback;
-        private final T mData;
+        private final DisplayCallback mDisplayCallback;
         private final Bitmap mImage;
         private final View mView;
 
-        private FadeCallback(@NonNull DisplayCallback<T> displayCallback, @NonNull T data, @NonNull Bitmap image,
-                @NonNull View view) {
+        private FadeCallback(@NonNull DisplayCallback displayCallback, @NonNull Bitmap image, @NonNull View view) {
             mDisplayCallback = displayCallback;
-            mData = data;
             mImage = image;
             mView = view;
         }
 
         @Override
         public void onDone() {
-            mDisplayCallback.onDisplayed(mData, mImage, mView);
+            mDisplayCallback.onDisplayed(mImage, mView);
         }
     }
 }
