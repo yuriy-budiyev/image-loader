@@ -66,7 +66,6 @@ public final class ImageRequest<T> {
     private ErrorCallback mErrorCallback;
     private DisplayCallback mDisplayCallback;
     private List<BitmapTransformation> mTransformations;
-    private BitmapTransformation mTransformation;
     private Drawable mPlaceholder;
     private Drawable mErrorDrawable;
     private boolean mFadeEnabled = true;
