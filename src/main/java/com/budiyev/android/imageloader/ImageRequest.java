@@ -92,8 +92,8 @@ public final class ImageRequest<T> {
      * Required image size
      */
     @NonNull
-    public ImageRequest<T> size(@Px int requiredWidth, @Px int requiredHeight) {
-        mRequiredSize = new Size(requiredWidth, requiredHeight);
+    public ImageRequest<T> size(@Nullable Size requiredSize) {
+        mRequiredSize = requiredSize;
         return this;
     }
 
@@ -101,8 +101,8 @@ public final class ImageRequest<T> {
      * Required image size
      */
     @NonNull
-    public ImageRequest<T> size(@Nullable Size requiredSize) {
-        mRequiredSize = requiredSize;
+    public ImageRequest<T> size(@Px int requiredWidth, @Px int requiredHeight) {
+        mRequiredSize = new Size(requiredWidth, requiredHeight);
         return this;
     }
 
