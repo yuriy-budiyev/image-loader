@@ -98,6 +98,15 @@ public final class ImageRequest<T> {
     }
 
     /**
+     * Required image size
+     */
+    @NonNull
+    public ImageRequest<T> size(@Nullable Size requiredSize) {
+        mRequiredSize = requiredSize;
+        return this;
+    }
+
+    /**
      * Display image with rounded corners using maximum corner radius,
      * for square image, will lead to circle result
      */

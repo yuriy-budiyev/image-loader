@@ -41,11 +41,12 @@ final class UriBitmapLoader implements BitmapLoader<Uri> {
 
     @Nullable
     @Override
-    public Bitmap load(@NonNull Uri data, @Nullable Size size) throws Throwable {
+    public Bitmap load(@NonNull Uri data, @Nullable Size requiredSize) throws Throwable {
         Bitmap bitmap;
         Context context = mContext;
-        if (size != null) {
-            bitmap = DataUtils.loadSampledBitmapFromUri(context, data, size.getWidth(), size.getHeight());
+        if (requiredSize != null) {
+            bitmap = DataUtils
+                    .loadSampledBitmapFromUri(context, data, requiredSize.getWidth(), requiredSize.getHeight());
         } else {
             InputStream inputStream = null;
             try {

@@ -81,7 +81,7 @@ final class InternalUtils {
         }
         StringBuilder sb = new StringBuilder(base);
         if (requiredSize != null) {
-            sb.append("_sampled_").append(requiredSize.getWidth()).append("x").append(requiredSize.getHeight());
+            sb.append("_required_size_").append(requiredSize.getWidth()).append("x").append(requiredSize.getHeight());
         }
         if (transformation != null) {
             sb.append(transformation.getKey());

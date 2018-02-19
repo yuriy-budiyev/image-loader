@@ -32,8 +32,8 @@ public interface BitmapLoader<T> {
     /**
      * Load {@link Bitmap} from source data
      *
-     * @param data Data
-     * @param size Required image size
+     * @param data         Data
+     * @param requiredSize Required image size or {@code null} if required size unspecified
      * @return Loaded bitmap or {@code null} if unable to load it, in that case,
      * {@link ErrorCallback#onError} will be called with {@link ImageNotLoadedException}.
      * @throws Throwable if unable to load {@link Bitmap}, this exception will be transferred
@@ -43,5 +43,5 @@ public interface BitmapLoader<T> {
      */
     @Nullable
     @WorkerThread
-    Bitmap load(@NonNull T data, @Nullable Size size) throws Throwable;
+    Bitmap load(@NonNull T data, @Nullable Size requiredSize) throws Throwable;
 }
