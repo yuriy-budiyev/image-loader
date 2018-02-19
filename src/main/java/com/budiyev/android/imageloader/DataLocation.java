@@ -23,43 +23,7 @@
  */
 package com.budiyev.android.imageloader;
 
-/**
- * Cache mode
- */
-public enum CacheMode {
-    /**
-     * Both memory and storage caches will be used in loading process
-     */
-    FULL(true, true),
-
-    /**
-     * Only memory cache will be used in loading process
-     */
-    MEMORY(true, false),
-
-    /**
-     * Only storage cache will be used in loading process
-     */
-    STORAGE(false, true),
-
-    /**
-     * No caching
-     */
-    NONE(false, false);
-
-    private final boolean mMemoryCacheEnabled;
-    private final boolean mStorageCacheEnabled;
-
-    CacheMode(boolean memoryCacheEnabled, boolean storageCacheEnabled) {
-        mMemoryCacheEnabled = memoryCacheEnabled;
-        mStorageCacheEnabled = storageCacheEnabled;
-    }
-
-    boolean isMemoryCacheEnabled() {
-        return mMemoryCacheEnabled;
-    }
-
-    boolean isStorageCacheEnabled() {
-        return mStorageCacheEnabled;
-    }
+public enum DataLocation {
+    REMOTE,
+    LOCAL
 }

@@ -161,6 +161,16 @@ public final class ImageUtils {
     }
 
     /**
+     * Fit image into frame with size of maximum image dimension
+     *
+     * @see BitmapTransformation
+     */
+    @NonNull
+    public static BitmapTransformation fitCenter() {
+        return new FitCenterTransformation();
+    }
+
+    /**
      * Fit image to specified frame ({@code resultWidth} x {@code resultHeight},
      * image will be scaled if needed
      *
@@ -324,6 +334,18 @@ public final class ImageUtils {
     }
 
     /**
+     * Crop center of image in square proportions, with size of minimum image dimension
+     *
+     * @param image Source image
+     * @return Cropped image or source image
+     */
+    @NonNull
+    public static Bitmap cropCenter(@NonNull Bitmap image) {
+        int size = Math.min(image.getWidth(), image.getHeight());
+        return cropCenter(image, size, size);
+    }
+
+    /**
      * Crop center of image in proportions of {@code resultWidth} and {@code resultHeight}
      * and, if needed, resize it to {@code resultWidth} x {@code resultHeight} size.
      * If specified {@code resultWidth} and {@code resultHeight} are the same as the current
@@ -369,6 +391,18 @@ public final class ImageUtils {
             cropped.recycle();
         }
         return scaled;
+    }
+
+    /**
+     * Fit image into frame with size of maximum image dimension
+     *
+     * @param image Source image
+     * @return Frame image with source image drawn in center or source image
+     */
+    @NonNull
+    public static Bitmap fitCenter(@NonNull Bitmap image) {
+        int size = Math.max(image.getWidth(), image.getHeight());
+        return fitCenter(image, size, size);
     }
 
     /**
@@ -646,8 +680,7 @@ public final class ImageUtils {
             if (mWidth > 0 && mHeight > 0) {
                 return cropCenter(bitmap, mWidth, mHeight);
             } else {
-                int size = Math.min(bitmap.getWidth(), bitmap.getHeight());
-                return cropCenter(bitmap, size, size);
+                return cropCenter(bitmap);
             }
         }
 
@@ -663,6 +696,12 @@ public final class ImageUtils {
         private final int mHeight;
         private final String mKey;
 
+        public FitCenterTransformation() {
+            mWidth = -1;
+            mHeight = -1;
+            mKey = "_fit_center_square";
+        }
+
         public FitCenterTransformation(int width, int height) {
             mWidth = width;
             mHeight = height;
@@ -672,7 +711,11 @@ public final class ImageUtils {
         @NonNull
         @Override
         public Bitmap transform(@NonNull Bitmap bitmap) throws Throwable {
-            return fitCenter(bitmap, mWidth, mHeight);
+            if (mWidth > 0 && mHeight > 0) {
+                return fitCenter(bitmap, mWidth, mHeight);
+            } else {
+                return fitCenter(bitmap);
+            }
         }
 
         @NonNull

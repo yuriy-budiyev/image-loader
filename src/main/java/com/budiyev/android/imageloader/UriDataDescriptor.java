@@ -25,19 +25,18 @@ package com.budiyev.android.imageloader;
 
 import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 final class UriDataDescriptor extends IdentifiableDataDescriptor<Uri> {
-    private final CacheMode mCacheMode;
+    private final DataLocation mLocation;
 
     public UriDataDescriptor(@NonNull Uri data) {
         super(data, data.toString());
-        mCacheMode = InternalUtils.isUriLocal(data) ? CacheMode.MEMORY : CacheMode.FULL;
+        mLocation = InternalUtils.isUriLocal(data) ? DataLocation.LOCAL : DataLocation.REMOTE;
     }
 
-    @Nullable
+    @NonNull
     @Override
-    public CacheMode getCacheMode() {
-        return mCacheMode;
+    public DataLocation getLocation() {
+        return mLocation;
     }
 }

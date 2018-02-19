@@ -37,9 +37,9 @@ abstract class UnidentifiableDataDescriptor<T> extends BaseDataDescriptor<T> {
         return null;
     }
 
-    @NonNull
+    @Nullable
     @Override
-    public final CacheMode getCacheMode() {
-        return CacheMode.NONE;
+    public final DataLocation getLocation() {
+        return null;
     }
 }

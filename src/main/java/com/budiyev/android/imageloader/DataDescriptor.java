@@ -48,7 +48,7 @@ public interface DataDescriptor<T> {
      * {@link DataDescriptor}s considered to be equal if their keys are equal and not {@code null},
      * caching is not available if this method returns {@code null}
      *
-     * @return Unique identifier
+     * @return Unique identifier or {@code null}
      * @see DataUtils#generateSHA256
      */
     @Nullable
@@ -56,12 +56,11 @@ public interface DataDescriptor<T> {
     String getKey();
 
     /**
-     * Caching mode for images that is loaded from this data descriptor data type,
-     * can be overridden with {@link ImageRequest#cacheMode}
+     * Location of the data, affects caching policy
      *
-     * @return Cache mode
+     * @return Data location or {@code null}
      */
     @Nullable
     @AnyThread
-    CacheMode getCacheMode();
+    DataLocation getLocation();
 }

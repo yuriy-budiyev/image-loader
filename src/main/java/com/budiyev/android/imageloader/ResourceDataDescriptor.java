@@ -32,7 +32,7 @@ final class ResourceDataDescriptor extends IdentifiableDataDescriptor<Integer> {
 
     @NonNull
     @Override
-    public CacheMode getCacheMode() {
-        return CacheMode.MEMORY;
+    public DataLocation getLocation() {
+        return DataLocation.LOCAL;
     }
 }

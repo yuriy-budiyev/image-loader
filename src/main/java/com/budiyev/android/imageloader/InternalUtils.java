@@ -62,11 +62,10 @@ final class InternalUtils {
         if (key == null) {
             return;
         }
-        CacheMode cacheMode = descriptor.getCacheMode();
-        if (memoryCache != null && (cacheMode == null || cacheMode.isMemoryCacheEnabled())) {
+        if (memoryCache != null) {
             memoryCache.remove(key);
         }
-        if (storageCache != null && (cacheMode == null || cacheMode.isStorageCacheEnabled())) {
+        if (storageCache != null) {
             storageCache.remove(key);
         }
     }

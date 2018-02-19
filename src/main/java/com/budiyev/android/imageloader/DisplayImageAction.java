@@ -48,14 +48,14 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
     private final float mCornerRadius;
 
     public DisplayImageAction(@NonNull Resources resources, @NonNull View view, @NonNull DataDescriptor<T> descriptor,
-            @NonNull BitmapLoader<T> bitmapLoader, @Nullable Size requiredSize, @Nullable CacheMode cacheMode,
+            @NonNull BitmapLoader<T> bitmapLoader, @Nullable Size requiredSize,
             @Nullable BitmapTransformation transformation, @NonNull Drawable placeholder,
             @Nullable Drawable errorDrawable, @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache,
             @Nullable LoadCallback loadCallback, @Nullable ErrorCallback errorCallback,
             @Nullable DisplayCallback displayCallback, @NonNull PauseLock pauseLock, @NonNull Handler mainThreadHandler,
             boolean fadeEnabled, long fadeDuration, float cornerRadius) {
-        super(descriptor, bitmapLoader, requiredSize, cacheMode, transformation, memoryCache, storageCache,
-                loadCallback, errorCallback, pauseLock);
+        super(descriptor, bitmapLoader, requiredSize, transformation, memoryCache, storageCache, loadCallback,
+                errorCallback, pauseLock);
         mResources = new WeakReference<>(resources);
         mView = new WeakReference<>(view);
         mDisplayCallback = displayCallback;

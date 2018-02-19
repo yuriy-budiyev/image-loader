@@ -32,7 +32,7 @@ final class UrlDataDescriptor extends IdentifiableDataDescriptor<String> {
 
     @NonNull
     @Override
-    public CacheMode getCacheMode() {
-        return CacheMode.FULL;
+    public DataLocation getLocation() {
+        return DataLocation.REMOTE;
     }
 }

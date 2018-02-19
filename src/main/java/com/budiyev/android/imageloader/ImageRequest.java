@@ -62,11 +62,11 @@ public final class ImageRequest<T> {
     private final BitmapLoader<T> mBitmapLoader;
     private final DataDescriptor<T> mDescriptor;
     private Size mRequiredSize;
-    private CacheMode mCacheMode;
     private LoadCallback mLoadCallback;
     private ErrorCallback mErrorCallback;
     private DisplayCallback mDisplayCallback;
     private List<BitmapTransformation> mTransformations;
+    private BitmapTransformation mTransformation;
     private Drawable mPlaceholder;
     private Drawable mErrorDrawable;
     private boolean mFadeEnabled = true;
@@ -92,15 +92,6 @@ public final class ImageRequest<T> {
     @NonNull
     public ImageRequest<T> size(@Px int requiredWidth, @Px int requiredHeight) {
         mRequiredSize = new Size(requiredWidth, requiredHeight);
-        return this;
-    }
-
-    /**
-     * Cache mode, overrides data type specific mode
-     */
-    @NonNull
-    public ImageRequest<T> cacheMode(@Nullable CacheMode mode) {
-        mCacheMode = mode;
         return this;
     }
 
@@ -280,8 +271,8 @@ public final class ImageRequest<T> {
     @Nullable
     @WorkerThread
     public Bitmap loadSync() {
-        return new SyncLoadImageAction<>(mDescriptor, mBitmapLoader, mRequiredSize, mCacheMode, getTransformation(),
-                mMemoryCache, mStorageCache, mLoadCallback, mErrorCallback, mPauseLock).execute();
+        return new SyncLoadImageAction<>(mDescriptor, mBitmapLoader, mRequiredSize, getTransformation(), mMemoryCache,
+                mStorageCache, mLoadCallback, mErrorCallback, mPauseLock).execute();
     }
 
     /**
@@ -292,7 +283,7 @@ public final class ImageRequest<T> {
      */
     @AnyThread
     public void load() {
-        new LoadImageAction<>(mDescriptor, mBitmapLoader, mRequiredSize, mCacheMode, getTransformation(), mMemoryCache,
+        new LoadImageAction<>(mDescriptor, mBitmapLoader, mRequiredSize, getTransformation(), mMemoryCache,
                 mStorageCache, mLoadCallback, mErrorCallback, mPauseLock).execute(mExecutor);
     }
 
@@ -304,23 +295,18 @@ public final class ImageRequest<T> {
         DataDescriptor<T> descriptor = mDescriptor;
         Bitmap image = null;
         String key = descriptor.getKey();
-        ImageCache memoryCache = mMemoryCache;
+        Size requiredSize = mRequiredSize;
+        if (key != null && requiredSize != null) {
+            key += "_sampled_" + requiredSize.getWidth() + "x" + requiredSize.getHeight();
+        }
         BitmapTransformation transformation = getTransformation();
-        CacheMode cacheMode = mCacheMode;
-        if (cacheMode == null) {
-            cacheMode = descriptor.getCacheMode();
-            if (cacheMode == null) {
-                cacheMode = CacheMode.FULL;
-            }
+        if (key != null && transformation != null) {
+            key += transformation.getKey();
         }
-        if (cacheMode.isMemoryCacheEnabled() && key != null && memoryCache != null) {
-            if (transformation != null) {
-                image = memoryCache.get(key + transformation.getKey());
-            } else {
-                image = memoryCache.get(key);
-            }
+        ImageCache memoryCache = mMemoryCache;
+        if (key != null && memoryCache != null) {
+            image = memoryCache.get(key);
         }
-        T data = descriptor.getData();
         Resources resources = mResources;
         LoadCallback loadCallback = mLoadCallback;
         DisplayCallback displayCallback = mDisplayCallback;
@@ -351,10 +337,9 @@ public final class ImageRequest<T> {
             placeholder = new ColorDrawable(Color.TRANSPARENT);
         }
         DisplayImageAction<T> action =
-                new DisplayImageAction<>(resources, view, descriptor, mBitmapLoader, mRequiredSize, cacheMode,
-                        transformation, placeholder, mErrorDrawable, memoryCache, mStorageCache, loadCallback,
-                        mErrorCallback, displayCallback, mPauseLock, mMainThreadHandler, mFadeEnabled, mFadeDuration,
-                        cornerRadius);
+                new DisplayImageAction<>(resources, view, descriptor, mBitmapLoader, requiredSize, transformation,
+                        placeholder, mErrorDrawable, memoryCache, mStorageCache, loadCallback, mErrorCallback,
+                        displayCallback, mPauseLock, mMainThreadHandler, mFadeEnabled, mFadeDuration, cornerRadius);
         InternalUtils.setDrawable(new PlaceholderDrawable(placeholder, action), view);
         action.execute(mExecutor);
     }
