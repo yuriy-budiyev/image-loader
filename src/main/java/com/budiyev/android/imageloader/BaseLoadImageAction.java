@@ -179,6 +179,9 @@ abstract class BaseLoadImageAction<T> {
             image = storageCache.get(key);
             if (image != null) {
                 processImage(image);
+                if (memoryCache != null) {
+                    memoryCache.put(key, image);
+                }
                 return;
             }
         }
@@ -209,9 +212,13 @@ abstract class BaseLoadImageAction<T> {
             return;
         }
         processImage(image);
-        if (key != null && storageCache != null &&
-                (descriptor.getLocation() != DataLocation.LOCAL || transformation != null)) {
-            storageCache.put(key, image);
+        if (key != null) {
+            if (memoryCache != null) {
+                memoryCache.put(key, image);
+            }
+            if (storageCache != null && (descriptor.getLocation() != DataLocation.LOCAL || transformation != null)) {
+                storageCache.put(key, image);
+            }
         }
     }
 
