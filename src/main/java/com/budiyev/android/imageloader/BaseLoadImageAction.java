@@ -152,12 +152,15 @@ abstract class BaseLoadImageAction<T> {
         DataDescriptor<T> descriptor = mDescriptor;
         String key = descriptor.getKey();
         Size requiredSize = mRequiredSize;
+        boolean changed = false;
         if (key != null && requiredSize != null) {
             key += "_sampled_" + requiredSize.getWidth() + "x" + requiredSize.getHeight();
+            changed = true;
         }
         BitmapTransformation transformation = mTransformation;
         if (key != null && transformation != null) {
             key += transformation.getKey();
+            changed = true;
         }
         T data = descriptor.getData();
         Bitmap image;
@@ -216,7 +219,7 @@ abstract class BaseLoadImageAction<T> {
             if (memoryCache != null) {
                 memoryCache.put(key, image);
             }
-            if (storageCache != null && (descriptor.getLocation() == DataLocation.REMOTE || transformation != null)) {
+            if (storageCache != null && (changed || descriptor.getLocation() == DataLocation.REMOTE)) {
                 storageCache.put(key, image);
             }
         }
