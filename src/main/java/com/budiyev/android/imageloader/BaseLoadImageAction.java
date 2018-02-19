@@ -219,7 +219,7 @@ abstract class BaseLoadImageAction<T> {
             if (memoryCache != null) {
                 memoryCache.put(key, image);
             }
-            if (storageCache != null && (changed || descriptor.getLocation() == DataLocation.REMOTE)) {
+            if (storageCache != null && (changed || descriptor.getLocation() != DataLocation.LOCAL)) {
                 storageCache.put(key, image);
             }
         }
