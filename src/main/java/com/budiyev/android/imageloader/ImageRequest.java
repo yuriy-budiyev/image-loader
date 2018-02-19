@@ -53,6 +53,7 @@ import android.view.View;
  */
 public final class ImageRequest<T> {
     private static final long DEFAULT_FADE_DURATION = 200L;
+    private static final int TRANSFORMATIONS_CAPACITY = 4;
     private final Resources mResources;
     private final ExecutorService mExecutor;
     private final PauseLock mPauseLock;
@@ -360,7 +361,7 @@ public final class ImageRequest<T> {
     private List<BitmapTransformation> transformations() {
         List<BitmapTransformation> t = mTransformations;
         if (t == null) {
-            t = new ArrayList<>();
+            t = new ArrayList<>(TRANSFORMATIONS_CAPACITY);
             mTransformations = t;
         }
         return t;
