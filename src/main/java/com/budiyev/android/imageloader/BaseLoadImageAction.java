@@ -156,9 +156,6 @@ abstract class BaseLoadImageAction<T> {
         }
         DataDescriptor<T> descriptor = mDescriptor;
         String key = getKey();
-        Size requiredSize = mRequiredSize;
-        BitmapTransformation transformation = mTransformation;
-        boolean changed = requiredSize != null || transformation != null;
         T data = descriptor.getData();
         Bitmap image;
         // Memory cache
@@ -189,6 +186,7 @@ abstract class BaseLoadImageAction<T> {
             return;
         }
         // Load new image
+        Size requiredSize = mRequiredSize;
         try {
             image = mBitmapLoader.load(data, requiredSize);
         } catch (Throwable error) {
@@ -200,6 +198,7 @@ abstract class BaseLoadImageAction<T> {
             return;
         }
         // Transform image
+        BitmapTransformation transformation = mTransformation;
         if (transformation != null) {
             try {
                 image = transformation.transform(image);
@@ -216,7 +215,8 @@ abstract class BaseLoadImageAction<T> {
             if (memoryCache != null) {
                 memoryCache.put(key, image);
             }
-            if (storageCache != null && (changed || descriptor.getLocation() != DataLocation.LOCAL)) {
+            if (storageCache != null && (requiredSize != null || transformation != null ||
+                    descriptor.getLocation() != DataLocation.LOCAL)) {
                 storageCache.put(key, image);
             }
         }
