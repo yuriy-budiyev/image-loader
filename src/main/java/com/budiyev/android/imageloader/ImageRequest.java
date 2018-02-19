@@ -303,10 +303,10 @@ public final class ImageRequest<T> {
         BitmapTransformation transformation = getTransformation();
         LoadCallback loadCallback = mLoadCallback;
         DisplayCallback displayCallback = mDisplayCallback;
+        ImageCache memoryCache = getMemoryCache();
         float cornerRadius = mCornerRadius;
         Bitmap image = null;
         String key = InternalUtils.buildFullKey(descriptor.getKey(), requiredSize, transformation);
-        ImageCache memoryCache = getMemoryCache();
         if (key != null && memoryCache != null) {
             image = memoryCache.get(key);
         }
