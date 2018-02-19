@@ -9,9 +9,9 @@ Image loader library for Android.
 ### Features
 * Image transformations
 * Automatic memory and storage caching
-* Almost unlimited customization
-* Generic load requests, ability to load images from any custom data type
+* Ability to load images from any custom data type
 * Both synchronous and asynchronous image loading modes
+* Almost unlimited customization
 
 ### Usage
 ```gradle
