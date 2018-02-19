@@ -161,12 +161,7 @@ public final class ImageRequest<T> {
      */
     @NonNull
     public ImageRequest<T> transform(@NonNull BitmapTransformation transformation) {
-        List<BitmapTransformation> t = mTransformations;
-        if (t == null) {
-            t = new ArrayList<>();
-            mTransformations = t;
-        }
-        t.add(transformation);
+        transformations().add(transformation);
         return this;
     }
 
@@ -178,12 +173,7 @@ public final class ImageRequest<T> {
      */
     @NonNull
     public ImageRequest<T> transform(@NonNull Collection<BitmapTransformation> transformations) {
-        List<BitmapTransformation> t = mTransformations;
-        if (t == null) {
-            t = new ArrayList<>();
-            mTransformations = t;
-        }
-        t.addAll(transformations);
+        transformations().addAll(transformations);
         return this;
     }
 
@@ -195,12 +185,7 @@ public final class ImageRequest<T> {
      */
     @NonNull
     public ImageRequest<T> transform(@NonNull BitmapTransformation... transformations) {
-        List<BitmapTransformation> t = mTransformations;
-        if (t == null) {
-            t = new ArrayList<>();
-            mTransformations = t;
-        }
-        Collections.addAll(t, transformations);
+        Collections.addAll(transformations(), transformations);
         return this;
     }
 
@@ -371,6 +356,16 @@ public final class ImageRequest<T> {
         mExecutor.submit(new InvalidateAction(mDescriptor, getMemoryCache(), getStorageCache()));
     }
 
+    @NonNull
+    private List<BitmapTransformation> transformations() {
+        List<BitmapTransformation> t = mTransformations;
+        if (t == null) {
+            t = new ArrayList<>();
+            mTransformations = t;
+        }
+        return t;
+    }
+
     @Nullable
     private BitmapTransformation getTransformation() {
         List<BitmapTransformation> t = mTransformations;
@@ -391,7 +386,8 @@ public final class ImageRequest<T> {
     }
 
     @Nullable
-    public ImageCache getStorageCache() {
+    private ImageCache getStorageCache() {
         return mStorageCacheEnabled ? mStorageCache : null;
     }
+
 }
