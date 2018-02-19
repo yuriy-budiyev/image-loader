@@ -70,6 +70,25 @@ final class InternalUtils {
         }
     }
 
+    @Nullable
+    public static String buildFullKey(@Nullable String base, @Nullable Size requiredSize,
+            @Nullable BitmapTransformation transformation) {
+        if (base == null) {
+            return null;
+        }
+        if (requiredSize == null && transformation == null) {
+            return base;
+        }
+        StringBuilder sb = new StringBuilder(base);
+        if (requiredSize != null) {
+            sb.append("_sampled_").append(requiredSize.getWidth()).append("x").append(requiredSize.getHeight());
+        }
+        if (transformation != null) {
+            sb.append(transformation.getKey());
+        }
+        return sb.toString();
+    }
+
     public static void close(@Nullable Closeable closeable) {
         if (closeable == null) {
             return;

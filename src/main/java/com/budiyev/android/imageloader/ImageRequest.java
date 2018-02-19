@@ -297,25 +297,19 @@ public final class ImageRequest<T> {
      */
     @MainThread
     public void load(@NonNull View view) {
+        Resources resources = mResources;
         DataDescriptor<T> descriptor = mDescriptor;
-        Bitmap image = null;
-        String key = descriptor.getKey();
         Size requiredSize = mRequiredSize;
-        if (key != null && requiredSize != null) {
-            key += "_sampled_" + requiredSize.getWidth() + "x" + requiredSize.getHeight();
-        }
         BitmapTransformation transformation = getTransformation();
-        if (key != null && transformation != null) {
-            key += transformation.getKey();
-        }
+        LoadCallback loadCallback = mLoadCallback;
+        DisplayCallback displayCallback = mDisplayCallback;
+        float cornerRadius = mCornerRadius;
+        Bitmap image = null;
+        String key = InternalUtils.buildFullKey(descriptor.getKey(), requiredSize, transformation);
         ImageCache memoryCache = getMemoryCache();
         if (key != null && memoryCache != null) {
             image = memoryCache.get(key);
         }
-        Resources resources = mResources;
-        LoadCallback loadCallback = mLoadCallback;
-        DisplayCallback displayCallback = mDisplayCallback;
-        float cornerRadius = mCornerRadius;
         if (image != null) {
             if (loadCallback != null) {
                 loadCallback.onLoaded(image);
@@ -332,7 +326,7 @@ public final class ImageRequest<T> {
         }
         DisplayImageAction<?> currentAction = InternalUtils.getDisplayImageAction(view);
         if (currentAction != null) {
-            if (currentAction.hasSameDescriptor(key)) {
+            if (currentAction.hasSameKey(key)) {
                 return;
             }
             currentAction.cancel();

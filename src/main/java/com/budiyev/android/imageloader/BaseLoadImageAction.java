@@ -99,6 +99,11 @@ abstract class BaseLoadImageAction<T> {
     }
 
     @Nullable
+    protected final String getKey() {
+        return InternalUtils.buildFullKey(mDescriptor.getKey(), mRequiredSize, mTransformation);
+    }
+
+    @Nullable
     protected final Size getRequiredSize() {
         return mRequiredSize;
     }
@@ -150,18 +155,10 @@ abstract class BaseLoadImageAction<T> {
             return;
         }
         DataDescriptor<T> descriptor = mDescriptor;
-        String key = descriptor.getKey();
+        String key = getKey();
         Size requiredSize = mRequiredSize;
-        boolean changed = false;
-        if (key != null && requiredSize != null) {
-            key += "_sampled_" + requiredSize.getWidth() + "x" + requiredSize.getHeight();
-            changed = true;
-        }
         BitmapTransformation transformation = mTransformation;
-        if (key != null && transformation != null) {
-            key += transformation.getKey();
-            changed = true;
-        }
+        boolean changed = requiredSize != null || transformation != null;
         T data = descriptor.getData();
         Bitmap image;
         // Memory cache
