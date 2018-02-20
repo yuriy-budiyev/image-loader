@@ -24,6 +24,7 @@
 package com.budiyev.android.imageloader;
 
 import java.lang.ref.WeakReference;
+import java.util.concurrent.ExecutorService;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -51,10 +52,11 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
             @NonNull BitmapLoader<T> bitmapLoader, @Nullable Size requiredSize,
             @Nullable BitmapTransformation transformation, @NonNull Drawable placeholder,
             @Nullable Drawable errorDrawable, @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache,
-            @Nullable LoadCallback loadCallback, @Nullable ErrorCallback errorCallback,
-            @Nullable DisplayCallback displayCallback, @NonNull PauseLock pauseLock, @NonNull Handler mainThreadHandler,
-            boolean fadeEnabled, long fadeDuration, float cornerRadius) {
-        super(cacheExecutor, descriptor, bitmapLoader, requiredSize, transformation, memoryCache, storageCache,
+            @Nullable ExecutorService cacheExecutor, @Nullable LoadCallback loadCallback,
+            @Nullable ErrorCallback errorCallback, @Nullable DisplayCallback displayCallback,
+            @NonNull PauseLock pauseLock, @NonNull Handler mainThreadHandler, boolean fadeEnabled, long fadeDuration,
+            float cornerRadius) {
+        super(descriptor, bitmapLoader, requiredSize, transformation, memoryCache, storageCache, cacheExecutor,
                 loadCallback, errorCallback, pauseLock);
         mResources = new WeakReference<>(resources);
         mView = new WeakReference<>(view);
