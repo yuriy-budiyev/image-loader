@@ -51,7 +51,7 @@ final class InternalUtils {
     private static final String LOAD_THREAD_NAME = "load";
     private static final String CACHE_THREAD_NAME = "cache";
     private static final int MAX_LOAD_POOL_SIZE = 4;
-    private static final int MAX_CACHE_POOL_SIZE = 2;
+    private static final int CACHE_POOL_SIZE = 1;
     private static final int CONNECT_TIMEOUT = 10000;
     private static final String URI_SCHEME_HTTP = "http";
     private static final String URI_SCHEME_HTTPS = "https";
@@ -237,7 +237,6 @@ final class InternalUtils {
 
     @NonNull
     public static ExecutorService cacheExecutor() {
-        return new ImageLoaderExecutor(CACHE_THREAD_NAME,
-                Math.min(Runtime.getRuntime().availableProcessors(), MAX_CACHE_POOL_SIZE));
+        return new ImageLoaderExecutor(CACHE_THREAD_NAME, CACHE_POOL_SIZE);
     }
 }
