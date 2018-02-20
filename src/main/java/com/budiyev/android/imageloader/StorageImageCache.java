@@ -198,8 +198,9 @@ final class StorageImageCache implements ImageCache {
                     }
                 }
             } catch (Exception ignored) {
+            } finally {
+                mTrimming.set(false);
             }
-            mTrimming.set(false);
         }
     }
 
