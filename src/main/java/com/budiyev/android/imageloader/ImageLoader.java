@@ -45,7 +45,8 @@ import android.support.annotation.Nullable;
  */
 public final class ImageLoader {
     private final Context mContext;
-    private final ExecutorService mExecutor;
+    private final ExecutorService mLoadExecutor;
+    private final ExecutorService mCacheExecutor;
     private final Handler mMainThreadHandler;
     private final ImageCache mMemoryCache;
     private final ImageCache mStorageCache;
@@ -59,10 +60,11 @@ public final class ImageLoader {
      * @see #with
      * @see #builder
      */
-    ImageLoader(@NonNull Context context, @NonNull ExecutorService executor, @Nullable ImageCache memoryCache,
-            @Nullable ImageCache storageCache) {
+    ImageLoader(@NonNull Context context, @NonNull ExecutorService loadExecutor, @NonNull ExecutorService cacheExecutor,
+            @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache) {
         mContext = context;
-        mExecutor = executor;
+        mLoadExecutor = loadExecutor;
+        mCacheExecutor = cacheExecutor;
         mMainThreadHandler = new Handler(context.getMainLooper());
         mMemoryCache = memoryCache;
         mStorageCache = storageCache;
@@ -102,8 +104,8 @@ public final class ImageLoader {
         if (descriptorFactory == null || bitmapLoader == null) {
             throw new IllegalArgumentException("Unsupported data type: " + dataClassName);
         }
-        return new ImageRequest<>(mContext.getResources(), mExecutor, mPauseLock, mMainThreadHandler, mMemoryCache,
-                mStorageCache, bitmapLoader, descriptorFactory.newDescriptor(data));
+        return new ImageRequest<>(mContext.getResources(), mLoadExecutor, mCacheExecutor, mPauseLock,
+                mMainThreadHandler, mMemoryCache, mStorageCache, bitmapLoader, descriptorFactory.newDescriptor(data));
     }
 
     /**

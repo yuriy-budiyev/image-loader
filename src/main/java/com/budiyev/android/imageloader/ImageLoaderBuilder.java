@@ -34,10 +34,13 @@ import android.support.annotation.Nullable;
  * Image loader builder
  */
 public final class ImageLoaderBuilder {
+    private static final String LOAD_EXECUTOR = "load";
+    private static final String CACHE_EXECUTOR = "cache";
     private final Context mContext;
     private ImageCache mMemoryCache;
     private ImageCache mStorageCache;
-    private ExecutorService mExecutor;
+    private ExecutorService mLoadExecutor;
+    private ExecutorService mCacheExecutor;
 
     ImageLoaderBuilder(@NonNull Context context) {
         mContext = context.getApplicationContext();
@@ -141,11 +144,20 @@ public final class ImageLoaderBuilder {
     }
 
     /**
-     * Custom executor
+     * Custom load executor
      */
     @NonNull
-    public ImageLoaderBuilder executor(@Nullable ExecutorService executor) {
-        mExecutor = executor;
+    public ImageLoaderBuilder loadExecutor(@Nullable ExecutorService executor) {
+        mLoadExecutor = executor;
+        return this;
+    }
+
+    /**
+     * Custom load executor
+     */
+    @NonNull
+    public ImageLoaderBuilder cacheExecutor(@Nullable ExecutorService executor) {
+        mCacheExecutor = executor;
         return this;
     }
 
@@ -154,14 +166,18 @@ public final class ImageLoaderBuilder {
      */
     @NonNull
     public ImageLoader build() {
-        ExecutorService executor = mExecutor;
-        if (executor == null) {
-            executor = new ImageLoaderExecutor(InternalUtils.getPoolSize());
+        ExecutorService loadExecutor = mLoadExecutor;
+        if (loadExecutor == null) {
+            loadExecutor = new ImageLoaderExecutor(LOAD_EXECUTOR, InternalUtils.getPoolSize());
+        }
+        ExecutorService cacheExecutor = mCacheExecutor;
+        if (cacheExecutor == null) {
+            cacheExecutor = new ImageLoaderExecutor(CACHE_EXECUTOR, InternalUtils.getPoolSize());
         }
         ImageCache storageCache = mStorageCache;
         if (storageCache instanceof StorageImageCache) {
-            ((StorageImageCache) storageCache).setExecutor(executor);
+            ((StorageImageCache) storageCache).setExecutor(loadExecutor);
         }
-        return new ImageLoader(mContext, executor, mMemoryCache, storageCache);
+        return new ImageLoader(mContext, loadExecutor, cacheExecutor, mMemoryCache, storageCache);
     }
 }

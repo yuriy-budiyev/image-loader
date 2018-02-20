@@ -34,9 +34,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 final class ImageLoaderExecutor extends ThreadPoolExecutor {
-    public ImageLoaderExecutor(int poolSize) {
+    public ImageLoaderExecutor(@NonNull String name, int poolSize) {
         super(poolSize, poolSize, 0L, TimeUnit.NANOSECONDS, new LinkedBlockingQueue<Runnable>(),
-                new ImageLoaderThreadFactory(), new DiscardPolicy());
+                new ImageLoaderThreadFactory(name), new DiscardPolicy());
     }
 
     @Override
