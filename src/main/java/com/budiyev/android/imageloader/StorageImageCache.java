@@ -30,10 +30,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -44,18 +41,14 @@ import android.support.annotation.Nullable;
 @SuppressWarnings("ResultOfMethodCallIgnored")
 final class StorageImageCache implements ImageCache {
     public static final String DEFAULT_DIRECTORY = "image_loader_cache";
-    public static final long DEFAULT_MAX_SIZE = 52428800L;
+    public static final long DEFAULT_MAX_SIZE = 104857600L;
     private static final int BUFFER_SIZE = 16384;
-    private final Lock mTrimLock = new ReentrantLock();
-    private final Callable<?> mTrimTask = new TrimTask();
     private final FileFilter mFileFilter = new CacheFileFilter();
     private final Comparator<File> mFileComparator = new FileComparator();
+    private final AtomicBoolean mTrimming = new AtomicBoolean();
     private final CompressMode mCompressMode;
     private final File mDirectory;
     private final long mMaxSize;
-    private volatile ExecutorService mExecutor;
-    private volatile boolean mTrimming;
-    private volatile boolean mTrimRequested;
 
     public StorageImageCache(@NonNull Context context) {
         this(getDefaultDirectory(context));
@@ -84,13 +77,6 @@ final class StorageImageCache implements ImageCache {
         if (!directory.exists()) {
             directory.mkdirs();
         }
-    }
-
-    public void setExecutor(@Nullable ExecutorService executor) {
-        if (mExecutor != null) {
-            return;
-        }
-        mExecutor = executor;
     }
 
     @Nullable
@@ -193,20 +179,27 @@ final class StorageImageCache implements ImageCache {
     }
 
     private void trim() {
-        ExecutorService executor = mExecutor;
-        if (executor == null) {
-            return;
-        }
-        mTrimLock.lock();
-        try {
-            if (mTrimming) {
-                mTrimRequested = true;
-            } else {
-                mTrimming = true;
-                executor.submit(mTrimTask);
+        if (mTrimming.compareAndSet(false, true)) {
+            try {
+                File[] files = getFiles();
+                if (files != null && files.length != 0) {
+                    Arrays.sort(files, mFileComparator);
+                    long size = 0L;
+                    boolean removing = false;
+                    for (File cached : files) {
+                        if (removing) {
+                            cached.delete();
+                        } else {
+                            size += cached.length();
+                            if (size >= mMaxSize) {
+                                removing = true;
+                            }
+                        }
+                    }
+                }
+            } catch (Exception ignored) {
             }
-        } finally {
-            mTrimLock.unlock();
+            mTrimming.set(false);
         }
     }
 
@@ -217,44 +210,6 @@ final class StorageImageCache implements ImageCache {
             directory = context.getCacheDir();
         }
         return new File(directory, DEFAULT_DIRECTORY);
-    }
-
-    private final class TrimTask implements Callable<Void> {
-        @Override
-        public Void call() throws Exception {
-            for (; ; ) {
-                try {
-                    File[] files = getFiles();
-                    if (files != null && files.length != 0) {
-                        Arrays.sort(files, mFileComparator);
-                        long size = 0L;
-                        boolean removing = false;
-                        for (File cached : files) {
-                            if (removing) {
-                                cached.delete();
-                            } else {
-                                size += cached.length();
-                                if (size >= mMaxSize) {
-                                    removing = true;
-                                }
-                            }
-                        }
-                    }
-                } catch (Exception ignored) {
-                }
-                mTrimLock.lock();
-                try {
-                    if (!mTrimRequested) {
-                        mTrimming = false;
-                        break;
-                    }
-                    mTrimRequested = false;
-                } finally {
-                    mTrimLock.unlock();
-                }
-            }
-            return null;
-        }
     }
 
     private static final class CacheFileFilter implements FileFilter {
