@@ -36,7 +36,7 @@ final class SyncLoadImageAction<T> extends BaseLoadImageAction<T> {
             @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache, @Nullable LoadCallback loadCallback,
             @Nullable ErrorCallback errorCallback, @NonNull PauseLock pauseLock) {
         super(descriptor, bitmapLoader, requiredSize, transformation, memoryCache, storageCache, null, loadCallback,
-                errorCallback, pauseLock);
+                errorCallback, pauseLock, true);
     }
 
     @Nullable
