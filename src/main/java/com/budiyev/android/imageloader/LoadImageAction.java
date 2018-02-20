@@ -23,8 +23,6 @@
  */
 package com.budiyev.android.imageloader;
 
-import java.util.concurrent.ExecutorService;
-
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -32,9 +30,9 @@ import android.support.annotation.Nullable;
 final class LoadImageAction<T> extends BaseLoadImageAction<T> {
     public LoadImageAction(@NonNull DataDescriptor<T> descriptor, @NonNull BitmapLoader<T> bitmapLoader,
             @Nullable Size requiredSize, @Nullable BitmapTransformation transformation,
-            @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache, @NonNull ExecutorService cacheExecutor,
-            @Nullable LoadCallback loadCallback, @Nullable ErrorCallback errorCallback, @NonNull PauseLock pauseLock) {
-        super(descriptor, bitmapLoader, requiredSize, transformation, memoryCache, storageCache, cacheExecutor,
+            @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache, @Nullable LoadCallback loadCallback,
+            @Nullable ErrorCallback errorCallback, @NonNull PauseLock pauseLock) {
+        super(cacheExecutor, descriptor, bitmapLoader, requiredSize, transformation, memoryCache, storageCache,
                 loadCallback, errorCallback, pauseLock);
     }
 

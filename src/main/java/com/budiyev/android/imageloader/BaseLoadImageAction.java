@@ -34,6 +34,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 
 abstract class BaseLoadImageAction<T> {
+    private final ExecutorService mCacheExecutor;
     private final DataDescriptor<T> mDescriptor;
     private final BitmapLoader<T> mBitmapLoader;
     private final Size mRequiredSize;
@@ -43,16 +44,16 @@ abstract class BaseLoadImageAction<T> {
     private final ImageCache mStorageCache;
     private final LoadCallback mLoadCallback;
     private final ErrorCallback mErrorCallback;
-    private final ExecutorService mCacheExecutor;
     private volatile Future<?> mFuture;
     private volatile boolean mCancelled;
     private volatile boolean mCalled;
 
-    protected BaseLoadImageAction(@NonNull DataDescriptor<T> descriptor, @NonNull BitmapLoader<T> bitmapLoader,
-            @Nullable Size requiredSize, @Nullable BitmapTransformation transformation,
-            @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache,
-            @Nullable ExecutorService cacheExecutor, @Nullable LoadCallback loadCallback,
+    protected BaseLoadImageAction(@NonNull ExecutorService cacheExecutor, @NonNull DataDescriptor<T> descriptor,
+            @NonNull BitmapLoader<T> bitmapLoader, @Nullable Size requiredSize,
+            @Nullable BitmapTransformation transformation, @Nullable ImageCache memoryCache,
+            @Nullable ImageCache storageCache, @Nullable LoadCallback loadCallback,
             @Nullable ErrorCallback errorCallback, @NonNull PauseLock pauseLock) {
+        mCacheExecutor = cacheExecutor;
         mDescriptor = descriptor;
         mBitmapLoader = bitmapLoader;
         mRequiredSize = requiredSize;
@@ -62,7 +63,6 @@ abstract class BaseLoadImageAction<T> {
         mStorageCache = storageCache;
         mLoadCallback = loadCallback;
         mErrorCallback = errorCallback;
-        mCacheExecutor = cacheExecutor;
     }
 
     @WorkerThread
@@ -180,7 +180,7 @@ abstract class BaseLoadImageAction<T> {
             if (image != null) {
                 processImage(image);
                 if (memoryCache != null) {
-                    cacheImage(key, image, memoryCache);
+                    mCacheExecutor.submit(new CacheImageAction(key, image, memoryCache));
                 }
                 return;
             }
@@ -220,22 +220,12 @@ abstract class BaseLoadImageAction<T> {
         processImage(image);
         if (key != null) {
             if (memoryCache != null) {
-                cacheImage(key, image, memoryCache);
+                mCacheExecutor.submit(new CacheImageAction(key, image, memoryCache));
             }
             if (storageCache != null && (requiredSize != null || transformation != null ||
                     descriptor.getLocation() != DataLocation.LOCAL)) {
-                cacheImage(key, image, storageCache);
+                mCacheExecutor.submit(new CacheImageAction(key, image, storageCache));
             }
-        }
-    }
-
-    @WorkerThread
-    private void cacheImage(@NonNull String key, @NonNull Bitmap image, @NonNull ImageCache cache) {
-        ExecutorService cacheExecutor = mCacheExecutor;
-        if (cacheExecutor != null) {
-            cacheExecutor.submit(new CacheImageAction(key, image, cache));
-        } else {
-            cache.put(key, image);
         }
     }
 

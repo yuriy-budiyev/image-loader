@@ -301,7 +301,7 @@ public final class ImageRequest<T> {
     @AnyThread
     public void load() {
         new LoadImageAction<>(mDescriptor, mBitmapLoader, mRequiredSize, getTransformation(), getMemoryCache(),
-                getStorageCache(), mCacheExecutor, mLoadCallback, mErrorCallback, mPauseLock).execute(mLoadExecutor);
+                getStorageCache(), mLoadCallback, mErrorCallback, mPauseLock).execute(mLoadExecutor);
     }
 
     /**
@@ -349,9 +349,8 @@ public final class ImageRequest<T> {
         }
         DisplayImageAction<T> action =
                 new DisplayImageAction<>(resources, view, descriptor, mBitmapLoader, requiredSize, transformation,
-                        placeholder, mErrorDrawable, memoryCache, getStorageCache(), mCacheExecutor, loadCallback,
-                        mErrorCallback, displayCallback, mPauseLock, mMainThreadHandler, mFadeEnabled, mFadeDuration,
-                        cornerRadius);
+                        placeholder, mErrorDrawable, memoryCache, getStorageCache(), loadCallback, mErrorCallback,
+                        displayCallback, mPauseLock, mMainThreadHandler, mFadeEnabled, mFadeDuration, cornerRadius);
         InternalUtils.setDrawable(new PlaceholderDrawable(placeholder, action), view);
         action.execute(mLoadExecutor);
     }
