@@ -153,7 +153,7 @@ public final class ImageLoaderBuilder {
     }
 
     /**
-     * Custom load executor
+     * Custom cache executor
      */
     @NonNull
     public ImageLoaderBuilder cacheExecutor(@Nullable ExecutorService executor) {
