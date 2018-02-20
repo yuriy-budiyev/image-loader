@@ -35,7 +35,7 @@ final class LoadImageAction<T> extends BaseLoadImageAction<T> {
             @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache, @NonNull ExecutorService cacheExecutor,
             @Nullable LoadCallback loadCallback, @Nullable ErrorCallback errorCallback, @NonNull PauseLock pauseLock) {
         super(descriptor, bitmapLoader, requiredSize, transformation, memoryCache, storageCache, cacheExecutor,
-                loadCallback, errorCallback, pauseLock, true);
+                loadCallback, errorCallback, pauseLock);
     }
 
     @Override

@@ -44,7 +44,6 @@ abstract class BaseLoadImageAction<T> {
     private final LoadCallback mLoadCallback;
     private final ErrorCallback mErrorCallback;
     private final ExecutorService mCacheExecutor;
-    private final boolean mLoadFromMemoryCache;
     private volatile Future<?> mFuture;
     private volatile boolean mCancelled;
     private volatile boolean mCalled;
@@ -53,7 +52,7 @@ abstract class BaseLoadImageAction<T> {
             @Nullable Size requiredSize, @Nullable BitmapTransformation transformation,
             @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache,
             @Nullable ExecutorService cacheExecutor, @Nullable LoadCallback loadCallback,
-            @Nullable ErrorCallback errorCallback, @NonNull PauseLock pauseLock, boolean loadFromMemoryCache) {
+            @Nullable ErrorCallback errorCallback, @NonNull PauseLock pauseLock) {
         mDescriptor = descriptor;
         mBitmapLoader = bitmapLoader;
         mRequiredSize = requiredSize;
@@ -64,7 +63,6 @@ abstract class BaseLoadImageAction<T> {
         mLoadCallback = loadCallback;
         mErrorCallback = errorCallback;
         mCacheExecutor = cacheExecutor;
-        mLoadFromMemoryCache = loadFromMemoryCache;
     }
 
     @WorkerThread
@@ -165,7 +163,7 @@ abstract class BaseLoadImageAction<T> {
         Bitmap image;
         // Memory cache
         ImageCache memoryCache = mMemoryCache;
-        if (mLoadFromMemoryCache && key != null && memoryCache != null) {
+        if (key != null && memoryCache != null) {
             image = memoryCache.get(key);
             if (image != null) {
                 processImage(image);
