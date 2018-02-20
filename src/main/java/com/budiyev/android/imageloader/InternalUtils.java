@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.concurrent.ExecutorService;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -48,11 +47,8 @@ import android.view.View;
 import android.widget.ImageView;
 
 final class InternalUtils {
-    private static final String LOAD_THREAD_NAME = "load";
-    private static final String CACHE_THREAD_NAME = "cache";
-    private static final int MAX_LOAD_POOL_SIZE = 4;
-    private static final int CACHE_POOL_SIZE = 1;
     private static final int CONNECT_TIMEOUT = 10000;
+    private static final int MAX_POOL_SIZE = 4;
     private static final String URI_SCHEME_HTTP = "http";
     private static final String URI_SCHEME_HTTPS = "https";
     private static final String URI_SCHEME_FTP = "ftp";
@@ -169,6 +165,10 @@ final class InternalUtils {
         }
     }
 
+    public static int getPoolSize() {
+        return Math.min(Runtime.getRuntime().availableProcessors(), MAX_POOL_SIZE);
+    }
+
     public static boolean isUriLocal(@NonNull Uri uri) {
         String scheme = uri.getScheme();
         return ContentResolver.SCHEME_FILE.equals(scheme) || ContentResolver.SCHEME_CONTENT.equals(scheme) ||
@@ -227,16 +227,5 @@ final class InternalUtils {
             bitmap.recycle();
         }
         return rotated;
-    }
-
-    @NonNull
-    public static ExecutorService loadExecutor() {
-        return new ImageLoaderExecutor(LOAD_THREAD_NAME,
-                Math.min(Runtime.getRuntime().availableProcessors(), MAX_LOAD_POOL_SIZE));
-    }
-
-    @NonNull
-    public static ExecutorService cacheExecutor() {
-        return new ImageLoaderExecutor(CACHE_THREAD_NAME, CACHE_POOL_SIZE);
     }
 }

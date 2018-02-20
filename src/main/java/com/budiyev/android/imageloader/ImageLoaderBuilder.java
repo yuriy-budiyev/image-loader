@@ -34,6 +34,8 @@ import android.support.annotation.Nullable;
  * Image loader builder
  */
 public final class ImageLoaderBuilder {
+    private static final String LOAD_EXECUTOR = "load";
+    private static final String CACHE_EXECUTOR = "cache";
     private final Context mContext;
     private ImageCache mMemoryCache;
     private ImageCache mStorageCache;
@@ -166,11 +168,11 @@ public final class ImageLoaderBuilder {
     public ImageLoader build() {
         ExecutorService loadExecutor = mLoadExecutor;
         if (loadExecutor == null) {
-            loadExecutor = InternalUtils.loadExecutor();
+            loadExecutor = new ImageLoaderExecutor(LOAD_EXECUTOR, InternalUtils.getPoolSize());
         }
         ExecutorService cacheExecutor = mCacheExecutor;
         if (cacheExecutor == null) {
-            cacheExecutor = InternalUtils.cacheExecutor();
+            cacheExecutor = new ImageLoaderExecutor(CACHE_EXECUTOR, InternalUtils.getPoolSize());
         }
         return new ImageLoader(mContext, loadExecutor, cacheExecutor, mMemoryCache, mStorageCache);
     }
