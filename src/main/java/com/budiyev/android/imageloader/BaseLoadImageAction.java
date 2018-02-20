@@ -201,7 +201,11 @@ abstract class BaseLoadImageAction<T> {
         BitmapTransformation transformation = mTransformation;
         if (transformation != null) {
             try {
-                image = transformation.transform(image);
+                Bitmap transformed = transformation.transform(image);
+                if (image != transformed && !image.isRecycled()) {
+                    image.recycle();
+                }
+                image = transformed;
             } catch (Throwable error) {
                 processError(error);
                 return;
