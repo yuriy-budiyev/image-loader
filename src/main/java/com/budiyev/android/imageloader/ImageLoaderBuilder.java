@@ -43,7 +43,7 @@ public final class ImageLoaderBuilder {
     private ExecutorService mCacheExecutor;
 
     ImageLoaderBuilder(@NonNull Context context) {
-        mContext = context.getApplicationContext();
+        mContext = context;
     }
 
     /**
@@ -174,10 +174,6 @@ public final class ImageLoaderBuilder {
         if (cacheExecutor == null) {
             cacheExecutor = new ImageLoaderExecutor(CACHE_EXECUTOR, InternalUtils.getPoolSize());
         }
-        ImageCache storageCache = mStorageCache;
-        if (storageCache instanceof StorageImageCache) {
-            ((StorageImageCache) storageCache).setExecutor(loadExecutor);
-        }
-        return new ImageLoader(mContext, loadExecutor, cacheExecutor, mMemoryCache, storageCache);
+        return new ImageLoader(mContext, loadExecutor, cacheExecutor, mMemoryCache, mStorageCache);
     }
 }

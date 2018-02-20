@@ -220,7 +220,9 @@ public final class ImageLoader {
     }
 
     /**
-     * Create new image loader builder instance
+     * Create new image loader builder instance,
+     * use application context to avoid memory leaks
+     * if image loader instance is static
      */
     @NonNull
     public static ImageLoaderBuilder builder(@NonNull Context context) {

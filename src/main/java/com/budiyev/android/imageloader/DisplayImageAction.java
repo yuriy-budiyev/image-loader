@@ -54,8 +54,8 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
             @Nullable LoadCallback loadCallback, @Nullable ErrorCallback errorCallback,
             @Nullable DisplayCallback displayCallback, @NonNull PauseLock pauseLock, @NonNull Handler mainThreadHandler,
             boolean fadeEnabled, long fadeDuration, float cornerRadius) {
-        super(descriptor, bitmapLoader, requiredSize, transformation, memoryCache, storageCache, loadCallback,
-                errorCallback, pauseLock);
+        super(cacheExecutor, descriptor, bitmapLoader, requiredSize, transformation, memoryCache, storageCache,
+                loadCallback, errorCallback, pauseLock);
         mResources = new WeakReference<>(resources);
         mView = new WeakReference<>(view);
         mDisplayCallback = displayCallback;
