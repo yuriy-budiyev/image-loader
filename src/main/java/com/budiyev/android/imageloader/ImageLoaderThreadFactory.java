@@ -30,17 +30,17 @@ import android.support.annotation.NonNull;
 
 final class ImageLoaderThreadFactory implements ThreadFactory {
     private final AtomicInteger mCounter = new AtomicInteger(1);
-    private final String mName;
+    private final String mThreadName;
 
-    public ImageLoaderThreadFactory(@NonNull String name) {
-        mName = name;
+    public ImageLoaderThreadFactory(@NonNull String threadName) {
+        mThreadName = threadName;
     }
 
     @NonNull
     @Override
     public Thread newThread(@NonNull Runnable r) {
         mCounter.compareAndSet(Integer.MAX_VALUE, 0);
-        Thread t = new Thread(r, "ImageLoader " + mName + " thread #" + mCounter.getAndIncrement());
+        Thread t = new Thread(r, "ImageLoader " + mThreadName + " thread #" + mCounter.getAndIncrement());
         if (t.getPriority() != Thread.MIN_PRIORITY) {
             t.setPriority(Thread.MIN_PRIORITY);
         }

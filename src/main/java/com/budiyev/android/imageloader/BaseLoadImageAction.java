@@ -180,7 +180,7 @@ abstract class BaseLoadImageAction<T> {
             if (image != null) {
                 processImage(image);
                 if (memoryCache != null) {
-                    cacheImage(key, image, memoryCache);
+                    memoryCache.put(key, image);
                 }
                 return;
             }
@@ -220,22 +220,17 @@ abstract class BaseLoadImageAction<T> {
         processImage(image);
         if (key != null) {
             if (memoryCache != null) {
-                cacheImage(key, image, memoryCache);
+                memoryCache.put(key, image);
             }
             if (storageCache != null && (requiredSize != null || transformation != null ||
                     descriptor.getLocation() != DataLocation.LOCAL)) {
-                cacheImage(key, image, storageCache);
+                ExecutorService cacheExecutor = mCacheExecutor;
+                if (cacheExecutor != null) {
+                    cacheExecutor.submit(new CacheImageAction(key, image, storageCache));
+                } else {
+                    storageCache.put(key, image);
+                }
             }
-        }
-    }
-
-    @WorkerThread
-    private void cacheImage(@NonNull String key, @NonNull Bitmap image, @NonNull ImageCache cache) {
-        ExecutorService cacheExecutor = mCacheExecutor;
-        if (cacheExecutor != null) {
-            cacheExecutor.submit(new CacheImageAction(key, image, cache));
-        } else {
-            cache.put(key, image);
         }
     }
 
