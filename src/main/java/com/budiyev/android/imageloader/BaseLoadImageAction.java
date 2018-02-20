@@ -34,7 +34,6 @@ import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 
 abstract class BaseLoadImageAction<T> {
-
     private final DataDescriptor<T> mDescriptor;
     private final BitmapLoader<T> mBitmapLoader;
     private final Size mRequiredSize;
