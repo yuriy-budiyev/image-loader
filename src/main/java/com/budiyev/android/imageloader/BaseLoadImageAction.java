@@ -98,49 +98,9 @@ abstract class BaseLoadImageAction<T> {
         onCancelled();
     }
 
-    @NonNull
-    protected final DataDescriptor<T> getDescriptor() {
-        return mDescriptor;
-    }
-
     @Nullable
     protected final String getKey() {
         return InternalUtils.buildFullKey(mDescriptor.getKey(), mRequiredSize, mTransformation);
-    }
-
-    @Nullable
-    protected final Size getRequiredSize() {
-        return mRequiredSize;
-    }
-
-    @NonNull
-    protected final BitmapLoader<T> getBitmapLoader() {
-        return mBitmapLoader;
-    }
-
-    @NonNull
-    protected final PauseLock getPauseLock() {
-        return mPauseLock;
-    }
-
-    @Nullable
-    protected final ImageCache getMemoryCache() {
-        return mMemoryCache;
-    }
-
-    @Nullable
-    protected final ImageCache getStorageCache() {
-        return mStorageCache;
-    }
-
-    @Nullable
-    protected final LoadCallback getLoadCallback() {
-        return mLoadCallback;
-    }
-
-    @Nullable
-    protected final ErrorCallback getErrorCallback() {
-        return mErrorCallback;
     }
 
     protected final boolean isCancelled() {
