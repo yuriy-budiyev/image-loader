@@ -48,9 +48,8 @@ final class ImageLoaderHolder {
             try {
                 instance = sInstance;
                 if (instance == null) {
-                    context = context.getApplicationContext();
                     instance = ImageLoader.builder(context).storageCache().memoryCache().build();
-                    context.registerComponentCallbacks(new ClearMemoryCallbacks());
+                    context.getApplicationContext().registerComponentCallbacks(new ClearMemoryCallbacks());
                     sInstance = instance;
                 }
             } finally {
