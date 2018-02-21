@@ -130,7 +130,6 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
                 return;
             }
             Bitmap image = mImage;
-            DisplayCallback displayCallback = mDisplayCallback;
             float cornerRadius = mCornerRadius;
             boolean roundCorners = cornerRadius > 0 || cornerRadius == RoundedDrawable.MAX_RADIUS;
             if (mFadeEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -144,6 +143,7 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
                     InternalUtils.setBitmap(resources, image, view);
                 }
             }
+            DisplayCallback displayCallback = mDisplayCallback;
             if (displayCallback != null) {
                 displayCallback.onDisplayed(image, view);
             }
