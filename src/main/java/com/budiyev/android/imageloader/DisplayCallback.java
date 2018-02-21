@@ -33,8 +33,7 @@ import android.view.View;
  */
 public interface DisplayCallback {
     /**
-     * Called when {@code image} displayed on {@code view},
-     * if fade effect is on, this method will be called after fade is done
+     * Called when {@code image} displayed into {@code view}
      *
      * @param image Loaded image
      * @param view  View, into which {@code image} is displayed

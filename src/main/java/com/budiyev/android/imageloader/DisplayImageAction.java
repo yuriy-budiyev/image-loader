@@ -103,8 +103,7 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
                 return;
             }
             if (mFadeEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                InternalUtils.setDrawable(
-                        new FadeDrawable(mPlaceholder, errorDrawable, mFadeDuration, mMainThreadHandler, null), view);
+                InternalUtils.setDrawable(new FadeDrawable(mPlaceholder, errorDrawable, mFadeDuration), view);
             } else {
                 InternalUtils.setDrawable(errorDrawable, view);
             }
@@ -137,35 +136,17 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
             if (mFadeEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 InternalUtils.setDrawable(new FadeDrawable(mPlaceholder,
                         roundCorners ? new RoundedDrawable(resources, image, cornerRadius) :
-                                new BitmapDrawable(resources, image), mFadeDuration, mMainThreadHandler,
-                        displayCallback != null ? new FadeCallback<>(displayCallback, image, view) : null), view);
+                                new BitmapDrawable(resources, image), mFadeDuration), view);
             } else {
                 if (roundCorners) {
                     InternalUtils.setDrawable(new RoundedDrawable(resources, image, cornerRadius), view);
                 } else {
                     InternalUtils.setBitmap(resources, image, view);
                 }
-                if (displayCallback != null) {
-                    displayCallback.onDisplayed(image, view);
-                }
             }
-        }
-    }
-
-    private static final class FadeCallback<T> implements FadeDrawable.FadeCallback {
-        private final DisplayCallback mDisplayCallback;
-        private final Bitmap mImage;
-        private final View mView;
-
-        private FadeCallback(@NonNull DisplayCallback displayCallback, @NonNull Bitmap image, @NonNull View view) {
-            mDisplayCallback = displayCallback;
-            mImage = image;
-            mView = view;
-        }
-
-        @Override
-        public void onDone() {
-            mDisplayCallback.onDisplayed(mImage, mView);
+            if (displayCallback != null) {
+                displayCallback.onDisplayed(image, view);
+            }
         }
     }
 }

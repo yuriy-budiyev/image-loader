@@ -27,10 +27,8 @@ import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Build;
-import android.os.Handler;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 
 @RequiresApi(Build.VERSION_CODES.KITKAT)
@@ -40,8 +38,6 @@ final class FadeDrawable extends LayerDrawable {
     private static final int STATE_DONE = 3;
     private static final int START_DRAWABLE = 0;
     private static final int END_DRAWABLE = 1;
-    private final Handler mMainThreadHandler;
-    private final FadeCallback mFadeCallback;
     private final long mFadeDuration;
     private final int mStartAlpha;
     private final int mEndAlpha;
@@ -49,12 +45,9 @@ final class FadeDrawable extends LayerDrawable {
     private int mFadeState = STATE_IDLE;
     private boolean mIgnoreInvalidation;
 
-    public FadeDrawable(@NonNull Drawable startDrawable, @NonNull Drawable endDrawable, long fadeDuration,
-            @NonNull Handler mainThreadHandler, @Nullable FadeCallback fadeCallback) {
+    public FadeDrawable(@NonNull Drawable startDrawable, @NonNull Drawable endDrawable, long fadeDuration) {
         super(new Drawable[] {startDrawable, endDrawable});
-        mMainThreadHandler = mainThreadHandler;
         mFadeDuration = fadeDuration;
-        mFadeCallback = fadeCallback;
         mStartAlpha = startDrawable.getAlpha();
         mEndAlpha = endDrawable.getAlpha();
     }
@@ -80,10 +73,6 @@ final class FadeDrawable extends LayerDrawable {
                     mFadeState = STATE_DONE;
                     endDrawable.setAlpha(mEndAlpha);
                     endDrawable.draw(canvas);
-                    FadeCallback fadeCallback = mFadeCallback;
-                    if (fadeCallback != null) {
-                        mMainThreadHandler.post(new CallbackAction(fadeCallback));
-                    }
                 } else {
                     startDrawable.setAlpha(Math.max(mStartAlpha - (int) (mStartAlpha * elapsed / mFadeDuration), 0));
                     startDrawable.draw(canvas);
@@ -114,23 +103,6 @@ final class FadeDrawable extends LayerDrawable {
     public void invalidateDrawable(@NonNull Drawable drawable) {
         if (!mIgnoreInvalidation) {
             super.invalidateDrawable(drawable);
-        }
-    }
-
-    public interface FadeCallback {
-        void onDone();
-    }
-
-    private static final class CallbackAction implements Runnable {
-        private final FadeCallback mCallback;
-
-        private CallbackAction(@NonNull FadeCallback callback) {
-            mCallback = callback;
-        }
-
-        @Override
-        public void run() {
-            mCallback.onDone();
         }
     }
 }
