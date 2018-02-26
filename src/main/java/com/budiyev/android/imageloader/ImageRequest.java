@@ -289,7 +289,7 @@ public final class ImageRequest<T> {
     @WorkerThread
     public Bitmap loadSync() {
         return new SyncLoadImageAction<>(mDescriptor, mBitmapLoader, mRequiredSize, getTransformation(),
-                getMemoryCache(), getStorageCache(), mLoadCallback, mErrorCallback, mPauseLock).executeSync();
+                getMemoryCache(), getStorageCache(), mLoadCallback, mErrorCallback, mPauseLock).load();
     }
 
     /**

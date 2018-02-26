@@ -41,7 +41,7 @@ final class SyncLoadImageAction<T> extends BaseLoadImageAction<T> {
 
     @Nullable
     @WorkerThread
-    public Bitmap executeSync() {
+    public Bitmap load() {
         loadImage();
         return mImage;
     }
