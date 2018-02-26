@@ -70,10 +70,15 @@ final class MemoryImageCache implements ImageCache {
             int size = mSize;
             size += getBitmapSize(value);
             mMap.put(key, value);
-            Iterator<Map.Entry<String, Bitmap>> iterator = mMap.entrySet().iterator();
-            while (size > mMaxSize && iterator.hasNext()) {
-                size -= getBitmapSize(iterator.next().getValue());
-                iterator.remove();
+            if (size > mMaxSize) {
+                Iterator<Map.Entry<String, Bitmap>> iterator = mMap.entrySet().iterator();
+                while (iterator.hasNext()) {
+                    size -= getBitmapSize(iterator.next().getValue());
+                    iterator.remove();
+                    if (size <= mMaxSize) {
+                        break;
+                    }
+                }
             }
             mSize = size;
         } finally {
