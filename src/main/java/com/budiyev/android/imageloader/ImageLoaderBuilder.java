@@ -37,7 +37,8 @@ public final class ImageLoaderBuilder {
     private final Context mContext;
     private ImageCache mMemoryCache;
     private ImageCache mStorageCache;
-    private ExecutorService mExecutor;
+    private ExecutorService mLoadExecutor;
+    private ExecutorService mCacheExecutor;
 
     ImageLoaderBuilder(@NonNull Context context) {
         mContext = context;
@@ -141,11 +142,20 @@ public final class ImageLoaderBuilder {
     }
 
     /**
-     * Custom executor
+     * Custom load executor
      */
     @NonNull
-    public ImageLoaderBuilder executor(@Nullable ExecutorService executor) {
-        mExecutor = executor;
+    public ImageLoaderBuilder loadExecutor(@Nullable ExecutorService executor) {
+        mLoadExecutor = executor;
+        return this;
+    }
+
+    /**
+     * Custom storage cache executor
+     */
+    @NonNull
+    public ImageLoaderBuilder cacheExecutor(@Nullable ExecutorService executor) {
+        mCacheExecutor = executor;
         return this;
     }
 
@@ -154,10 +164,14 @@ public final class ImageLoaderBuilder {
      */
     @NonNull
     public ImageLoader build() {
-        ExecutorService executor = mExecutor;
-        if (executor == null) {
-            executor = new ImageLoaderExecutor(InternalUtils.getPoolSize());
+        ExecutorService loadExecutor = mLoadExecutor;
+        if (loadExecutor == null) {
+            loadExecutor = new ImageLoaderExecutor(InternalUtils.getPoolSize());
         }
-        return new ImageLoader(mContext, executor, mMemoryCache, mStorageCache);
+        ExecutorService cacheExecutor = mCacheExecutor;
+        if (cacheExecutor == null) {
+            cacheExecutor = new ImageLoaderExecutor();
+        }
+        return new ImageLoader(mContext, loadExecutor, cacheExecutor, mMemoryCache, mStorageCache);
     }
 }

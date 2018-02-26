@@ -29,13 +29,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 import android.support.annotation.NonNull;
 
 final class ImageLoaderThreadFactory implements ThreadFactory {
-    private final AtomicInteger mCounter = new AtomicInteger(1);
+    private static final AtomicInteger COUNTER = new AtomicInteger(1);
 
     @NonNull
     @Override
     public Thread newThread(@NonNull Runnable r) {
-        mCounter.compareAndSet(Integer.MAX_VALUE, 0);
-        Thread t = new Thread(r, "ImageLoader thread #" + mCounter.getAndIncrement());
+        COUNTER.compareAndSet(Integer.MAX_VALUE, 0);
+        Thread t = new Thread(r, "ImageLoader thread #" + COUNTER.getAndIncrement());
         if (t.getPriority() != Thread.MIN_PRIORITY) {
             t.setPriority(Thread.MIN_PRIORITY);
         }

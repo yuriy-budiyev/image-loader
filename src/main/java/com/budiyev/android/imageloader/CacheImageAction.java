@@ -23,41 +23,29 @@
  */
 package com.budiyev.android.imageloader;
 
+import java.lang.ref.WeakReference;
+import java.util.concurrent.Callable;
+
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.WorkerThread;
 
-final class SyncLoadImageAction<T> extends BaseLoadImageAction<T> {
-    private Bitmap mImage;
+final class CacheImageAction implements Callable<Void> {
+    private final String mKey;
+    private final WeakReference<Bitmap> mImage;
+    private final ImageCache mCache;
 
-    public SyncLoadImageAction(@NonNull DataDescriptor<T> descriptor, @NonNull BitmapLoader<T> bitmapLoader,
-            @Nullable Size requiredSize, @Nullable BitmapTransformation transformation,
-            @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache, @Nullable LoadCallback loadCallback,
-            @Nullable ErrorCallback errorCallback, @NonNull PauseLock pauseLock) {
-        super(null, null, descriptor, bitmapLoader, requiredSize, transformation, memoryCache, storageCache,
-                loadCallback, errorCallback, pauseLock);
-    }
-
-    @Nullable
-    @WorkerThread
-    public Bitmap executeSync() {
-        loadImage();
-        return mImage;
+    public CacheImageAction(@NonNull String key, @NonNull Bitmap image, @NonNull ImageCache cache) {
+        mKey = key;
+        mImage = new WeakReference<>(image);
+        mCache = cache;
     }
 
     @Override
-    protected void onImageLoaded(@NonNull Bitmap image) {
-        mImage = image;
-    }
-
-    @Override
-    protected void onError(@NonNull Throwable error) {
-        // Do nothing
-    }
-
-    @Override
-    protected void onCancelled() {
-        // Do nothing
+    public Void call() throws Exception {
+        Bitmap image = mImage.get();
+        if (image != null) {
+            mCache.put(mKey, image);
+        }
+        return null;
     }
 }

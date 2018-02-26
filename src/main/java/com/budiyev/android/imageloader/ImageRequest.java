@@ -55,7 +55,8 @@ public final class ImageRequest<T> {
     private static final long DEFAULT_FADE_DURATION = 200L;
     private static final int TRANSFORMATIONS_CAPACITY = 4;
     private final Resources mResources;
-    private final ExecutorService mExecutor;
+    private final ExecutorService mLoadExecutor;
+    private final ExecutorService mCacheExecutor;
     private final PauseLock mPauseLock;
     private final Handler mMainThreadHandler;
     private final ImageCache mMemoryCache;
@@ -75,11 +76,13 @@ public final class ImageRequest<T> {
     private boolean mMemoryCacheEnabled = true;
     private boolean mStorageCacheEnabled = true;
 
-    ImageRequest(@NonNull Resources resources, @NonNull ExecutorService executor, @NonNull PauseLock pauseLock,
-            @NonNull Handler mainThreadHandler, @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache,
-            @NonNull BitmapLoader<T> bitmapLoader, @NonNull DataDescriptor<T> descriptor) {
+    ImageRequest(@NonNull Resources resources, @NonNull ExecutorService loadExecutor,
+            @NonNull ExecutorService cacheExecutor, @NonNull PauseLock pauseLock, @NonNull Handler mainThreadHandler,
+            @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache, @NonNull BitmapLoader<T> bitmapLoader,
+            @NonNull DataDescriptor<T> descriptor) {
         mResources = resources;
-        mExecutor = executor;
+        mLoadExecutor = loadExecutor;
+        mCacheExecutor = cacheExecutor;
         mPauseLock = pauseLock;
         mMemoryCache = memoryCache;
         mStorageCache = storageCache;
@@ -286,7 +289,7 @@ public final class ImageRequest<T> {
     @WorkerThread
     public Bitmap loadSync() {
         return new SyncLoadImageAction<>(mDescriptor, mBitmapLoader, mRequiredSize, getTransformation(),
-                getMemoryCache(), getStorageCache(), mLoadCallback, mErrorCallback, mPauseLock).execute();
+                getMemoryCache(), getStorageCache(), mLoadCallback, mErrorCallback, mPauseLock).executeSync();
     }
 
     /**
@@ -297,8 +300,9 @@ public final class ImageRequest<T> {
      */
     @AnyThread
     public void load() {
-        new LoadImageAction<>(mDescriptor, mBitmapLoader, mRequiredSize, getTransformation(), getMemoryCache(),
-                getStorageCache(), mLoadCallback, mErrorCallback, mPauseLock).execute(mExecutor);
+        new LoadImageAction<>(mLoadExecutor, mCacheExecutor, mDescriptor, mBitmapLoader, mRequiredSize,
+                getTransformation(), getMemoryCache(), getStorageCache(), mLoadCallback, mErrorCallback, mPauseLock)
+                .execute();
     }
 
     /**
@@ -345,11 +349,12 @@ public final class ImageRequest<T> {
             placeholder = new ColorDrawable(Color.TRANSPARENT);
         }
         DisplayImageAction<T> action =
-                new DisplayImageAction<>(resources, view, descriptor, mBitmapLoader, requiredSize, transformation,
-                        placeholder, mErrorDrawable, memoryCache, getStorageCache(), loadCallback, mErrorCallback,
-                        displayCallback, mPauseLock, mMainThreadHandler, mFadeEnabled, mFadeDuration, cornerRadius);
+                new DisplayImageAction<>(mLoadExecutor, mCacheExecutor, resources, view, descriptor, mBitmapLoader,
+                        requiredSize, transformation, placeholder, mErrorDrawable, memoryCache, getStorageCache(),
+                        loadCallback, mErrorCallback, displayCallback, mPauseLock, mMainThreadHandler, mFadeEnabled,
+                        mFadeDuration, cornerRadius);
         InternalUtils.setDrawable(new PlaceholderDrawable(placeholder, action), view);
-        action.execute(mExecutor);
+        action.execute();
     }
 
     /**
@@ -357,7 +362,7 @@ public final class ImageRequest<T> {
      */
     @AnyThread
     public void invalidate() {
-        mExecutor.submit(new InvalidateAction(mDescriptor, getMemoryCache(), getStorageCache()));
+        mLoadExecutor.submit(new InvalidateAction(mDescriptor, getMemoryCache(), getStorageCache()));
     }
 
     @NonNull

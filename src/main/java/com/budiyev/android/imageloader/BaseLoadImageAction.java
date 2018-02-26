@@ -34,6 +34,8 @@ import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 
 abstract class BaseLoadImageAction<T> {
+    private final ExecutorService mLoadExecutor;
+    private final ExecutorService mCacheExecutor;
     private final DataDescriptor<T> mDescriptor;
     private final BitmapLoader<T> mBitmapLoader;
     private final Size mRequiredSize;
@@ -43,14 +45,17 @@ abstract class BaseLoadImageAction<T> {
     private final ImageCache mStorageCache;
     private final LoadCallback mLoadCallback;
     private final ErrorCallback mErrorCallback;
-    private volatile Future<?> mFuture;
+    private volatile Future<?> mLoadFuture;
+    private volatile Future<?> mCacheFuture;
     private volatile boolean mCancelled;
-    private volatile boolean mCalled;
 
-    protected BaseLoadImageAction(@NonNull DataDescriptor<T> descriptor, @NonNull BitmapLoader<T> bitmapLoader,
-            @Nullable Size requiredSize, @Nullable BitmapTransformation transformation,
-            @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache, @Nullable LoadCallback loadCallback,
+    protected BaseLoadImageAction(@Nullable ExecutorService loadExecutor, @Nullable ExecutorService cacheExecutor,
+            @NonNull DataDescriptor<T> descriptor, @NonNull BitmapLoader<T> bitmapLoader, @Nullable Size requiredSize,
+            @Nullable BitmapTransformation transformation, @Nullable ImageCache memoryCache,
+            @Nullable ImageCache storageCache, @Nullable LoadCallback loadCallback,
             @Nullable ErrorCallback errorCallback, @NonNull PauseLock pauseLock) {
+        mLoadExecutor = loadExecutor;
+        mCacheExecutor = cacheExecutor;
         mDescriptor = descriptor;
         mBitmapLoader = bitmapLoader;
         mRequiredSize = requiredSize;
@@ -72,23 +77,24 @@ abstract class BaseLoadImageAction<T> {
     protected abstract void onCancelled();
 
     @AnyThread
-    public final void execute(@NonNull ExecutorService executor) {
-        if (mCalled) {
-            throw new IllegalStateException("Action can be executed only once");
-        }
-        mCalled = true;
-        if (mCancelled) {
+    public final void execute() {
+        ExecutorService executor = mLoadExecutor;
+        if (mCancelled || executor == null) {
             return;
         }
-        mFuture = executor.submit(new LoadImageTask());
+        mLoadFuture = executor.submit(new LoadImageTask());
     }
 
     @AnyThread
     public final void cancel() {
         mCancelled = true;
-        Future<?> future = mFuture;
-        if (future != null) {
-            future.cancel(false);
+        Future<?> loadFuture = mLoadFuture;
+        if (loadFuture != null) {
+            loadFuture.cancel(false);
+        }
+        Future<?> cacheFuture = mCacheFuture;
+        if (cacheFuture != null) {
+            cacheFuture.cancel(false);
         }
         onCancelled();
     }
@@ -221,7 +227,12 @@ abstract class BaseLoadImageAction<T> {
             }
             if (storageCache != null && (requiredSize != null || transformation != null ||
                     descriptor.getLocation() != DataLocation.LOCAL)) {
-                storageCache.put(key, image);
+                ExecutorService cacheExecutor = mCacheExecutor;
+                if (cacheExecutor != null) {
+                    mCacheFuture = cacheExecutor.submit(new CacheImageAction(key, image, storageCache));
+                } else {
+                    storageCache.put(key, image);
+                }
             }
         }
     }
@@ -251,8 +262,9 @@ abstract class BaseLoadImageAction<T> {
         @Override
         public Void call() throws Exception {
             loadImage();
-            mFuture = null;
+            mLoadFuture = null;
             return null;
         }
     }
+
 }
