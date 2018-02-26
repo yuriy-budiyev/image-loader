@@ -23,79 +23,99 @@
  */
 package com.budiyev.android.imageloader;
 
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.LruCache;
 
 final class MemoryImageCache implements ImageCache {
     private static final float DEFAULT_MEMORY_FRACTION = 0.25f;
-    private final LruCache<String, Bitmap> mCache;
-    private final Set<String> mKeySet = Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
+    private final Lock mLock;
+    private final LinkedHashMap<String, Bitmap> mMap;
+    private final int mMaxSize;
+    private volatile int mSize;
 
     public MemoryImageCache() {
         this(Math.round(Runtime.getRuntime().maxMemory() * DEFAULT_MEMORY_FRACTION));
     }
 
     public MemoryImageCache(int maxSize) {
-        mCache = new CacheImpl(maxSize);
+        mLock = new ReentrantLock();
+        mMap = new LinkedHashMap<>(0, 0.75f, true);
+        mMaxSize = maxSize;
     }
 
     @Nullable
     @Override
     public Bitmap get(@NonNull String key) {
-        return mCache.get(key);
+        mLock.lock();
+        try {
+            mMap.get(key);
+        } finally {
+            mLock.unlock();
+        }
+        return null;
     }
 
     @Override
     public void put(@NonNull String key, @NonNull Bitmap value) {
-        mCache.put(key, value);
-        mKeySet.add(key);
+        mLock.lock();
+        try {
+            int size = mSize;
+            size += getBitmapSize(value);
+            mMap.put(key, value);
+            Iterator<Map.Entry<String, Bitmap>> iterator = mMap.entrySet().iterator();
+            while (size > mMaxSize && iterator.hasNext()) {
+                size -= getBitmapSize(iterator.next().getValue());
+                iterator.remove();
+            }
+            mSize = size;
+        } finally {
+            mLock.unlock();
+        }
     }
 
     @Override
     public void remove(@NonNull String key) {
-        // Remove possible cached transformations too
-        Iterator<String> i = mKeySet.iterator();
-        while (i.hasNext()) {
-            String k = i.next();
-            if (k.startsWith(key)) {
-                mCache.remove(k);
-                i.remove();
+        mLock.lock();
+        try {
+            Iterator<Map.Entry<String, Bitmap>> iterator = mMap.entrySet().iterator();
+            int size = mSize;
+            while (iterator.hasNext()) {
+                Map.Entry<String, Bitmap> entry = iterator.next();
+                if (entry.getKey().startsWith(key)) {
+                    size -= getBitmapSize(entry.getValue());
+                    iterator.remove();
+                }
             }
+            mSize = size;
+        } finally {
+            mLock.unlock();
         }
     }
 
     @Override
     public void clear() {
-        mCache.evictAll();
+        mLock.lock();
+        try {
+            mMap.clear();
+            mSize = 0;
+        } finally {
+            mLock.unlock();
+        }
     }
 
-    private final class CacheImpl extends LruCache<String, Bitmap> {
-        public CacheImpl(int maxSize) {
-            super(maxSize);
-        }
-
-        @Override
-        protected int sizeOf(String key, Bitmap value) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                return value.getAllocationByteCount();
-            } else {
-                return value.getByteCount();
-            }
-        }
-
-        @Override
-        protected void entryRemoved(boolean evicted, String key, Bitmap oldValue, Bitmap newValue) {
-            if (evicted) {
-                mKeySet.remove(key);
-            }
+    private static int getBitmapSize(@NonNull Bitmap bitmap) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            return bitmap.getAllocationByteCount();
+        } else {
+            return bitmap.getByteCount();
         }
     }
 }
