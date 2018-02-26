@@ -56,11 +56,10 @@ final class MemoryImageCache implements ImageCache {
     public Bitmap get(@NonNull String key) {
         mLock.lock();
         try {
-            mMap.get(key);
+            return mMap.get(key);
         } finally {
             mLock.unlock();
         }
-        return null;
     }
 
     @Override
