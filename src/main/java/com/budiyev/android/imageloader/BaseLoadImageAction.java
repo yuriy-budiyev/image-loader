@@ -33,7 +33,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 
-abstract class BaseLoadImageAction<T> {
+abstract class BaseLoadImageAction<T> implements Callable<Void> {
     private final DataDescriptor<T> mDescriptor;
     private final BitmapLoader<T> mBitmapLoader;
     private final Size mRequiredSize;
@@ -79,7 +79,7 @@ abstract class BaseLoadImageAction<T> {
         if (mCancelled) {
             return;
         }
-        mLoadFuture = executor.submit(new LoadImageTask());
+        mLoadFuture = executor.submit(this);
     }
 
     @AnyThread
@@ -94,6 +94,13 @@ abstract class BaseLoadImageAction<T> {
             cacheAction.cancel();
         }
         onCancelled();
+    }
+
+    @Override
+    public final Void call() throws Exception {
+        loadImage();
+        mLoadFuture = null;
+        return null;
     }
 
     @NonNull
@@ -254,14 +261,4 @@ abstract class BaseLoadImageAction<T> {
         }
         onError(error);
     }
-
-    private final class LoadImageTask implements Callable<Void> {
-        @Override
-        public Void call() throws Exception {
-            loadImage();
-            mLoadFuture = null;
-            return null;
-        }
-    }
-
 }
