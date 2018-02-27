@@ -30,13 +30,13 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 final class LoadImageAction<T> extends BaseLoadImageAction<T> {
-    public LoadImageAction(@Nullable ExecutorService loadExecutor, @Nullable ExecutorService cacheExecutor,
-            @NonNull DataDescriptor<T> descriptor, @NonNull BitmapLoader<T> bitmapLoader, @Nullable Size requiredSize,
-            @Nullable BitmapTransformation transformation, @Nullable ImageCache memoryCache,
-            @Nullable ImageCache storageCache, @Nullable LoadCallback loadCallback,
+    public LoadImageAction(@NonNull DataDescriptor<T> descriptor, @NonNull BitmapLoader<T> bitmapLoader,
+            @Nullable Size requiredSize, @Nullable BitmapTransformation transformation,
+            @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache,
+            @Nullable ExecutorService cacheExecutor, @Nullable LoadCallback loadCallback,
             @Nullable ErrorCallback errorCallback, @NonNull PauseLock pauseLock) {
-        super(loadExecutor, cacheExecutor, descriptor, bitmapLoader, requiredSize, transformation, memoryCache,
-                storageCache, loadCallback, errorCallback, pauseLock);
+        super(descriptor, bitmapLoader, requiredSize, transformation, memoryCache, storageCache, cacheExecutor,
+                loadCallback, errorCallback, pauseLock);
     }
 
     @Override

@@ -289,7 +289,7 @@ public final class ImageRequest<T> {
     @WorkerThread
     public Bitmap loadSync() {
         return new SyncLoadImageAction<>(mDescriptor, mBitmapLoader, mRequiredSize, getTransformation(),
-                getMemoryCache(), getStorageCache(), mLoadCallback, mErrorCallback, mPauseLock).load();
+                getMemoryCache(), getStorageCache(), mLoadCallback, mErrorCallback, mPauseLock).execute();
     }
 
     /**
@@ -300,9 +300,8 @@ public final class ImageRequest<T> {
      */
     @AnyThread
     public void load() {
-        new LoadImageAction<>(mLoadExecutor, mCacheExecutor, mDescriptor, mBitmapLoader, mRequiredSize,
-                getTransformation(), getMemoryCache(), getStorageCache(), mLoadCallback, mErrorCallback, mPauseLock)
-                .execute();
+        new LoadImageAction<>(mDescriptor, mBitmapLoader, mRequiredSize, getTransformation(), getMemoryCache(),
+                getStorageCache(), mCacheExecutor, mLoadCallback, mErrorCallback, mPauseLock).submit(mLoadExecutor);
     }
 
     /**
@@ -349,12 +348,12 @@ public final class ImageRequest<T> {
             placeholder = new ColorDrawable(Color.TRANSPARENT);
         }
         DisplayImageAction<T> action =
-                new DisplayImageAction<>(mLoadExecutor, mCacheExecutor, resources, view, descriptor, mBitmapLoader,
-                        requiredSize, transformation, placeholder, mErrorDrawable, memoryCache, getStorageCache(),
-                        loadCallback, mErrorCallback, displayCallback, mPauseLock, mMainThreadHandler, mFadeEnabled,
-                        mFadeDuration, cornerRadius);
+                new DisplayImageAction<>(resources, view, descriptor, mBitmapLoader, requiredSize, transformation,
+                        placeholder, mErrorDrawable, memoryCache, getStorageCache(), mCacheExecutor, loadCallback,
+                        mErrorCallback, displayCallback, mPauseLock, mMainThreadHandler, mFadeEnabled, mFadeDuration,
+                        cornerRadius);
         InternalUtils.setDrawable(new PlaceholderDrawable(placeholder, action), view);
-        action.execute();
+        action.submit(mLoadExecutor);
     }
 
     /**

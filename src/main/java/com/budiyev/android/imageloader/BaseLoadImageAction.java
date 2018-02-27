@@ -34,8 +34,6 @@ import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 
 abstract class BaseLoadImageAction<T> {
-    private final ExecutorService mLoadExecutor;
-    private final ExecutorService mCacheExecutor;
     private final DataDescriptor<T> mDescriptor;
     private final BitmapLoader<T> mBitmapLoader;
     private final Size mRequiredSize;
@@ -43,19 +41,18 @@ abstract class BaseLoadImageAction<T> {
     private final PauseLock mPauseLock;
     private final ImageCache mMemoryCache;
     private final ImageCache mStorageCache;
+    private final ExecutorService mCacheExecutor;
     private final LoadCallback mLoadCallback;
     private final ErrorCallback mErrorCallback;
     private volatile Future<?> mLoadFuture;
-    private volatile Future<?> mCacheFuture;
+    private volatile CacheImageAction mCacheAction;
     private volatile boolean mCancelled;
 
-    protected BaseLoadImageAction(@Nullable ExecutorService loadExecutor, @Nullable ExecutorService cacheExecutor,
-            @NonNull DataDescriptor<T> descriptor, @NonNull BitmapLoader<T> bitmapLoader, @Nullable Size requiredSize,
-            @Nullable BitmapTransformation transformation, @Nullable ImageCache memoryCache,
-            @Nullable ImageCache storageCache, @Nullable LoadCallback loadCallback,
+    protected BaseLoadImageAction(@NonNull DataDescriptor<T> descriptor, @NonNull BitmapLoader<T> bitmapLoader,
+            @Nullable Size requiredSize, @Nullable BitmapTransformation transformation,
+            @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache,
+            @Nullable ExecutorService cacheExecutor, @Nullable LoadCallback loadCallback,
             @Nullable ErrorCallback errorCallback, @NonNull PauseLock pauseLock) {
-        mLoadExecutor = loadExecutor;
-        mCacheExecutor = cacheExecutor;
         mDescriptor = descriptor;
         mBitmapLoader = bitmapLoader;
         mRequiredSize = requiredSize;
@@ -63,6 +60,7 @@ abstract class BaseLoadImageAction<T> {
         mPauseLock = pauseLock;
         mMemoryCache = memoryCache;
         mStorageCache = storageCache;
+        mCacheExecutor = cacheExecutor;
         mLoadCallback = loadCallback;
         mErrorCallback = errorCallback;
     }
@@ -77,9 +75,8 @@ abstract class BaseLoadImageAction<T> {
     protected abstract void onCancelled();
 
     @AnyThread
-    public final void execute() {
-        ExecutorService executor = mLoadExecutor;
-        if (mCancelled || executor == null) {
+    public final void submit(@NonNull ExecutorService executor) {
+        if (mCancelled) {
             return;
         }
         mLoadFuture = executor.submit(new LoadImageTask());
@@ -92,9 +89,9 @@ abstract class BaseLoadImageAction<T> {
         if (loadFuture != null) {
             loadFuture.cancel(false);
         }
-        Future<?> cacheFuture = mCacheFuture;
-        if (cacheFuture != null) {
-            cacheFuture.cancel(false);
+        CacheImageAction cacheAction = mCacheAction;
+        if (cacheAction != null) {
+            cacheAction.cancel();
         }
         onCancelled();
     }
@@ -229,7 +226,7 @@ abstract class BaseLoadImageAction<T> {
                     descriptor.getLocation() != DataLocation.LOCAL)) {
                 ExecutorService cacheExecutor = mCacheExecutor;
                 if (cacheExecutor != null) {
-                    mCacheFuture = cacheExecutor.submit(new CacheImageAction(key, image, storageCache));
+                    mCacheAction = new CacheImageAction(key, image, storageCache).submit(cacheExecutor);
                 } else {
                     storageCache.put(key, image);
                 }
