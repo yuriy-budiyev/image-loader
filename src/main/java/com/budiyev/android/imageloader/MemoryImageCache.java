@@ -71,10 +71,10 @@ final class MemoryImageCache implements ImageCache {
             mImages.put(key, value);
             int maxSize = mMaxSize;
             if (size > maxSize) {
-                Iterator<Map.Entry<String, Bitmap>> iterator = mImages.entrySet().iterator();
-                while (iterator.hasNext()) {
-                    size -= getBitmapSize(iterator.next().getValue());
-                    iterator.remove();
+                Iterator<Map.Entry<String, Bitmap>> i = mImages.entrySet().iterator();
+                while (i.hasNext()) {
+                    size -= getBitmapSize(i.next().getValue());
+                    i.remove();
                     if (size <= maxSize) {
                         break;
                     }
@@ -90,13 +90,13 @@ final class MemoryImageCache implements ImageCache {
     public void remove(@NonNull String key) {
         mLock.lock();
         try {
-            Iterator<Map.Entry<String, Bitmap>> iterator = mImages.entrySet().iterator();
+            Iterator<Map.Entry<String, Bitmap>> i = mImages.entrySet().iterator();
             int size = mSize;
-            while (iterator.hasNext()) {
-                Map.Entry<String, Bitmap> entry = iterator.next();
+            while (i.hasNext()) {
+                Map.Entry<String, Bitmap> entry = i.next();
                 if (entry.getKey().startsWith(key)) {
                     size -= getBitmapSize(entry.getValue());
-                    iterator.remove();
+                    i.remove();
                 }
             }
             mSize = size;
