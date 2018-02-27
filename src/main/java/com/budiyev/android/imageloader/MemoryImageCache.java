@@ -36,7 +36,7 @@ import android.support.annotation.Nullable;
 
 final class MemoryImageCache implements ImageCache {
     private static final float DEFAULT_MEMORY_FRACTION = 0.25f;
-    private final LinkedHashMap<String, Bitmap> mMap;
+    private final LinkedHashMap<String, Bitmap> mImages;
     private final Lock mLock;
     private final int mMaxSize;
     private volatile int mSize;
@@ -46,7 +46,7 @@ final class MemoryImageCache implements ImageCache {
     }
 
     public MemoryImageCache(int maxSize) {
-        mMap = new LinkedHashMap<>(0, 0.75f, true);
+        mImages = new LinkedHashMap<>(0, 0.75f, true);
         mLock = new ReentrantLock();
         mMaxSize = maxSize;
     }
@@ -56,7 +56,7 @@ final class MemoryImageCache implements ImageCache {
     public Bitmap get(@NonNull String key) {
         mLock.lock();
         try {
-            return mMap.get(key);
+            return mImages.get(key);
         } finally {
             mLock.unlock();
         }
@@ -68,10 +68,10 @@ final class MemoryImageCache implements ImageCache {
         try {
             int size = mSize;
             size += getBitmapSize(value);
-            mMap.put(key, value);
+            mImages.put(key, value);
             int maxSize = mMaxSize;
             if (size > maxSize) {
-                Iterator<Map.Entry<String, Bitmap>> iterator = mMap.entrySet().iterator();
+                Iterator<Map.Entry<String, Bitmap>> iterator = mImages.entrySet().iterator();
                 while (iterator.hasNext()) {
                     size -= getBitmapSize(iterator.next().getValue());
                     iterator.remove();
@@ -90,7 +90,7 @@ final class MemoryImageCache implements ImageCache {
     public void remove(@NonNull String key) {
         mLock.lock();
         try {
-            Iterator<Map.Entry<String, Bitmap>> iterator = mMap.entrySet().iterator();
+            Iterator<Map.Entry<String, Bitmap>> iterator = mImages.entrySet().iterator();
             int size = mSize;
             while (iterator.hasNext()) {
                 Map.Entry<String, Bitmap> entry = iterator.next();
@@ -109,7 +109,7 @@ final class MemoryImageCache implements ImageCache {
     public void clear() {
         mLock.lock();
         try {
-            mMap.clear();
+            mImages.clear();
             mSize = 0;
         } finally {
             mLock.unlock();
