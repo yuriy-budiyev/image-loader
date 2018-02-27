@@ -229,6 +229,12 @@ final class StorageImageCache implements ImageCache {
                         mFiles.put(file.getName(), file);
                         size += file.length();
                     }
+                    for (int i = files.length - 1; i >= 0 && size > mMaxSize; i--) {
+                        File file = files[i];
+                        mFiles.remove(file.getName());
+                        size -= file.length();
+                        file.delete();
+                    }
                     mSize = size;
                 }
             } else {
