@@ -36,8 +36,8 @@ import android.support.annotation.Nullable;
 
 final class MemoryImageCache implements ImageCache {
     private static final float DEFAULT_MEMORY_FRACTION = 0.25f;
-    private final Lock mLock;
     private final LinkedHashMap<String, Bitmap> mMap;
+    private final Lock mLock;
     private final int mMaxSize;
     private volatile int mSize;
 
@@ -46,8 +46,8 @@ final class MemoryImageCache implements ImageCache {
     }
 
     public MemoryImageCache(int maxSize) {
-        mLock = new ReentrantLock();
         mMap = new LinkedHashMap<>(0, 0.75f, true);
+        mLock = new ReentrantLock();
         mMaxSize = maxSize;
     }
 
