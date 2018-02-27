@@ -63,8 +63,8 @@ android {
 }
 
 dependencies {
-    api 'com.android.support:support-annotations:27.0.2'
-    api 'com.android.support:exifinterface:27.0.2'
+    api 'com.android.support:support-annotations:27.1.0'
+    api 'com.android.support:exifinterface:27.1.0'
 }
 
 group = publishedGroupId
