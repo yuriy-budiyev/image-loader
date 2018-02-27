@@ -189,6 +189,7 @@ final class StorageImageCache implements ImageCache {
         for (File file : files) {
             mLock.lock();
             try {
+                initialize();
                 mFiles.remove(file.getName());
                 mSize -= file.length();
             } finally {
@@ -202,6 +203,7 @@ final class StorageImageCache implements ImageCache {
     public void clear() {
         mLock.lock();
         try {
+            initialize();
             mFiles.clear();
             mSize = 0L;
         } finally {
