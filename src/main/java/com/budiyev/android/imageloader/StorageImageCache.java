@@ -30,7 +30,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -43,12 +47,15 @@ final class StorageImageCache implements ImageCache {
     public static final String DEFAULT_DIRECTORY = "image_loader_cache";
     public static final long DEFAULT_MAX_SIZE = 104857600L;
     private static final int BUFFER_SIZE = 16384;
+    private final Lock mLock = new ReentrantLock();
+    private final LinkedHashMap<String, File> mFiles = new LinkedHashMap<>(0, 0.75f, true);
     private final FileFilter mFileFilter = new CacheFileFilter();
     private final Comparator<File> mFileComparator = new FileComparator();
-    private final AtomicBoolean mTrimming = new AtomicBoolean();
     private final CompressMode mCompressMode;
     private final File mDirectory;
     private final long mMaxSize;
+    private volatile boolean mInitialized;
+    private volatile long mSize;
 
     public StorageImageCache(@NonNull Context context) {
         this(getDefaultDirectory(context));
@@ -74,16 +81,20 @@ final class StorageImageCache implements ImageCache {
         mDirectory = directory;
         mCompressMode = compressMode;
         mMaxSize = maxSize;
-        if (!directory.exists()) {
-            directory.mkdirs();
-        }
     }
 
     @Nullable
     @Override
     public Bitmap get(@NonNull String key) {
-        File file = getFile(key);
-        if (!file.exists()) {
+        File file;
+        mLock.lock();
+        try {
+            initialize();
+            file = mFiles.get(key);
+        } finally {
+            mLock.unlock();
+        }
+        if (file == null || !file.exists()) {
             return null;
         }
         Bitmap bitmap = null;
@@ -115,22 +126,22 @@ final class StorageImageCache implements ImageCache {
 
     @Override
     public void put(@NonNull String key, @NonNull Bitmap value) {
-        File file = getFile(key);
+        File file = new File(mDirectory, key);
         if (file.exists()) {
             file.delete();
         }
         ByteBuffer outputBuffer = new ByteBuffer(BUFFER_SIZE);
         if (value.compress(mCompressMode.getFormat(), mCompressMode.getQuality(), outputBuffer)) {
             byte[] array = outputBuffer.getArray();
-            int size = outputBuffer.getSize();
+            int outputSize = outputBuffer.getSize();
             FileOutputStream output = null;
             boolean success;
             try {
                 output = new FileOutputStream(file);
-                int remaining = size;
+                int remaining = outputSize;
                 for (int write; remaining > 0; ) {
                     write = Math.min(remaining, BUFFER_SIZE);
-                    output.write(array, (size - remaining), write);
+                    output.write(array, (outputSize - remaining), write);
                     remaining -= write;
                 }
                 success = true;
@@ -140,7 +151,29 @@ final class StorageImageCache implements ImageCache {
                 InternalUtils.close(output);
             }
             if (success) {
-                trim();
+                mLock.lock();
+                try {
+                    initialize();
+                    mFiles.put(key, file);
+                    long cacheSize = mSize;
+                    cacheSize += file.length();
+                    long maxCacheSize = mMaxSize;
+                    if (cacheSize > maxCacheSize) {
+                        Iterator<Map.Entry<String, File>> i = mFiles.entrySet().iterator();
+                        while (i.hasNext()) {
+                            File f = i.next().getValue();
+                            cacheSize -= f.length();
+                            i.remove();
+                            f.delete();
+                            if (cacheSize <= maxCacheSize) {
+                                break;
+                            }
+                        }
+                    }
+                    mSize = cacheSize;
+                } finally {
+                    mLock.unlock();
+                }
             } else {
                 file.delete();
             }
@@ -154,13 +187,27 @@ final class StorageImageCache implements ImageCache {
             return;
         }
         for (File file : files) {
+            mLock.lock();
+            try {
+                mFiles.remove(file.getName());
+                mSize -= file.length();
+            } finally {
+                mLock.unlock();
+            }
             file.delete();
         }
     }
 
     @Override
     public void clear() {
-        File[] files = getFiles();
+        mLock.lock();
+        try {
+            mFiles.clear();
+            mSize = 0L;
+        } finally {
+            mLock.unlock();
+        }
+        File[] files = mDirectory.listFiles(mFileFilter);
         if (files != null) {
             for (File file : files) {
                 file.delete();
@@ -168,39 +215,24 @@ final class StorageImageCache implements ImageCache {
         }
     }
 
-    @NonNull
-    private File getFile(@NonNull String key) {
-        return new File(mDirectory, key);
-    }
-
-    @Nullable
-    private File[] getFiles() {
-        return mDirectory.listFiles(mFileFilter);
-    }
-
-    private void trim() {
-        if (mTrimming.compareAndSet(false, true)) {
-            try {
-                File[] files = getFiles();
+    private void initialize() {
+        if (!mInitialized) {
+            File directory = mDirectory;
+            if (directory.exists()) {
+                File[] files = directory.listFiles(mFileFilter);
                 if (files != null && files.length != 0) {
                     Arrays.sort(files, mFileComparator);
-                    long size = 0L;
-                    boolean removing = false;
-                    for (File cached : files) {
-                        if (removing) {
-                            cached.delete();
-                        } else {
-                            size += cached.length();
-                            if (size >= mMaxSize) {
-                                removing = true;
-                            }
-                        }
+                    long size = 0;
+                    for (File file : files) {
+                        mFiles.put(file.getName(), file);
+                        size += file.length();
                     }
+                    mSize = size;
                 }
-            } catch (Exception ignored) {
-            } finally {
-                mTrimming.set(false);
+            } else {
+                directory.mkdirs();
             }
+            mInitialized = true;
         }
     }
 
