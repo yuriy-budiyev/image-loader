@@ -34,7 +34,7 @@ public enum DataLocation {
 
     /**
      * Data is located at device's local storage,
-     * local images will not be cached in storage cache except sampled and transformed ones
+     * local images will not be cached in storage cache except sized and transformed ones
      */
     LOCAL
 }
