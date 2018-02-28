@@ -82,7 +82,7 @@ public final class ImageLoader {
      * <br><br>
      * <b>Data types, supported by default:</b>
      * <ul>
-     * <li>{@link Uri}, {@link String} - Android URI</li>
+     * <li>{@link Uri}, {@link String} - URI (remote and local)</li>
      * <li>{@link File} - File</li>
      * <li>{@link Integer} - Android resource</li>
      * <li>{@link FileDescriptor} - File descriptor</li>
