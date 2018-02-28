@@ -70,7 +70,7 @@ public final class ImageLoader {
         mStorageCache = storageCache;
         registerDataType(Uri.class, new UriDataDescriptorFactory(), new UriBitmapLoader(context));
         registerDataType(File.class, new FileDataDescriptorFactory(), new FileBitmapLoader());
-        registerDataType(String.class, new UrlDataDescriptorFactory(), new UrlBitmapLoader());
+        registerDataType(String.class, new StringUriDataDescriptorFactory(), new StringUriBitmapLoader(context));
         registerDataType(Integer.class, new ResourceDataDescriptorFactory(), new ResourceBitmapLoader(context));
         registerDataType(FileDescriptor.class, new FileDescriptorDataDescriptorFactory(),
                 new FileDescriptorBitmapLoader());
@@ -82,9 +82,8 @@ public final class ImageLoader {
      * <br><br>
      * <b>Data types, supported by default:</b>
      * <ul>
-     * <li>{@link Uri} - Android URI</li>
+     * <li>{@link Uri}, {@link String} - Android URI</li>
      * <li>{@link File} - File</li>
-     * <li>{@link String} - URL</li>
      * <li>{@link Integer} - Android resource</li>
      * <li>{@link FileDescriptor} - File descriptor</li>
      * <li>{@code byte[]} - Byte array</li>

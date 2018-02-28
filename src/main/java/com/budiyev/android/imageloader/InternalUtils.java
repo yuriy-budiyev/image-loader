@@ -170,7 +170,16 @@ final class InternalUtils {
     }
 
     public static boolean isUriLocal(@NonNull Uri uri) {
-        String scheme = uri.getScheme();
+        return isUriSchemeLocal(uri.getScheme());
+    }
+
+    public static boolean isUriLocal(@NonNull String uri) {
+        int ssi = uri.indexOf(':');
+        return ssi != -1 && isUriSchemeLocal(uri.substring(0, ssi));
+
+    }
+
+    private static boolean isUriSchemeLocal(@NonNull String scheme) {
         return ContentResolver.SCHEME_FILE.equals(scheme) || ContentResolver.SCHEME_CONTENT.equals(scheme) ||
                 ContentResolver.SCHEME_ANDROID_RESOURCE.equals(scheme);
     }

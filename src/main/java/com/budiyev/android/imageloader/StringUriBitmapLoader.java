@@ -25,28 +25,47 @@ package com.budiyev.android.imageloader;
 
 import java.io.InputStream;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-final class UrlBitmapLoader implements BitmapLoader<String> {
+final class StringUriBitmapLoader implements BitmapLoader<String> {
+    private final Context mContext;
+
+    StringUriBitmapLoader(@NonNull Context context) {
+        mContext = context;
+    }
+
     @Nullable
     @Override
     public Bitmap load(@NonNull String data, @Nullable Size requiredSize) throws Throwable {
+        Bitmap bitmap;
+        Context context = mContext;
+        Uri uri = Uri.parse(data);
         if (requiredSize != null) {
-            return DataUtils.loadSampledBitmapFromUrl(data, requiredSize.getWidth(), requiredSize.getHeight());
+            bitmap =
+                    DataUtils.loadSampledBitmapFromUri(context, uri, requiredSize.getWidth(), requiredSize.getHeight());
         } else {
             InputStream inputStream = null;
             try {
-                inputStream = InternalUtils.getDataStreamFromUrl(data);
+                inputStream = InternalUtils.getDataStreamFromUri(context, uri);
                 if (inputStream == null) {
                     return null;
                 }
-                return BitmapFactory.decodeStream(inputStream);
+                bitmap = BitmapFactory.decodeStream(inputStream);
             } finally {
                 InternalUtils.close(inputStream);
             }
         }
+        if (bitmap != null && InternalUtils.isUriLocal(uri)) {
+            int rotation = InternalUtils.getExifRotation(context, uri);
+            if (rotation != 0) {
+                bitmap = InternalUtils.rotateAndRecycle(bitmap, rotation);
+            }
+        }
+        return bitmap;
     }
 }

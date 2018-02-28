@@ -25,10 +25,10 @@ package com.budiyev.android.imageloader;
 
 import android.support.annotation.NonNull;
 
-final class UrlDataDescriptorFactory implements DataDescriptorFactory<String> {
+final class StringUriDataDescriptorFactory implements DataDescriptorFactory<String> {
     @NonNull
     @Override
     public DataDescriptor<String> newDescriptor(@NonNull String data) {
-        return new UrlDataDescriptor(data);
+        return new StringUriDataDescriptor(data);
     }
 }

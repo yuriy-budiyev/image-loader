@@ -25,14 +25,17 @@ package com.budiyev.android.imageloader;
 
 import android.support.annotation.NonNull;
 
-final class UrlDataDescriptor extends IdentifiableDataDescriptor<String> {
-    public UrlDataDescriptor(@NonNull String data) {
+final class StringUriDataDescriptor extends IdentifiableDataDescriptor<String> {
+    private final DataLocation mLocation;
+
+    public StringUriDataDescriptor(@NonNull String data) {
         super(data, data);
+        mLocation = InternalUtils.isUriLocal(data) ? DataLocation.LOCAL : DataLocation.REMOTE;
     }
 
     @NonNull
     @Override
     public DataLocation getLocation() {
-        return DataLocation.REMOTE;
+        return mLocation;
     }
 }
