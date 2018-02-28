@@ -35,7 +35,7 @@ import android.support.annotation.Nullable;
 final class StringUriBitmapLoader implements BitmapLoader<String> {
     private final Context mContext;
 
-    StringUriBitmapLoader(@NonNull Context context) {
+    public StringUriBitmapLoader(@NonNull Context context) {
         mContext = context;
     }
 
