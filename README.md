@@ -34,8 +34,8 @@ public class MainActivity extends AppCompatActivity {
         // Advanced usage
         ImageLoader.with(this)
                 /*Create new load request for specified data.
-                  Data types supported by default: Android URIs, string URLs, files, file descriptors,
-                  resources and byte arrays.*/
+                  Data types supported by default: Android URIs (remote and local), 
+                  files, file descriptors, resources and byte arrays.*/
                 .from("https://some.url/image")
                 /*Required image size (to load sampled bitmaps)*/
                 .size(1000, 1000)
