@@ -179,6 +179,9 @@ abstract class BaseLoadImageAction<T> implements Callable<Void> {
                 return;
             }
         }
+        if (isCancelled()) {
+            return;
+        }
         // Storage cache
         ImageCache storageCache = mStorageCache;
         if (key != null && storageCache != null) {
@@ -191,6 +194,9 @@ abstract class BaseLoadImageAction<T> implements Callable<Void> {
                 return;
             }
         }
+        if (isCancelled()) {
+            return;
+        }
         // Load new image
         Size requiredSize = mRequiredSize;
         try {
@@ -201,6 +207,9 @@ abstract class BaseLoadImageAction<T> implements Callable<Void> {
         }
         if (image == null) {
             processError(new ImageNotLoadedException());
+            return;
+        }
+        if (isCancelled()) {
             return;
         }
         // Transform image
@@ -216,6 +225,9 @@ abstract class BaseLoadImageAction<T> implements Callable<Void> {
                 processError(error);
                 return;
             }
+        }
+        if (isCancelled()) {
+            return;
         }
         processImage(image);
         if (key != null) {
