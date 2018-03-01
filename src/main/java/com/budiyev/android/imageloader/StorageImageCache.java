@@ -45,7 +45,7 @@ import android.support.annotation.Nullable;
 @SuppressWarnings("ResultOfMethodCallIgnored")
 final class StorageImageCache implements ImageCache {
     public static final String DEFAULT_DIRECTORY = "image_loader_cache";
-    public static final long DEFAULT_MAX_SIZE = 104857600L;
+    public static final long DEFAULT_MAX_SIZE = 268435456L;
     private static final int BUFFER_SIZE = 16384;
     private final Lock mLock = new ReentrantLock();
     private final LinkedHashMap<String, File> mFiles = new LinkedHashMap<>(0, 0.75f, true);

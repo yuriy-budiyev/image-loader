@@ -84,6 +84,9 @@ abstract class BaseLoadImageAction<T> implements Callable<Void> {
 
     @AnyThread
     public final void cancel() {
+        if (mCancelled) {
+            return;
+        }
         mCancelled = true;
         Future<?> loadFuture = mLoadFuture;
         if (loadFuture != null) {
