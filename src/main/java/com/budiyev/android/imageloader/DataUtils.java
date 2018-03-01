@@ -259,7 +259,7 @@ public final class DataUtils {
             return;
         }
         int sampleSize = 1;
-        while (Math.abs(width - requiredWidth) > threshold && Math.abs(height - requiredHeight) > threshold) {
+        while (width - requiredWidth > threshold && height - requiredHeight > threshold) {
             width /= 2;
             height /= 2;
             sampleSize *= 2;
