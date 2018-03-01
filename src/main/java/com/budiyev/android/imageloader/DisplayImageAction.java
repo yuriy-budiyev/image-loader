@@ -76,15 +76,12 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
 
     @Override
     protected void onImageLoaded(@NonNull Bitmap image) {
-        if (mView.get() == null || mResources.get() == null) {
-            return;
-        }
         mMainThreadHandler.post(new SetImageAction(image));
     }
 
     @Override
     protected void onError(@NonNull Throwable error) {
-        if (mErrorDrawable != null || !isCancelled()) {
+        if (mErrorDrawable != null) {
             mMainThreadHandler.post(new SetErrorDrawableAction());
         }
     }
