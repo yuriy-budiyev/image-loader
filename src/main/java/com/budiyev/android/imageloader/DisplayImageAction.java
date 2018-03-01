@@ -98,9 +98,12 @@ final class DisplayImageAction<T> extends BaseLoadImageAction<T> {
     private final class SetErrorDrawableAction implements Runnable {
         @Override
         public void run() {
+            if (isCancelled()) {
+                return;
+            }
             Drawable errorDrawable = mErrorDrawable;
             View view = mView.get();
-            if (isCancelled() || errorDrawable == null || view == null ||
+            if (errorDrawable == null || view == null ||
                     InternalUtils.getDisplayImageAction(view) != DisplayImageAction.this) {
                 return;
             }

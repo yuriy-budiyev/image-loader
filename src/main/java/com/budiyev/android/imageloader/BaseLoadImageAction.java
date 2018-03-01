@@ -179,9 +179,6 @@ abstract class BaseLoadImageAction<T> implements Callable<Void> {
                 return;
             }
         }
-        if (isCancelled()) {
-            return;
-        }
         // Storage cache
         ImageCache storageCache = mStorageCache;
         if (key != null && storageCache != null) {
@@ -194,9 +191,6 @@ abstract class BaseLoadImageAction<T> implements Callable<Void> {
                 return;
             }
         }
-        if (isCancelled()) {
-            return;
-        }
         // Load new image
         Size requiredSize = mRequiredSize;
         try {
@@ -207,9 +201,6 @@ abstract class BaseLoadImageAction<T> implements Callable<Void> {
         }
         if (image == null) {
             processError(new ImageNotLoadedException());
-            return;
-        }
-        if (isCancelled()) {
             return;
         }
         // Transform image
@@ -227,9 +218,6 @@ abstract class BaseLoadImageAction<T> implements Callable<Void> {
             }
         }
         processImage(image);
-        if (isCancelled()) {
-            return;
-        }
         if (key != null) {
             if (memoryCache != null) {
                 memoryCache.put(key, image);
@@ -248,9 +236,6 @@ abstract class BaseLoadImageAction<T> implements Callable<Void> {
 
     @WorkerThread
     private void processImage(@NonNull Bitmap image) {
-        if (isCancelled()) {
-            return;
-        }
         LoadCallback loadCallback = mLoadCallback;
         if (loadCallback != null) {
             loadCallback.onLoaded(image);
@@ -260,9 +245,6 @@ abstract class BaseLoadImageAction<T> implements Callable<Void> {
 
     @WorkerThread
     private void processError(@NonNull Throwable error) {
-        if (isCancelled()) {
-            return;
-        }
         ErrorCallback errorCallback = mErrorCallback;
         if (errorCallback != null) {
             errorCallback.onError(error);
