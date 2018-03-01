@@ -26,6 +26,7 @@ package com.budiyev.android.imageloader;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.graphics.Bitmap;
 import android.support.annotation.AnyThread;
@@ -44,9 +45,9 @@ abstract class BaseLoadImageAction<T> implements Callable<Void> {
     private final ExecutorService mCacheExecutor;
     private final LoadCallback mLoadCallback;
     private final ErrorCallback mErrorCallback;
+    private final AtomicBoolean mCancelled = new AtomicBoolean();
     private volatile Future<?> mLoadFuture;
     private volatile CacheImageAction mCacheAction;
-    private volatile boolean mCancelled;
 
     protected BaseLoadImageAction(@NonNull DataDescriptor<T> descriptor, @NonNull BitmapLoader<T> bitmapLoader,
             @Nullable Size requiredSize, @Nullable BitmapTransformation transformation,
@@ -76,7 +77,7 @@ abstract class BaseLoadImageAction<T> implements Callable<Void> {
 
     @AnyThread
     public final void submit(@NonNull ExecutorService executor) {
-        if (mCancelled) {
+        if (isCancelled()) {
             return;
         }
         mLoadFuture = executor.submit(this);
@@ -84,19 +85,21 @@ abstract class BaseLoadImageAction<T> implements Callable<Void> {
 
     @AnyThread
     public final void cancel() {
-        if (mCancelled) {
-            return;
+        if (mCancelled.compareAndSet(false, true)) {
+            Future<?> loadFuture = mLoadFuture;
+            if (loadFuture != null) {
+                loadFuture.cancel(false);
+            }
+            CacheImageAction cacheAction = mCacheAction;
+            if (cacheAction != null) {
+                cacheAction.cancel();
+            }
+            onCancelled();
         }
-        mCancelled = true;
-        Future<?> loadFuture = mLoadFuture;
-        if (loadFuture != null) {
-            loadFuture.cancel(false);
-        }
-        CacheImageAction cacheAction = mCacheAction;
-        if (cacheAction != null) {
-            cacheAction.cancel();
-        }
-        onCancelled();
+    }
+
+    public final boolean isCancelled() {
+        return mCancelled.get();
     }
 
     @Override
@@ -151,20 +154,16 @@ abstract class BaseLoadImageAction<T> implements Callable<Void> {
         return mErrorCallback;
     }
 
-    protected final boolean isCancelled() {
-        return mCancelled;
-    }
-
     @WorkerThread
     protected final void loadImage() {
-        while (!mCancelled && !mPauseLock.shouldInterruptEarly() && mPauseLock.isPaused()) {
+        while (!isCancelled() && !mPauseLock.shouldInterruptEarly() && mPauseLock.isPaused()) {
             try {
                 mPauseLock.await();
             } catch (InterruptedException e) {
                 return;
             }
         }
-        if (mCancelled || mPauseLock.shouldInterruptEarly()) {
+        if (isCancelled() || mPauseLock.shouldInterruptEarly()) {
             return;
         }
         DataDescriptor<T> descriptor = mDescriptor;
@@ -180,7 +179,7 @@ abstract class BaseLoadImageAction<T> implements Callable<Void> {
                 return;
             }
         }
-        if (mCancelled) {
+        if (isCancelled()) {
             return;
         }
         // Storage cache
@@ -195,7 +194,7 @@ abstract class BaseLoadImageAction<T> implements Callable<Void> {
                 return;
             }
         }
-        if (mCancelled) {
+        if (isCancelled()) {
             return;
         }
         // Load new image
@@ -208,6 +207,9 @@ abstract class BaseLoadImageAction<T> implements Callable<Void> {
         }
         if (image == null) {
             processError(new ImageNotLoadedException());
+            return;
+        }
+        if (isCancelled()) {
             return;
         }
         // Transform image
@@ -224,10 +226,10 @@ abstract class BaseLoadImageAction<T> implements Callable<Void> {
                 return;
             }
         }
-        if (mCancelled) {
+        processImage(image);
+        if (isCancelled()) {
             return;
         }
-        processImage(image);
         if (key != null) {
             if (memoryCache != null) {
                 memoryCache.put(key, image);
@@ -246,6 +248,9 @@ abstract class BaseLoadImageAction<T> implements Callable<Void> {
 
     @WorkerThread
     private void processImage(@NonNull Bitmap image) {
+        if (isCancelled()) {
+            return;
+        }
         LoadCallback loadCallback = mLoadCallback;
         if (loadCallback != null) {
             loadCallback.onLoaded(image);
@@ -255,7 +260,7 @@ abstract class BaseLoadImageAction<T> implements Callable<Void> {
 
     @WorkerThread
     private void processError(@NonNull Throwable error) {
-        if (mCancelled) {
+        if (isCancelled()) {
             return;
         }
         ErrorCallback errorCallback = mErrorCallback;
