@@ -338,7 +338,7 @@ public final class ImageRequest<T> {
         }
         DisplayImageAction<?> currentAction = InternalUtils.getDisplayImageAction(view);
         if (currentAction != null) {
-            if (currentAction.hasSameKey(key)) {
+            if (currentAction.hasSameKey(key) && !currentAction.isCancelled()) {
                 return;
             }
             currentAction.cancel();
