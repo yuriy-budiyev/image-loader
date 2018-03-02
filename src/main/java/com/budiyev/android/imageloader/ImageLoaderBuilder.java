@@ -166,11 +166,11 @@ public final class ImageLoaderBuilder {
     public ImageLoader build() {
         ExecutorService loadExecutor = mLoadExecutor;
         if (loadExecutor == null) {
-            loadExecutor = new ImageLoaderExecutor(InternalUtils.getPoolSize());
+            loadExecutor = new ImageLoaderExecutor(InternalUtils.getLoadPoolSize());
         }
         ExecutorService cacheExecutor = mCacheExecutor;
         if (cacheExecutor == null) {
-            cacheExecutor = new ImageLoaderExecutor();
+            cacheExecutor = new ImageLoaderExecutor(InternalUtils.getCachePoolSize());
         }
         return new ImageLoader(mContext, loadExecutor, cacheExecutor, mMemoryCache, mStorageCache);
     }
