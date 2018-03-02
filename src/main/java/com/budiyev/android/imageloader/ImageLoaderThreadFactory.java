@@ -30,12 +30,17 @@ import android.support.annotation.NonNull;
 
 final class ImageLoaderThreadFactory implements ThreadFactory {
     private static final AtomicInteger THREAD_COUNTER = new AtomicInteger(1);
-    private static final String THREAD_NAME_PREFIX = "ImageLoader thread #";
+    private static final String THREAD_NAME_PREFIX = "image-loader-";
 
     @NonNull
     @Override
     public Thread newThread(@NonNull Runnable r) {
-        THREAD_COUNTER.compareAndSet(Integer.MAX_VALUE, 0);
-        return new ImageLoaderThread(r, THREAD_NAME_PREFIX + THREAD_COUNTER.getAndIncrement());
+        return new ImageLoaderThread(r, nextThreadName());
+    }
+
+    @NonNull
+    private static String nextThreadName() {
+        THREAD_COUNTER.compareAndSet(Integer.MAX_VALUE, 1);
+        return THREAD_NAME_PREFIX + THREAD_COUNTER.getAndIncrement();
     }
 }
