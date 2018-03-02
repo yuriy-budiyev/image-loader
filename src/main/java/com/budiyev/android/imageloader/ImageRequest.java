@@ -361,7 +361,7 @@ public final class ImageRequest<T> {
      */
     @AnyThread
     public void invalidate() {
-        mLoadExecutor.submit(new InvalidateAction(mDescriptor, getMemoryCache(), getStorageCache()));
+        mCacheExecutor.submit(new InvalidateAction(mDescriptor, getMemoryCache(), getStorageCache()));
     }
 
     @NonNull
