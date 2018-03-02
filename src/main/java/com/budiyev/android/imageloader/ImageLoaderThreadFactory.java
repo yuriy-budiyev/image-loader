@@ -35,11 +35,11 @@ final class ImageLoaderThreadFactory implements ThreadFactory {
     @NonNull
     @Override
     public Thread newThread(@NonNull Runnable r) {
-        return new ImageLoaderThread(r, getNextThreadName());
+        return new ImageLoaderThread(r, nextThreadName());
     }
 
     @NonNull
-    private static String getNextThreadName() {
+    private static String nextThreadName() {
         THREAD_COUNTER.compareAndSet(Integer.MAX_VALUE, 1);
         return THREAD_NAME_PREFIX + THREAD_COUNTER.getAndIncrement();
     }
