@@ -24,9 +24,11 @@
 package com.budiyev.android.imageloader;
 
 import java.io.File;
+import java.io.FileDescriptor;
 import java.util.concurrent.ExecutorService;
 
 import android.content.Context;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -172,6 +174,17 @@ public final class ImageLoaderBuilder {
         if (cacheExecutor == null) {
             cacheExecutor = new ImageLoaderExecutor(InternalUtils.getCachePoolSize());
         }
-        return new ImageLoader(mContext, loadExecutor, cacheExecutor, mMemoryCache, mStorageCache);
+        Context context = mContext;
+        ImageLoader imageLoader = new ImageLoader(context, loadExecutor, cacheExecutor, mMemoryCache, mStorageCache);
+        imageLoader.registerDataType(Uri.class, new UriDataDescriptorFactory(), new UriBitmapLoader(context));
+        imageLoader.registerDataType(File.class, new FileDataDescriptorFactory(), new FileBitmapLoader());
+        imageLoader.registerDataType(String.class, new StringUriDataDescriptorFactory(),
+                new StringUriBitmapLoader(context));
+        imageLoader.registerDataType(Integer.class, new ResourceDataDescriptorFactory(),
+                new ResourceBitmapLoader(context));
+        imageLoader.registerDataType(FileDescriptor.class, new FileDescriptorDataDescriptorFactory(),
+                new FileDescriptorBitmapLoader());
+        imageLoader.registerDataType(byte[].class, new ByteArrayDataDescriptorFactory(), new ByteArrayBitmapLoader());
+        return imageLoader;
     }
 }

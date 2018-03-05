@@ -68,13 +68,6 @@ public final class ImageLoader {
         mCacheExecutor = cacheExecutor;
         mMemoryCache = memoryCache;
         mStorageCache = storageCache;
-        registerDataType(Uri.class, new UriDataDescriptorFactory(), new UriBitmapLoader(context));
-        registerDataType(File.class, new FileDataDescriptorFactory(), new FileBitmapLoader());
-        registerDataType(String.class, new StringUriDataDescriptorFactory(), new StringUriBitmapLoader(context));
-        registerDataType(Integer.class, new ResourceDataDescriptorFactory(), new ResourceBitmapLoader(context));
-        registerDataType(FileDescriptor.class, new FileDescriptorDataDescriptorFactory(),
-                new FileDescriptorBitmapLoader());
-        registerDataType(byte[].class, new ByteArrayDataDescriptorFactory(), new ByteArrayBitmapLoader());
     }
 
     /**
