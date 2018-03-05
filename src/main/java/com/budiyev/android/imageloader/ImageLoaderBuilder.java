@@ -175,16 +175,14 @@ public final class ImageLoaderBuilder {
             cacheExecutor = new ImageLoaderExecutor(InternalUtils.getCachePoolSize());
         }
         Context context = mContext;
-        ImageLoader imageLoader = new ImageLoader(context, loadExecutor, cacheExecutor, mMemoryCache, mStorageCache);
-        imageLoader.registerDataType(Uri.class, new UriDataDescriptorFactory(), new UriBitmapLoader(context));
-        imageLoader.registerDataType(File.class, new FileDataDescriptorFactory(), new FileBitmapLoader());
-        imageLoader.registerDataType(String.class, new StringUriDataDescriptorFactory(),
-                new StringUriBitmapLoader(context));
-        imageLoader.registerDataType(Integer.class, new ResourceDataDescriptorFactory(),
-                new ResourceBitmapLoader(context));
-        imageLoader.registerDataType(FileDescriptor.class, new FileDescriptorDataDescriptorFactory(),
+        ImageLoader loader = new ImageLoader(context, loadExecutor, cacheExecutor, mMemoryCache, mStorageCache);
+        loader.registerDataType(Uri.class, new UriDataDescriptorFactory(), new UriBitmapLoader(context));
+        loader.registerDataType(File.class, new FileDataDescriptorFactory(), new FileBitmapLoader());
+        loader.registerDataType(String.class, new StringUriDataDescriptorFactory(), new StringUriBitmapLoader(context));
+        loader.registerDataType(Integer.class, new ResourceDataDescriptorFactory(), new ResourceBitmapLoader(context));
+        loader.registerDataType(FileDescriptor.class, new FileDescriptorDataDescriptorFactory(),
                 new FileDescriptorBitmapLoader());
-        imageLoader.registerDataType(byte[].class, new ByteArrayDataDescriptorFactory(), new ByteArrayBitmapLoader());
-        return imageLoader;
+        loader.registerDataType(byte[].class, new ByteArrayDataDescriptorFactory(), new ByteArrayBitmapLoader());
+        return loader;
     }
 }
