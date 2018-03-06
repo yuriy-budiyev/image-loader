@@ -48,8 +48,8 @@ import android.widget.ImageView;
 
 final class InternalUtils {
     private static final int CONNECT_TIMEOUT = 10000;
-    private static final int MAX_LOAD_POOL_SIZE = 4;
-    private static final int MAX_CACHE_POOL_SIZE = 2;
+    private static final int MAX_POOL_SIZE = 4;
+    private static final int MIN_POOL_SIZE = 1;
     private static final String URI_SCHEME_HTTP = "http";
     private static final String URI_SCHEME_HTTPS = "https";
     private static final String URI_SCHEME_FTP = "ftp";
@@ -167,15 +167,15 @@ final class InternalUtils {
     }
 
     public static int getLoadPoolSize() {
-        return Math.min(Runtime.getRuntime().availableProcessors(), MAX_LOAD_POOL_SIZE);
+        return Math.min(Runtime.getRuntime().availableProcessors(), MAX_POOL_SIZE);
     }
 
     public static int getCachePoolSize() {
         int size = getLoadPoolSize() / 2;
-        if (size != 0) {
-            return size;
+        if (size < MIN_POOL_SIZE) {
+            return MIN_POOL_SIZE;
         } else {
-            return 1;
+            return size;
         }
     }
 
