@@ -171,7 +171,12 @@ final class InternalUtils {
     }
 
     public static int getCachePoolSize() {
-        return Math.min(Runtime.getRuntime().availableProcessors(), MAX_CACHE_POOL_SIZE);
+        int size = getLoadPoolSize() / 2;
+        if (size != 0) {
+            return size;
+        } else {
+            return 1;
+        }
     }
 
     public static boolean isUriLocal(@NonNull Uri uri) {
