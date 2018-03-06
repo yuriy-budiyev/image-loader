@@ -289,26 +289,33 @@ public final class ImageRequest<T> {
     @WorkerThread
     public Bitmap loadSync() {
         return new SyncLoadImageAction<>(mDescriptor, mBitmapLoader, mRequiredSize, getTransformation(),
-                getMemoryCache(), getStorageCache(), mLoadCallback, mErrorCallback, mPauseLock).execute();
+                getMemoryCache(), getStorageCache(), mLoadCallback, mErrorCallback, mPauseLock).load();
     }
 
     /**
      * Load image asynchronously
      *
+     * @return {@link ImageRequestDelegate} object, representing pending execution of the request
      * @see #onLoaded
      * @see LoadCallback
      */
+    @NonNull
     @AnyThread
-    public void load() {
-        new LoadImageAction<>(mDescriptor, mBitmapLoader, mRequiredSize, getTransformation(), getMemoryCache(),
-                getStorageCache(), mCacheExecutor, mLoadCallback, mErrorCallback, mPauseLock).submit(mLoadExecutor);
+    public ImageRequestDelegate load() {
+        return new AsyncLoadImageAction<>(mDescriptor, mBitmapLoader, mRequiredSize, getTransformation(),
+                getMemoryCache(), getStorageCache(), mCacheExecutor, mLoadCallback, mErrorCallback, mPauseLock)
+                .submit(mLoadExecutor);
     }
 
     /**
-     * Load image asynchronously and display it in the specified {@code view}
+     * Load image asynchronously and display it into the specified {@code view}
+     *
+     * @return {@link ImageRequestDelegate} object, representing pending execution of the request,
+     * or {@code null} if required image has already been loaded into memory
      */
+    @Nullable
     @MainThread
-    public void load(@NonNull View view) {
+    public ImageRequestDelegate load(@NonNull View view) {
         Resources resources = mResources;
         DataDescriptor<T> descriptor = mDescriptor;
         Size requiredSize = mRequiredSize;
@@ -322,7 +329,11 @@ public final class ImageRequest<T> {
         if (key != null && memoryCache != null) {
             image = memoryCache.get(key);
         }
+        DisplayImageAction<?> currentAction = InternalUtils.getDisplayImageAction(view);
         if (image != null) {
+            if (currentAction != null) {
+                currentAction.cancel();
+            }
             if (loadCallback != null) {
                 loadCallback.onLoaded(image);
             }
@@ -334,12 +345,11 @@ public final class ImageRequest<T> {
             if (displayCallback != null) {
                 displayCallback.onDisplayed(image, view);
             }
-            return;
+            return null;
         }
-        DisplayImageAction<?> currentAction = InternalUtils.getDisplayImageAction(view);
         if (currentAction != null) {
             if (currentAction.hasSameKey(key) && !currentAction.isCancelled()) {
-                return;
+                return currentAction;
             }
             currentAction.cancel();
         }
@@ -353,15 +363,17 @@ public final class ImageRequest<T> {
                         mErrorCallback, displayCallback, mPauseLock, mMainThreadHandler, mFadeEnabled, mFadeDuration,
                         cornerRadius);
         InternalUtils.setDrawable(new PlaceholderDrawable(placeholder, action), view);
-        action.submit(mLoadExecutor);
+        return action.submit(mLoadExecutor);
     }
 
     /**
      * Delete all cached images for specified data asynchronously
+     *
+     * @return {@link ImageRequestDelegate} object, representing pending execution of the request
      */
     @AnyThread
-    public void invalidate() {
-        mCacheExecutor.submit(new InvalidateAction(mDescriptor, getMemoryCache(), getStorageCache()));
+    public ImageRequestDelegate invalidate() {
+        return new InvalidateAction(mDescriptor, getMemoryCache(), getStorageCache()).submit(mCacheExecutor);
     }
 
     @NonNull

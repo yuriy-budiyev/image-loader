@@ -23,28 +23,22 @@
  */
 package com.budiyev.android.imageloader;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+/**
+ * Image request delegate
+ */
+public interface ImageRequestDelegate {
+    /**
+     * Cancel associated request
+     */
+    void cancel();
 
-final class InvalidateAction extends ImageRequestAction {
-    private final DataDescriptor<?> mDescriptor;
-    private final ImageCache mMemoryCache;
-    private final ImageCache mStorageCache;
+    /**
+     * Whether if associated request is done
+     */
+    boolean isDone();
 
-    public InvalidateAction(@NonNull DataDescriptor<?> descriptor, @Nullable ImageCache memoryCache,
-            @Nullable ImageCache storageCache) {
-        mDescriptor = descriptor;
-        mMemoryCache = memoryCache;
-        mStorageCache = storageCache;
-    }
-
-    @Override
-    protected void execute() {
-        InternalUtils.invalidate(mMemoryCache, mStorageCache, mDescriptor);
-    }
-
-    @Override
-    protected void onCancelled() {
-        // Do noting
-    }
+    /**
+     * Whether if associated request is cancelled
+     */
+    boolean isCancelled();
 }

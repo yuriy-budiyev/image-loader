@@ -28,29 +28,205 @@ import java.util.concurrent.ExecutorService;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.WorkerThread;
 
-final class LoadImageAction<T> extends BaseLoadImageAction<T> {
-    public LoadImageAction(@NonNull DataDescriptor<T> descriptor, @NonNull BitmapLoader<T> bitmapLoader,
+abstract class LoadImageAction<T> extends ImageRequestAction {
+    private final DataDescriptor<T> mDescriptor;
+    private final BitmapLoader<T> mBitmapLoader;
+    private final Size mRequiredSize;
+    private final BitmapTransformation mTransformation;
+    private final PauseLock mPauseLock;
+    private final ImageCache mMemoryCache;
+    private final ImageCache mStorageCache;
+    private final ExecutorService mCacheExecutor;
+    private final LoadCallback mLoadCallback;
+    private final ErrorCallback mErrorCallback;
+    private volatile CacheImageAction mCacheAction;
+
+    protected LoadImageAction(@NonNull DataDescriptor<T> descriptor, @NonNull BitmapLoader<T> bitmapLoader,
             @Nullable Size requiredSize, @Nullable BitmapTransformation transformation,
             @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache,
             @Nullable ExecutorService cacheExecutor, @Nullable LoadCallback loadCallback,
             @Nullable ErrorCallback errorCallback, @NonNull PauseLock pauseLock) {
-        super(descriptor, bitmapLoader, requiredSize, transformation, memoryCache, storageCache, cacheExecutor,
-                loadCallback, errorCallback, pauseLock);
+        mDescriptor = descriptor;
+        mBitmapLoader = bitmapLoader;
+        mRequiredSize = requiredSize;
+        mTransformation = transformation;
+        mPauseLock = pauseLock;
+        mMemoryCache = memoryCache;
+        mStorageCache = storageCache;
+        mCacheExecutor = cacheExecutor;
+        mLoadCallback = loadCallback;
+        mErrorCallback = errorCallback;
     }
 
-    @Override
-    protected void onImageLoaded(@NonNull Bitmap image) {
-        // Do nothing
-    }
+    @WorkerThread
+    protected abstract void onImageLoaded(@NonNull Bitmap image);
 
-    @Override
-    protected void onError(@NonNull Throwable error) {
-        // Do nothing
-    }
+    @WorkerThread
+    protected abstract void onError(@NonNull Throwable error);
 
     @Override
     protected void onCancelled() {
-        // Do nothing
+        CacheImageAction cacheAction = mCacheAction;
+        if (cacheAction != null) {
+            cacheAction.cancel();
+        }
+    }
+
+    @NonNull
+    protected final DataDescriptor<T> getDescriptor() {
+        return mDescriptor;
+    }
+
+    @Nullable
+    protected final String getKey() {
+        return InternalUtils.buildFullKey(mDescriptor.getKey(), mRequiredSize, mTransformation);
+    }
+
+    @Nullable
+    protected final Size getRequiredSize() {
+        return mRequiredSize;
+    }
+
+    @NonNull
+    protected final BitmapLoader<T> getBitmapLoader() {
+        return mBitmapLoader;
+    }
+
+    @NonNull
+    protected final PauseLock getPauseLock() {
+        return mPauseLock;
+    }
+
+    @Nullable
+    protected final ImageCache getMemoryCache() {
+        return mMemoryCache;
+    }
+
+    @Nullable
+    protected final ImageCache getStorageCache() {
+        return mStorageCache;
+    }
+
+    @Nullable
+    protected final LoadCallback getLoadCallback() {
+        return mLoadCallback;
+    }
+
+    @Nullable
+    protected final ErrorCallback getErrorCallback() {
+        return mErrorCallback;
+    }
+
+    @Override
+    @WorkerThread
+    protected final void execute() {
+        while (!isCancelled() && !mPauseLock.shouldInterruptEarly() && mPauseLock.isPaused()) {
+            try {
+                mPauseLock.await();
+            } catch (InterruptedException e) {
+                return;
+            }
+        }
+        if (isCancelled() || mPauseLock.shouldInterruptEarly()) {
+            return;
+        }
+        DataDescriptor<T> descriptor = mDescriptor;
+        String key = getKey();
+        T data = descriptor.getData();
+        Bitmap image;
+        // Memory cache
+        ImageCache memoryCache = mMemoryCache;
+        if (key != null && memoryCache != null) {
+            image = memoryCache.get(key);
+            if (image != null) {
+                processImage(image);
+                return;
+            }
+        }
+        if (isCancelled()) {
+            return;
+        }
+        // Storage cache
+        ImageCache storageCache = mStorageCache;
+        if (key != null && storageCache != null) {
+            image = storageCache.get(key);
+            if (image != null) {
+                processImage(image);
+                if (memoryCache != null) {
+                    memoryCache.put(key, image);
+                }
+                return;
+            }
+        }
+        if (isCancelled()) {
+            return;
+        }
+        // Load new image
+        Size requiredSize = mRequiredSize;
+        try {
+            image = mBitmapLoader.load(data, requiredSize);
+        } catch (Throwable error) {
+            processError(error);
+            return;
+        }
+        if (image == null) {
+            processError(new ImageNotLoadedException());
+            return;
+        }
+        if (isCancelled()) {
+            return;
+        }
+        // Transform image
+        BitmapTransformation transformation = mTransformation;
+        if (transformation != null) {
+            try {
+                Bitmap transformed = transformation.transform(image);
+                if (image != transformed && !image.isRecycled()) {
+                    image.recycle();
+                }
+                image = transformed;
+            } catch (Throwable error) {
+                processError(error);
+                return;
+            }
+        }
+        if (isCancelled()) {
+            return;
+        }
+        processImage(image);
+        if (key != null) {
+            if (memoryCache != null) {
+                memoryCache.put(key, image);
+            }
+            if (storageCache != null && (requiredSize != null || transformation != null ||
+                    descriptor.getLocation() != DataLocation.LOCAL)) {
+                ExecutorService cacheExecutor = mCacheExecutor;
+                if (cacheExecutor != null) {
+                    mCacheAction = new CacheImageAction(key, image, storageCache).submit(cacheExecutor);
+                } else {
+                    storageCache.put(key, image);
+                }
+            }
+        }
+    }
+
+    @WorkerThread
+    private void processImage(@NonNull Bitmap image) {
+        LoadCallback loadCallback = mLoadCallback;
+        if (loadCallback != null) {
+            loadCallback.onLoaded(image);
+        }
+        onImageLoaded(image);
+    }
+
+    @WorkerThread
+    private void processError(@NonNull Throwable error) {
+        ErrorCallback errorCallback = mErrorCallback;
+        if (errorCallback != null) {
+            errorCallback.onError(error);
+        }
+        onError(error);
     }
 }

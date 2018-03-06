@@ -23,32 +23,25 @@
  */
 package com.budiyev.android.imageloader;
 
+import java.util.concurrent.ExecutorService;
+
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.WorkerThread;
 
-final class SyncLoadImageAction<T> extends LoadImageAction<T> {
-    private Bitmap mImage;
-
-    public SyncLoadImageAction(@NonNull DataDescriptor<T> descriptor, @NonNull BitmapLoader<T> bitmapLoader,
+final class AsyncLoadImageAction<T> extends LoadImageAction<T> {
+    public AsyncLoadImageAction(@NonNull DataDescriptor<T> descriptor, @NonNull BitmapLoader<T> bitmapLoader,
             @Nullable Size requiredSize, @Nullable BitmapTransformation transformation,
-            @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache, @Nullable LoadCallback loadCallback,
+            @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache,
+            @Nullable ExecutorService cacheExecutor, @Nullable LoadCallback loadCallback,
             @Nullable ErrorCallback errorCallback, @NonNull PauseLock pauseLock) {
-        super(descriptor, bitmapLoader, requiredSize, transformation, memoryCache, storageCache, null, loadCallback,
-                errorCallback, pauseLock);
-    }
-
-    @Nullable
-    @WorkerThread
-    public Bitmap load() {
-        execute();
-        return mImage;
+        super(descriptor, bitmapLoader, requiredSize, transformation, memoryCache, storageCache, cacheExecutor,
+                loadCallback, errorCallback, pauseLock);
     }
 
     @Override
     protected void onImageLoaded(@NonNull Bitmap image) {
-        mImage = image;
+        // Do nothing
     }
 
     @Override
