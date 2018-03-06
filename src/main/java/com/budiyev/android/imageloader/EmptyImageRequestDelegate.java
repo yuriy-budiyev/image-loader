@@ -23,25 +23,19 @@
  */
 package com.budiyev.android.imageloader;
 
-import android.support.annotation.AnyThread;
+final class EmptyImageRequestDelegate implements ImageRequestDelegate {
+    public static final ImageRequestDelegate INSTANCE = new EmptyImageRequestDelegate();
 
-/**
- * Image request delegate
- */
-public interface ImageRequestDelegate {
-    /**
-     * Cancel request
-     *
-     * @return {@code false} if request could not be cancelled, {@code true} otherwise
-     */
-    @AnyThread
-    boolean cancel();
+    private EmptyImageRequestDelegate() {
+    }
 
-    /**
-     * Whether if request is cancelled
-     *
-     * @return {@code true} if request is cancelled, {@code false} otherwise
-     */
-    @AnyThread
-    boolean isCancelled();
+    @Override
+    public boolean cancel() {
+        return false;
+    }
+
+    @Override
+    public boolean isCancelled() {
+        return false;
+    }
 }

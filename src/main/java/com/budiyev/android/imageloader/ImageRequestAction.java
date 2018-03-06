@@ -53,13 +53,16 @@ abstract class ImageRequestAction implements ImageRequestDelegate, Callable<Void
     }
 
     @Override
-    public final void cancel() {
+    public final boolean cancel() {
         if (mCancelled.compareAndSet(false, true)) {
             Future<?> future = mFuture;
             if (future != null) {
                 future.cancel(false);
             }
             onCancelled();
+            return true;
+        } else {
+            return false;
         }
     }
 

@@ -329,11 +329,10 @@ public final class ImageRequest<T> {
     /**
      * Load image asynchronously and display it into the specified {@code view}
      *
-     * @return {@link ImageRequestDelegate} object, associated with execution of the request,
-     * or {@code null} if required image has already been loaded into memory
+     * @return {@link ImageRequestDelegate} object, associated with execution of the request
      * @throws IllegalStateException if request has already been executed
      */
-    @Nullable
+    @NonNull
     @MainThread
     public ImageRequestDelegate load(@NonNull View view) {
         checkAndSetExecutedState();
@@ -366,7 +365,7 @@ public final class ImageRequest<T> {
             if (displayCallback != null) {
                 displayCallback.onDisplayed(image, view);
             }
-            return null;
+            return EmptyImageRequestDelegate.INSTANCE;
         }
         if (currentAction != null) {
             if (currentAction.hasSameKey(key) && !currentAction.isCancelled()) {
@@ -393,6 +392,7 @@ public final class ImageRequest<T> {
      * @return {@link ImageRequestDelegate} object, associated with execution of the request
      * @throws IllegalStateException if request has already been executed
      */
+    @NonNull
     @AnyThread
     public ImageRequestDelegate invalidate() {
         checkAndSetExecutedState();
