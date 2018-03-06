@@ -60,4 +60,10 @@ final class SyncLoadImageAction<T> extends LoadImageAction<T> {
     protected void onCancelled() {
         // Do nothing
     }
+
+    @Override
+    public boolean isDone() {
+        // Not used
+        return false;
+    }
 }

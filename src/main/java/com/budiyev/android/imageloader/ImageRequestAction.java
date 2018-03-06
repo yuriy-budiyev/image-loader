@@ -26,16 +26,12 @@ package com.budiyev.android.imageloader;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.support.annotation.NonNull;
 
 abstract class ImageRequestAction implements ImageRequestDelegate, Callable<Void> {
-    private static final int STATE_NEW = 0;
-    private static final int STATE_PROCESSING = 1;
-    private static final int STATE_DONE = 2;
-    private static final int STATE_CANCELED = 3;
-    private final AtomicInteger mState = new AtomicInteger(STATE_NEW);
+    private final AtomicBoolean mCancelled = new AtomicBoolean();
     private volatile Future<?> mFuture;
 
     protected abstract void execute();
@@ -45,13 +41,12 @@ abstract class ImageRequestAction implements ImageRequestDelegate, Callable<Void
     @Override
     public final Void call() throws Exception {
         execute();
-        mState.compareAndSet(STATE_PROCESSING, STATE_DONE);
         return null;
     }
 
     @NonNull
     public final ImageRequestDelegate submit(@NonNull ExecutorService executor) {
-        if (mState.compareAndSet(STATE_NEW, STATE_PROCESSING)) {
+        if (!mCancelled.get()) {
             mFuture = executor.submit(this);
         }
         return this;
@@ -59,7 +54,7 @@ abstract class ImageRequestAction implements ImageRequestDelegate, Callable<Void
 
     @Override
     public final void cancel() {
-        if (mState.compareAndSet(STATE_NEW, STATE_CANCELED) || mState.compareAndSet(STATE_PROCESSING, STATE_CANCELED)) {
+        if (mCancelled.compareAndSet(false, true)) {
             Future<?> future = mFuture;
             if (future != null) {
                 future.cancel(false);
@@ -69,12 +64,7 @@ abstract class ImageRequestAction implements ImageRequestDelegate, Callable<Void
     }
 
     @Override
-    public final boolean isDone() {
-        return mState.get() == STATE_DONE;
-    }
-
-    @Override
     public final boolean isCancelled() {
-        return mState.get() == STATE_CANCELED;
+        return mCancelled.get();
     }
 }

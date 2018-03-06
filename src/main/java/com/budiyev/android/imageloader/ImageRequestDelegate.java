@@ -23,6 +23,8 @@
  */
 package com.budiyev.android.imageloader;
 
+import android.support.annotation.AnyThread;
+
 /**
  * Image request delegate
  */
@@ -30,15 +32,18 @@ public interface ImageRequestDelegate {
     /**
      * Cancel associated request
      */
+    @AnyThread
     void cancel();
 
     /**
      * Whether if associated request is done
      */
+    @AnyThread
     boolean isDone();
 
     /**
      * Whether if associated request is cancelled
      */
+    @AnyThread
     boolean isCancelled();
 }
