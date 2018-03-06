@@ -40,7 +40,9 @@ final class InvalidateAction extends ImageRequestAction {
 
     @Override
     protected void execute() {
-        InternalUtils.invalidate(mMemoryCache, mStorageCache, mDescriptor);
+        if (!isCancelled()) {
+            InternalUtils.invalidate(mMemoryCache, mStorageCache, mDescriptor);
+        }
     }
 
     @Override

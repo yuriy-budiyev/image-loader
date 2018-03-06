@@ -38,6 +38,7 @@ import android.os.Handler;
 import android.support.annotation.AnyThread;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.FloatRange;
+import android.support.annotation.IntRange;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -49,7 +50,7 @@ import android.view.View;
  * Image request
  * <br>
  * Note that all methods of this class should be called on the same thread as {@link ImageLoader#from} method
- * that created this request
+ * that created this request, each request can be executed only once
  */
 public final class ImageRequest<T> {
     private static final long DEFAULT_FADE_DURATION = 200L;
@@ -75,6 +76,7 @@ public final class ImageRequest<T> {
     private float mCornerRadius;
     private boolean mMemoryCacheEnabled = true;
     private boolean mStorageCacheEnabled = true;
+    private boolean mExecuted;
 
     ImageRequest(@NonNull Resources resources, @NonNull ExecutorService loadExecutor,
             @NonNull ExecutorService cacheExecutor, @NonNull PauseLock pauseLock, @NonNull Handler mainThreadHandler,
@@ -96,6 +98,9 @@ public final class ImageRequest<T> {
      */
     @NonNull
     public ImageRequest<T> size(@Nullable Size requiredSize) {
+        if (requiredSize != null) {
+            checkSize(requiredSize.getWidth(), requiredSize.getHeight());
+        }
         mRequiredSize = requiredSize;
         return this;
     }
@@ -105,6 +110,7 @@ public final class ImageRequest<T> {
      */
     @NonNull
     public ImageRequest<T> size(@Px int requiredWidth, @Px int requiredHeight) {
+        checkSize(requiredWidth, requiredHeight);
         mRequiredSize = new Size(requiredWidth, requiredHeight);
         return this;
     }
@@ -126,6 +132,9 @@ public final class ImageRequest<T> {
      */
     @NonNull
     public ImageRequest<T> roundCorners(@FloatRange(from = 0f, to = Float.MAX_VALUE) float radius) {
+        if (radius < 0f) {
+            throw new IllegalArgumentException("Corner radius should be greater than or equal to zero");
+        }
         mCornerRadius = radius;
         return this;
     }
@@ -174,6 +183,7 @@ public final class ImageRequest<T> {
      */
     @NonNull
     public ImageRequest<T> transform(@NonNull BitmapTransformation transformation) {
+        checkNonNull(transformation);
         transformations().add(transformation);
         return this;
     }
@@ -186,6 +196,7 @@ public final class ImageRequest<T> {
      */
     @NonNull
     public ImageRequest<T> transform(@NonNull Collection<BitmapTransformation> transformations) {
+        checkNonNull(transformations);
         transformations().addAll(transformations);
         return this;
     }
@@ -198,6 +209,7 @@ public final class ImageRequest<T> {
      */
     @NonNull
     public ImageRequest<T> transform(@NonNull BitmapTransformation... transformations) {
+        checkNonNull(transformations);
         Collections.addAll(transformations(), transformations);
         return this;
     }
@@ -229,7 +241,10 @@ public final class ImageRequest<T> {
      * supported on API 19+
      */
     @NonNull
-    public ImageRequest<T> fade(long duration) {
+    public ImageRequest<T> fade(@IntRange(from = 0L) long duration) {
+        if (duration < 0L) {
+            throw new IllegalArgumentException("Fade duration should be greater than or equal to zero");
+        }
         mFadeEnabled = true;
         mFadeDuration = duration;
         return this;
@@ -284,10 +299,12 @@ public final class ImageRequest<T> {
      * Load image synchronously (on current thread)
      *
      * @return Loaded image or {@code null} if image could not be loaded
+     * @throws IllegalStateException if request has already been executed
      */
     @Nullable
     @WorkerThread
     public Bitmap loadSync() {
+        checkAndSetExecutedState();
         return new SyncLoadImageAction<>(mDescriptor, mBitmapLoader, mRequiredSize, getTransformation(),
                 getMemoryCache(), getStorageCache(), mLoadCallback, mErrorCallback, mPauseLock).load();
     }
@@ -295,13 +312,15 @@ public final class ImageRequest<T> {
     /**
      * Load image asynchronously
      *
-     * @return {@link ImageRequestDelegate} object, representing pending execution of the request
+     * @return {@link ImageRequestDelegate} object, associated with execution of the request
+     * @throws IllegalStateException if request has already been executed
      * @see #onLoaded
      * @see LoadCallback
      */
     @NonNull
     @AnyThread
     public ImageRequestDelegate load() {
+        checkAndSetExecutedState();
         return new AsyncLoadImageAction<>(mDescriptor, mBitmapLoader, mRequiredSize, getTransformation(),
                 getMemoryCache(), getStorageCache(), mCacheExecutor, mLoadCallback, mErrorCallback, mPauseLock)
                 .submit(mLoadExecutor);
@@ -310,12 +329,14 @@ public final class ImageRequest<T> {
     /**
      * Load image asynchronously and display it into the specified {@code view}
      *
-     * @return {@link ImageRequestDelegate} object, representing pending execution of the request,
+     * @return {@link ImageRequestDelegate} object, associated with execution of the request,
      * or {@code null} if required image has already been loaded into memory
+     * @throws IllegalStateException if request has already been executed
      */
     @Nullable
     @MainThread
     public ImageRequestDelegate load(@NonNull View view) {
+        checkAndSetExecutedState();
         Resources resources = mResources;
         DataDescriptor<T> descriptor = mDescriptor;
         Size requiredSize = mRequiredSize;
@@ -369,10 +390,12 @@ public final class ImageRequest<T> {
     /**
      * Delete all cached images for specified data asynchronously
      *
-     * @return {@link ImageRequestDelegate} object, representing pending execution of the request
+     * @return {@link ImageRequestDelegate} object, associated with execution of the request
+     * @throws IllegalStateException if request has already been executed
      */
     @AnyThread
     public ImageRequestDelegate invalidate() {
+        checkAndSetExecutedState();
         return new InvalidateAction(mDescriptor, getMemoryCache(), getStorageCache()).submit(mCacheExecutor);
     }
 
@@ -410,4 +433,22 @@ public final class ImageRequest<T> {
         return mStorageCacheEnabled ? mStorageCache : null;
     }
 
+    private void checkAndSetExecutedState() {
+        if (mExecuted) {
+            throw new IllegalStateException("Request can be executed only once");
+        }
+        mExecuted = true;
+    }
+
+    private void checkSize(int width, int height) {
+        if (width < 1 || height < 1) {
+            throw new IllegalArgumentException("Width and height should be greater than zero");
+        }
+    }
+
+    private void checkNonNull(Object value) {
+        if (value == null) {
+            throw new NullPointerException();
+        }
+    }
 }

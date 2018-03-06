@@ -41,7 +41,7 @@ abstract class LoadImageAction<T> extends ImageRequestAction {
     private final ExecutorService mCacheExecutor;
     private final LoadCallback mLoadCallback;
     private final ErrorCallback mErrorCallback;
-    private volatile CacheImageAction mCacheAction;
+    private volatile ImageRequestDelegate mCacheDelegate;
 
     protected LoadImageAction(@NonNull DataDescriptor<T> descriptor, @NonNull BitmapLoader<T> bitmapLoader,
             @Nullable Size requiredSize, @Nullable BitmapTransformation transformation,
@@ -68,9 +68,9 @@ abstract class LoadImageAction<T> extends ImageRequestAction {
 
     @Override
     protected void onCancelled() {
-        CacheImageAction cacheAction = mCacheAction;
-        if (cacheAction != null) {
-            cacheAction.cancel();
+        ImageRequestDelegate delegate = mCacheDelegate;
+        if (delegate != null) {
+            delegate.cancel();
         }
     }
 
@@ -204,7 +204,7 @@ abstract class LoadImageAction<T> extends ImageRequestAction {
                     descriptor.getLocation() != DataLocation.LOCAL)) {
                 ExecutorService cacheExecutor = mCacheExecutor;
                 if (cacheExecutor != null) {
-                    mCacheAction = new CacheImageAction(key, image, storageCache).submit(cacheExecutor);
+                    mCacheDelegate = new CacheImageAction(key, image, storageCache).submit(cacheExecutor);
                 } else {
                     storageCache.put(key, image);
                 }

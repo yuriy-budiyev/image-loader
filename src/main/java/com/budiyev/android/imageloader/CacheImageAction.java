@@ -24,19 +24,14 @@
 package com.budiyev.android.imageloader;
 
 import java.lang.ref.WeakReference;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
-final class CacheImageAction implements Callable<Void> {
+final class CacheImageAction extends ImageRequestAction {
     private final String mKey;
     private final WeakReference<Bitmap> mImage;
     private final ImageCache mCache;
-    private volatile Future<?> mFuture;
-    private volatile boolean mCancelled;
 
     public CacheImageAction(@NonNull String key, @NonNull Bitmap image, @NonNull ImageCache cache) {
         mKey = key;
@@ -44,26 +39,18 @@ final class CacheImageAction implements Callable<Void> {
         mCache = cache;
     }
 
-    @NonNull
-    public CacheImageAction submit(@NonNull ExecutorService executor) {
-        mFuture = executor.submit(this);
-        return this;
-    }
-
-    public void cancel() {
-        mCancelled = true;
-        mFuture.cancel(true);
-        mImage.clear();
-    }
-
     @Override
-    public Void call() throws Exception {
-        if (!mCancelled) {
+    protected void execute() {
+        if (!isCancelled()) {
             Bitmap image = mImage.get();
             if (image != null) {
                 mCache.put(mKey, image);
             }
         }
-        return null;
+    }
+
+    @Override
+    protected void onCancelled() {
+        mImage.clear();
     }
 }
