@@ -30,7 +30,7 @@ public enum CompressMode {
     /**
      * Lossless compression, supports transparency, no quality loss, used by default
      */
-    LOSSLESS(Bitmap.CompressFormat.PNG, 0),
+    LOSSLESS(Bitmap.CompressFormat.PNG, 100),
 
     /**
      * Lossy compression, doesn't support transparency, small quality loss,
