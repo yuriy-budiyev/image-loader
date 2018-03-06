@@ -14,7 +14,7 @@ Image loader library for Android.
 * Almost unlimited customization
 
 ### Usage ([sample](https://github.com/yuriy-budiyev/lib-demo-app))
-Add a dependency:
+Add dependency:
 ```gradle
 dependencies {
     implementation 'com.budiyev.android:image-loader:2.5.4'
