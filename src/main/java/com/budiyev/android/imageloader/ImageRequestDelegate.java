@@ -32,7 +32,8 @@ public interface ImageRequestDelegate {
     /**
      * Cancel request
      *
-     * @return {@code false} if request could not be cancelled, {@code true} otherwise
+     * @return {@code false} if request could not be cancelled or has already been cancelled,
+     * {@code true} otherwise
      */
     @AnyThread
     boolean cancel();
