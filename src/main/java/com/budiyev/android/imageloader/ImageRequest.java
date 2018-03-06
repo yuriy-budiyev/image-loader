@@ -278,20 +278,20 @@ public final class ImageRequest<T> {
     }
 
     /**
-     * Whether to use memory cache
+     * Don't use memory cache in this request
      */
     @NonNull
-    public ImageRequest<T> memoryCache(boolean enabled) {
-        mMemoryCacheEnabled = enabled;
+    public ImageRequest<T> noMemoryCache() {
+        mMemoryCacheEnabled = false;
         return this;
     }
 
     /**
-     * Whether to use storage cache
+     * Don't use storage cache in this request
      */
     @NonNull
-    public ImageRequest<T> storageCache(boolean enabled) {
-        mStorageCacheEnabled = enabled;
+    public ImageRequest<T> noStorageCache() {
+        mStorageCacheEnabled = false;
         return this;
     }
 
