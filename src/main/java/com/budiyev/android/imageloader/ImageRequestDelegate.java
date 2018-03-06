@@ -30,19 +30,15 @@ import android.support.annotation.AnyThread;
  */
 public interface ImageRequestDelegate {
     /**
-     * Cancel associated request
+     * Cancel request
      */
     @AnyThread
     void cancel();
 
     /**
-     * Whether if associated request is done
-     */
-    @AnyThread
-    boolean isDone();
-
-    /**
-     * Whether if associated request is cancelled
+     * Whether if request is cancelled
+     *
+     * @return {@code true} if request is cancelled, {@code false} otherwise
      */
     @AnyThread
     boolean isCancelled();

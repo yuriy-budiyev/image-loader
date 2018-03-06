@@ -30,8 +30,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 final class AsyncLoadImageAction<T> extends LoadImageAction<T> {
-    private volatile boolean mDone;
-
     public AsyncLoadImageAction(@NonNull DataDescriptor<T> descriptor, @NonNull BitmapLoader<T> bitmapLoader,
             @Nullable Size requiredSize, @Nullable BitmapTransformation transformation,
             @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache,
@@ -43,7 +41,7 @@ final class AsyncLoadImageAction<T> extends LoadImageAction<T> {
 
     @Override
     protected void onImageLoaded(@NonNull Bitmap image) {
-        mDone = true;
+        // Do nothing
     }
 
     @Override
@@ -54,10 +52,5 @@ final class AsyncLoadImageAction<T> extends LoadImageAction<T> {
     @Override
     protected void onCancelled() {
         // Do nothing
-    }
-
-    @Override
-    public boolean isDone() {
-        return mDone;
     }
 }

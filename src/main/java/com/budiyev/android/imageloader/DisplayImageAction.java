@@ -47,7 +47,6 @@ final class DisplayImageAction<T> extends LoadImageAction<T> {
     private final boolean mFadeEnabled;
     private final long mFadeDuration;
     private final float mCornerRadius;
-    private volatile boolean mDone;
 
     public DisplayImageAction(@NonNull Resources resources, @NonNull View view, @NonNull DataDescriptor<T> descriptor,
             @NonNull BitmapLoader<T> bitmapLoader, @Nullable Size requiredSize,
@@ -68,11 +67,6 @@ final class DisplayImageAction<T> extends LoadImageAction<T> {
         mFadeEnabled = fadeEnabled;
         mFadeDuration = fadeDuration;
         mCornerRadius = cornerRadius;
-    }
-
-    @Override
-    public boolean isDone() {
-        return mDone;
     }
 
     public boolean hasSameKey(@Nullable String key) {
@@ -133,28 +127,28 @@ final class DisplayImageAction<T> extends LoadImageAction<T> {
             }
             View view = mView.get();
             Resources resources = mResources.get();
-            if (view != null && resources != null &&
-                    InternalUtils.getDisplayImageAction(view) == DisplayImageAction.this) {
-                Bitmap image = mImage;
-                float cornerRadius = mCornerRadius;
-                boolean roundCorners = cornerRadius > 0 || cornerRadius == RoundedDrawable.MAX_RADIUS;
-                if (mFadeEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                    InternalUtils.setDrawable(new FadeDrawable(mPlaceholder,
-                            roundCorners ? new RoundedDrawable(resources, image, cornerRadius) :
-                                    new BitmapDrawable(resources, image), mFadeDuration), view);
+            if (view == null || resources == null ||
+                    InternalUtils.getDisplayImageAction(view) != DisplayImageAction.this) {
+                return;
+            }
+            Bitmap image = mImage;
+            float cornerRadius = mCornerRadius;
+            boolean roundCorners = cornerRadius > 0 || cornerRadius == RoundedDrawable.MAX_RADIUS;
+            if (mFadeEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                InternalUtils.setDrawable(new FadeDrawable(mPlaceholder,
+                        roundCorners ? new RoundedDrawable(resources, image, cornerRadius) :
+                                new BitmapDrawable(resources, image), mFadeDuration), view);
+            } else {
+                if (roundCorners) {
+                    InternalUtils.setDrawable(new RoundedDrawable(resources, image, cornerRadius), view);
                 } else {
-                    if (roundCorners) {
-                        InternalUtils.setDrawable(new RoundedDrawable(resources, image, cornerRadius), view);
-                    } else {
-                        InternalUtils.setBitmap(resources, image, view);
-                    }
-                }
-                DisplayCallback displayCallback = mDisplayCallback;
-                if (displayCallback != null) {
-                    displayCallback.onDisplayed(image, view);
+                    InternalUtils.setBitmap(resources, image, view);
                 }
             }
-            mDone = true;
+            DisplayCallback displayCallback = mDisplayCallback;
+            if (displayCallback != null) {
+                displayCallback.onDisplayed(image, view);
+            }
         }
     }
 }

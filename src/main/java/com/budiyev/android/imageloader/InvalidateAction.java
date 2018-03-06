@@ -30,7 +30,6 @@ final class InvalidateAction extends ImageRequestAction {
     private final DataDescriptor<?> mDescriptor;
     private final ImageCache mMemoryCache;
     private final ImageCache mStorageCache;
-    private volatile boolean mDone;
 
     public InvalidateAction(@NonNull DataDescriptor<?> descriptor, @Nullable ImageCache memoryCache,
             @Nullable ImageCache storageCache) {
@@ -42,16 +41,10 @@ final class InvalidateAction extends ImageRequestAction {
     @Override
     protected void execute() {
         InternalUtils.invalidate(mMemoryCache, mStorageCache, mDescriptor);
-        mDone = true;
     }
 
     @Override
     protected void onCancelled() {
         // Do noting
-    }
-
-    @Override
-    public boolean isDone() {
-        return mDone;
     }
 }
