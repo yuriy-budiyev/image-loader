@@ -13,13 +13,14 @@ Image loader library for Android.
 * Both synchronous and asynchronous image loading modes
 * Almost unlimited customization
 
-### Usage
+### Usage ([sample](https://github.com/yuriy-budiyev/lib-demo-app))
+Add a dependency:
 ```gradle
 dependencies {
     implementation 'com.budiyev.android:image-loader:2.5.4'
 }
 ```
-### Basic usage sample
+And load images simply:
 ```java
 public class MainActivity extends AppCompatActivity {
     @Override
