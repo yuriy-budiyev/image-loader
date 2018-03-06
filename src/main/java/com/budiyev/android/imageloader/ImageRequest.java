@@ -183,8 +183,7 @@ public final class ImageRequest<T> {
      */
     @NonNull
     public ImageRequest<T> transform(@NonNull BitmapTransformation transformation) {
-        checkNonNull(transformation);
-        transformations().add(transformation);
+        transformations().add(InternalUtils.requireNonNull(transformation));
         return this;
     }
 
@@ -196,8 +195,7 @@ public final class ImageRequest<T> {
      */
     @NonNull
     public ImageRequest<T> transform(@NonNull Collection<BitmapTransformation> transformations) {
-        checkNonNull(transformations);
-        transformations().addAll(transformations);
+        transformations().addAll(InternalUtils.requireNonNull(transformations));
         return this;
     }
 
@@ -209,8 +207,7 @@ public final class ImageRequest<T> {
      */
     @NonNull
     public ImageRequest<T> transform(@NonNull BitmapTransformation... transformations) {
-        checkNonNull(transformations);
-        Collections.addAll(transformations(), transformations);
+        Collections.addAll(transformations(), InternalUtils.requireNonNull(transformations));
         return this;
     }
 
@@ -443,12 +440,6 @@ public final class ImageRequest<T> {
     private void checkSize(int width, int height) {
         if (width < 1 || height < 1) {
             throw new IllegalArgumentException("Width and height should be greater than zero");
-        }
-    }
-
-    private void checkNonNull(Object value) {
-        if (value == null) {
-            throw new NullPointerException();
         }
     }
 }

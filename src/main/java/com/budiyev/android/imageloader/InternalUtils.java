@@ -247,4 +247,12 @@ final class InternalUtils {
         }
         return rotated;
     }
+
+    @NonNull
+    public static <T> T requireNonNull(@Nullable T value) {
+        if (value == null) {
+            throw new NullPointerException();
+        }
+        return value;
+    }
 }

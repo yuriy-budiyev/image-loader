@@ -131,8 +131,9 @@ public final class ImageLoader {
     public <T> void registerDataType(@NonNull Class<T> dataClass, @NonNull DataDescriptorFactory<T> descriptorFactory,
             @NonNull BitmapLoader<T> bitmapLoader) {
         String dataClassName = dataClass.getName();
-        mDescriptorFactories.put(dataClassName, (DataDescriptorFactory<Object>) descriptorFactory);
-        mBitmapLoaders.put(dataClassName, (BitmapLoader<Object>) bitmapLoader);
+        mDescriptorFactories
+                .put(dataClassName, (DataDescriptorFactory<Object>) InternalUtils.requireNonNull(descriptorFactory));
+        mBitmapLoaders.put(dataClassName, (BitmapLoader<Object>) InternalUtils.requireNonNull(bitmapLoader));
     }
 
     /**

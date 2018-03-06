@@ -29,6 +29,7 @@ import java.util.concurrent.ExecutorService;
 
 import android.content.Context;
 import android.net.Uri;
+import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -59,7 +60,7 @@ public final class ImageLoaderBuilder {
      * Memory cache with specified maximum size
      */
     @NonNull
-    public ImageLoaderBuilder memoryCache(int maxSize) {
+    public ImageLoaderBuilder memoryCache(@IntRange(from = 0) int maxSize) {
         mMemoryCache = new MemoryImageCache(maxSize);
         return this;
     }
@@ -88,7 +89,7 @@ public final class ImageLoaderBuilder {
      * located in subdirectory of {@link Context#getExternalCacheDir}
      */
     @NonNull
-    public ImageLoaderBuilder storageCache(long maxSize) {
+    public ImageLoaderBuilder storageCache(@IntRange(from = 0L) long maxSize) {
         mStorageCache = new StorageImageCache(mContext, maxSize);
         return this;
     }
@@ -100,7 +101,7 @@ public final class ImageLoaderBuilder {
      * @see CompressMode
      */
     @NonNull
-    public ImageLoaderBuilder storageCache(@NonNull CompressMode compressMode, long maxSize) {
+    public ImageLoaderBuilder storageCache(@NonNull CompressMode compressMode, @IntRange(from = 0L) long maxSize) {
         mStorageCache = new StorageImageCache(mContext, compressMode, maxSize);
         return this;
     }
@@ -118,7 +119,7 @@ public final class ImageLoaderBuilder {
      * Storage cache with specified directory and maximum size
      */
     @NonNull
-    public ImageLoaderBuilder storageCache(@NonNull File directory, long maxSize) {
+    public ImageLoaderBuilder storageCache(@NonNull File directory, @IntRange(from = 0L) long maxSize) {
         mStorageCache = new StorageImageCache(directory, maxSize);
         return this;
     }

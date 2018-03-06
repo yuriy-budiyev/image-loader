@@ -78,8 +78,11 @@ final class StorageImageCache implements ImageCache {
     }
 
     public StorageImageCache(@NonNull File directory, @NonNull CompressMode compressMode, long maxSize) {
-        mDirectory = directory;
-        mCompressMode = compressMode;
+        mDirectory = InternalUtils.requireNonNull(directory);
+        mCompressMode = InternalUtils.requireNonNull(compressMode);
+        if (maxSize < 0L) {
+            throw new IllegalArgumentException("Cache size should be greater than or equal to zero");
+        }
         mMaxSize = maxSize;
     }
 
