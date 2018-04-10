@@ -215,4 +215,11 @@ internal object InternalUtils {
         }
         return rotated
     }
+
+    fun <T> requireNonNull(value: T?): T {
+        if (value == null) {
+            throw NullPointerException()
+        }
+        return value
+    }
 }

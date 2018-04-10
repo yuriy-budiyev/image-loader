@@ -168,7 +168,7 @@ class ImageRequest<T> internal constructor(private val mResources: Resources,
      * @see BitmapTransformation
      */
     fun transform(transformation: BitmapTransformation): ImageRequest<T> {
-        transformations().add(transformation)
+        transformations().add(InternalUtils.requireNonNull(transformation))
         return this
     }
 
@@ -180,7 +180,7 @@ class ImageRequest<T> internal constructor(private val mResources: Resources,
      * @see BitmapTransformation
      */
     fun transform(transformations: Collection<BitmapTransformation>): ImageRequest<T> {
-        transformations().addAll(transformations)
+        transformations().addAll(InternalUtils.requireNonNull(transformations))
         return this
     }
 
