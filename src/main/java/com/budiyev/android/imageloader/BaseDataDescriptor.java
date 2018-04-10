@@ -28,7 +28,7 @@ import android.support.annotation.NonNull;
 abstract class BaseDataDescriptor<T> implements DataDescriptor<T> {
     private final T mData;
 
-    protected BaseDataDescriptor(@NonNull T data) {
+    protected BaseDataDescriptor(@NonNull final T data) {
         mData = data;
     }
 

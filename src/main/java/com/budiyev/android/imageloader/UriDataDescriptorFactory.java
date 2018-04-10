@@ -29,7 +29,7 @@ import android.support.annotation.NonNull;
 final class UriDataDescriptorFactory implements DataDescriptorFactory<Uri> {
     @NonNull
     @Override
-    public DataDescriptor<Uri> newDescriptor(@NonNull Uri data) {
+    public DataDescriptor<Uri> newDescriptor(@NonNull final Uri data) {
         return new UriDataDescriptor(data);
     }
 }

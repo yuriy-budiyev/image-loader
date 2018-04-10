@@ -28,7 +28,7 @@ import java.io.FileDescriptor;
 import android.support.annotation.NonNull;
 
 final class FileDescriptorDataDescriptor extends UnidentifiableDataDescriptor<FileDescriptor> {
-    public FileDescriptorDataDescriptor(@NonNull FileDescriptor data) {
+    public FileDescriptorDataDescriptor(@NonNull final FileDescriptor data) {
         super(data);
     }
 }

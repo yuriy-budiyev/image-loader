@@ -45,7 +45,7 @@ final class MemoryImageCache implements ImageCache {
         this(Math.round(Runtime.getRuntime().maxMemory() * DEFAULT_MEMORY_FRACTION));
     }
 
-    public MemoryImageCache(int maxSize) {
+    public MemoryImageCache(final int maxSize) {
         if (maxSize < 0) {
             throw new IllegalArgumentException("Cache size should be greater than or equal to zero");
         }
@@ -56,7 +56,7 @@ final class MemoryImageCache implements ImageCache {
 
     @Nullable
     @Override
-    public Bitmap get(@NonNull String key) {
+    public Bitmap get(@NonNull final String key) {
         mLock.lock();
         try {
             return mImages.get(key);
@@ -66,15 +66,15 @@ final class MemoryImageCache implements ImageCache {
     }
 
     @Override
-    public void put(@NonNull String key, @NonNull Bitmap value) {
+    public void put(@NonNull final String key, @NonNull final Bitmap value) {
         mLock.lock();
         try {
             int size = mSize;
             size += getBitmapSize(value);
             mImages.put(key, value);
-            int maxSize = mMaxSize;
+            final int maxSize = mMaxSize;
             if (size > maxSize) {
-                Iterator<Map.Entry<String, Bitmap>> i = mImages.entrySet().iterator();
+                final Iterator<Map.Entry<String, Bitmap>> i = mImages.entrySet().iterator();
                 while (i.hasNext()) {
                     size -= getBitmapSize(i.next().getValue());
                     i.remove();
@@ -90,13 +90,13 @@ final class MemoryImageCache implements ImageCache {
     }
 
     @Override
-    public void remove(@NonNull String key) {
+    public void remove(@NonNull final String key) {
         mLock.lock();
         try {
-            Iterator<Map.Entry<String, Bitmap>> i = mImages.entrySet().iterator();
+            final Iterator<Map.Entry<String, Bitmap>> i = mImages.entrySet().iterator();
             int size = mSize;
             while (i.hasNext()) {
-                Map.Entry<String, Bitmap> entry = i.next();
+                final Map.Entry<String, Bitmap> entry = i.next();
                 if (entry.getKey().startsWith(key)) {
                     size -= getBitmapSize(entry.getValue());
                     i.remove();
@@ -119,7 +119,7 @@ final class MemoryImageCache implements ImageCache {
         }
     }
 
-    private static int getBitmapSize(@NonNull Bitmap bitmap) {
+    private static int getBitmapSize(@NonNull final Bitmap bitmap) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             return bitmap.getAllocationByteCount();
         } else {

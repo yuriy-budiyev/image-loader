@@ -69,7 +69,7 @@ public final class ImageUtils {
      * @see BitmapTransformation
      */
     @NonNull
-    public static BitmapTransformation tint(@ColorInt int color) {
+    public static BitmapTransformation tint(@ColorInt final int color) {
         return new TintTransformation(color, PorterDuff.Mode.SRC_ATOP);
     }
 
@@ -81,7 +81,7 @@ public final class ImageUtils {
      * @see BitmapTransformation
      */
     @NonNull
-    public static BitmapTransformation tint(@ColorInt int color, @NonNull PorterDuff.Mode mode) {
+    public static BitmapTransformation tint(@ColorInt final int color, @NonNull final PorterDuff.Mode mode) {
         return new TintTransformation(color, mode);
     }
 
@@ -112,7 +112,7 @@ public final class ImageUtils {
      * @see BitmapTransformation
      */
     @NonNull
-    public static BitmapTransformation rotate(float rotationAngle) {
+    public static BitmapTransformation rotate(final float rotationAngle) {
         return new RotateTransformation(rotationAngle);
     }
 
@@ -135,7 +135,7 @@ public final class ImageUtils {
      * @see BitmapTransformation
      */
     @NonNull
-    public static BitmapTransformation roundCorners(float cornerRadius) {
+    public static BitmapTransformation roundCorners(final float cornerRadius) {
         return new RoundCornersTransformation(cornerRadius);
     }
 
@@ -156,7 +156,7 @@ public final class ImageUtils {
      * @see BitmapTransformation
      */
     @NonNull
-    public static BitmapTransformation cropCenter(int resultWidth, int resultHeight) {
+    public static BitmapTransformation cropCenter(final int resultWidth, final int resultHeight) {
         return new CropCenterTransformation(resultWidth, resultHeight);
     }
 
@@ -177,7 +177,7 @@ public final class ImageUtils {
      * @see BitmapTransformation
      */
     @NonNull
-    public static BitmapTransformation fitCenter(int resultWidth, int resultHeight) {
+    public static BitmapTransformation fitCenter(final int resultWidth, final int resultHeight) {
         return new FitCenterTransformation(resultWidth, resultHeight);
     }
 
@@ -187,7 +187,7 @@ public final class ImageUtils {
      * @see BitmapTransformation
      */
     @NonNull
-    public static BitmapTransformation scaleToFit(int resultWidth, int resultHeight) {
+    public static BitmapTransformation scaleToFit(final int resultWidth, final int resultHeight) {
         return new ScaleToFitTransformation(resultWidth, resultHeight, false);
     }
 
@@ -198,7 +198,8 @@ public final class ImageUtils {
      * @see BitmapTransformation
      */
     @NonNull
-    public static BitmapTransformation scaleToFit(int resultWidth, int resultHeight, boolean upscale) {
+    public static BitmapTransformation scaleToFit(final int resultWidth, final int resultHeight,
+            final boolean upscale) {
         return new ScaleToFitTransformation(resultWidth, resultHeight, upscale);
     }
 
@@ -209,7 +210,7 @@ public final class ImageUtils {
      * @return Inverted image
      */
     @NonNull
-    public static Bitmap invertColors(@NonNull Bitmap image) {
+    public static Bitmap invertColors(@NonNull final Bitmap image) {
         return applyColorFilter(image, new ColorMatrixColorFilter(
                 new float[] {-1, 0, 0, 0, 255, 0, -1, 0, 0, 255, 0, 0, -1, 0, 255, 0, 0, 0, 1, 0}));
     }
@@ -221,8 +222,8 @@ public final class ImageUtils {
      * @return Converted image
      */
     @NonNull
-    public static Bitmap convertToGrayScale(@NonNull Bitmap image) {
-        ColorMatrix colorMatrix = new ColorMatrix();
+    public static Bitmap convertToGrayScale(@NonNull final Bitmap image) {
+        final ColorMatrix colorMatrix = new ColorMatrix();
         colorMatrix.setSaturation(0f);
         return applyColorFilter(image, new ColorMatrixColorFilter(colorMatrix));
     }
@@ -234,7 +235,7 @@ public final class ImageUtils {
      * @return Converted image
      */
     @NonNull
-    public static Bitmap tint(@NonNull Bitmap image, @ColorInt int color) {
+    public static Bitmap tint(@NonNull final Bitmap image, @ColorInt final int color) {
         return tint(image, color, PorterDuff.Mode.SRC_ATOP);
     }
 
@@ -245,8 +246,9 @@ public final class ImageUtils {
      * @return Converted image
      */
     @NonNull
-    public static Bitmap tint(@NonNull Bitmap image, @ColorInt int color, @NonNull PorterDuff.Mode mode) {
-        ColorMatrix colorMatrix = new ColorMatrix();
+    public static Bitmap tint(@NonNull final Bitmap image, @ColorInt final int color,
+            @NonNull final PorterDuff.Mode mode) {
+        final ColorMatrix colorMatrix = new ColorMatrix();
         colorMatrix.setSaturation(0f);
         return applyColorFilter(image, new PorterDuffColorFilter(color, mode));
     }
@@ -259,10 +261,10 @@ public final class ImageUtils {
      * @return Filtered image
      */
     @NonNull
-    public static Bitmap applyColorFilter(@NonNull Bitmap image, @NonNull ColorFilter colorFilter) {
-        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
+    public static Bitmap applyColorFilter(@NonNull final Bitmap image, @NonNull final ColorFilter colorFilter) {
+        final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
         paint.setColorFilter(colorFilter);
-        Bitmap bitmap = Bitmap.createBitmap(image.getWidth(), image.getHeight(), Bitmap.Config.ARGB_8888);
+        final Bitmap bitmap = Bitmap.createBitmap(image.getWidth(), image.getHeight(), Bitmap.Config.ARGB_8888);
         bitmap.setDensity(image.getDensity());
         new Canvas(bitmap).drawBitmap(image, 0f, 0f, paint);
         return bitmap;
@@ -275,8 +277,8 @@ public final class ImageUtils {
      * @return Mirrored image
      */
     @NonNull
-    public static Bitmap mirrorHorizontally(@NonNull Bitmap image) {
-        Matrix matrix = new Matrix();
+    public static Bitmap mirrorHorizontally(@NonNull final Bitmap image) {
+        final Matrix matrix = new Matrix();
         matrix.setScale(-1f, 1f);
         return Bitmap.createBitmap(image, 0, 0, image.getWidth(), image.getHeight(), matrix, true);
     }
@@ -288,8 +290,8 @@ public final class ImageUtils {
      * @return Mirrored image
      */
     @NonNull
-    public static Bitmap mirrorVertically(@NonNull Bitmap image) {
-        Matrix matrix = new Matrix();
+    public static Bitmap mirrorVertically(@NonNull final Bitmap image) {
+        final Matrix matrix = new Matrix();
         matrix.setScale(1f, -1f);
         return Bitmap.createBitmap(image, 0, 0, image.getWidth(), image.getHeight(), matrix, true);
     }
@@ -302,8 +304,8 @@ public final class ImageUtils {
      * @return Rotated image
      */
     @NonNull
-    public static Bitmap rotate(@NonNull Bitmap image, float rotationAngle) {
-        Matrix matrix = new Matrix();
+    public static Bitmap rotate(@NonNull final Bitmap image, final float rotationAngle) {
+        final Matrix matrix = new Matrix();
         matrix.setRotate(rotationAngle);
         return Bitmap.createBitmap(image, 0, 0, image.getWidth(), image.getHeight(), matrix, true);
     }
@@ -316,16 +318,16 @@ public final class ImageUtils {
      * @return Image with rounded corners
      */
     @NonNull
-    public static Bitmap roundCorners(@NonNull Bitmap image, float cornerRadius) {
-        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
+    public static Bitmap roundCorners(@NonNull final Bitmap image, final float cornerRadius) {
+        final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
         paint.setColor(0xff424242);
-        int width = image.getWidth();
-        int height = image.getHeight();
-        Rect rect = new Rect(0, 0, width, height);
-        RectF rectF = new RectF(rect);
-        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        final int width = image.getWidth();
+        final int height = image.getHeight();
+        final Rect rect = new Rect(0, 0, width, height);
+        final RectF rectF = new RectF(rect);
+        final Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         bitmap.setDensity(image.getDensity());
-        Canvas canvas = new Canvas(bitmap);
+        final Canvas canvas = new Canvas(bitmap);
         canvas.drawARGB(0, 0, 0, 0);
         canvas.drawRoundRect(rectF, cornerRadius, cornerRadius, paint);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
@@ -340,8 +342,8 @@ public final class ImageUtils {
      * @return Cropped image or source image
      */
     @NonNull
-    public static Bitmap cropCenter(@NonNull Bitmap image) {
-        int size = Math.min(image.getWidth(), image.getHeight());
+    public static Bitmap cropCenter(@NonNull final Bitmap image) {
+        final int size = Math.min(image.getWidth(), image.getHeight());
         return cropCenter(image, size, size);
     }
 
@@ -357,25 +359,25 @@ public final class ImageUtils {
      * @return Cropped (and/or resized) image or source image
      */
     @NonNull
-    public static Bitmap cropCenter(@NonNull Bitmap image, int resultWidth, int resultHeight) {
-        int sourceWidth = image.getWidth();
-        int sourceHeight = image.getHeight();
+    public static Bitmap cropCenter(@NonNull final Bitmap image, final int resultWidth, final int resultHeight) {
+        final int sourceWidth = image.getWidth();
+        final int sourceHeight = image.getHeight();
         if (sourceWidth == resultWidth && sourceHeight == resultHeight) {
             return image;
         }
-        int sourceDivisor = greatestCommonDivisor(sourceWidth, sourceHeight);
-        int sourceRatioWidth = sourceWidth / sourceDivisor;
-        int sourceRatioHeight = sourceHeight / sourceDivisor;
-        int resultDivisor = greatestCommonDivisor(resultWidth, resultHeight);
-        int resultRatioWidth = resultWidth / resultDivisor;
-        int resultRatioHeight = resultHeight / resultDivisor;
+        final int sourceDivisor = greatestCommonDivisor(sourceWidth, sourceHeight);
+        final int sourceRatioWidth = sourceWidth / sourceDivisor;
+        final int sourceRatioHeight = sourceHeight / sourceDivisor;
+        final int resultDivisor = greatestCommonDivisor(resultWidth, resultHeight);
+        final int resultRatioWidth = resultWidth / resultDivisor;
+        final int resultRatioHeight = resultHeight / resultDivisor;
         if (sourceRatioWidth == resultRatioWidth && sourceRatioHeight == resultRatioHeight) {
             return Bitmap.createScaledBitmap(image, resultWidth, resultHeight, true);
         }
-        Bitmap cropped;
-        int cropWidth = resultRatioWidth * sourceHeight / resultRatioHeight;
+        final Bitmap cropped;
+        final int cropWidth = resultRatioWidth * sourceHeight / resultRatioHeight;
         if (cropWidth > sourceWidth) {
-            int cropHeight = resultRatioHeight * sourceWidth / resultRatioWidth;
+            final int cropHeight = resultRatioHeight * sourceWidth / resultRatioWidth;
             cropped = Bitmap.createBitmap(image, 0, (sourceHeight - cropHeight) / 2, sourceWidth, cropHeight);
             if (cropHeight == resultHeight && sourceWidth == resultWidth) {
                 return cropped;
@@ -386,7 +388,7 @@ public final class ImageUtils {
                 return cropped;
             }
         }
-        Bitmap scaled = Bitmap.createScaledBitmap(cropped, resultWidth, resultHeight, true);
+        final Bitmap scaled = Bitmap.createScaledBitmap(cropped, resultWidth, resultHeight, true);
         if (cropped != image && cropped != scaled) {
             cropped.recycle();
         }
@@ -400,8 +402,8 @@ public final class ImageUtils {
      * @return Frame image with source image drawn in center or source image
      */
     @NonNull
-    public static Bitmap fitCenter(@NonNull Bitmap image) {
-        int size = Math.max(image.getWidth(), image.getHeight());
+    public static Bitmap fitCenter(@NonNull final Bitmap image) {
+        final int size = Math.max(image.getWidth(), image.getHeight());
         return fitCenter(image, size, size);
     }
 
@@ -418,32 +420,32 @@ public final class ImageUtils {
      * or scaled image
      */
     @NonNull
-    public static Bitmap fitCenter(@NonNull Bitmap image, int resultWidth, int resultHeight) {
-        int sourceWidth = image.getWidth();
-        int sourceHeight = image.getHeight();
+    public static Bitmap fitCenter(@NonNull final Bitmap image, final int resultWidth, final int resultHeight) {
+        final int sourceWidth = image.getWidth();
+        final int sourceHeight = image.getHeight();
         if (sourceWidth == resultWidth && sourceHeight == resultHeight) {
             return image;
         }
-        int sourceDivisor = greatestCommonDivisor(sourceWidth, sourceHeight);
-        int sourceRatioWidth = sourceWidth / sourceDivisor;
-        int sourceRatioHeight = sourceHeight / sourceDivisor;
-        int resultDivisor = greatestCommonDivisor(resultWidth, resultHeight);
-        int resultRatioWidth = resultWidth / resultDivisor;
-        int resultRatioHeight = resultHeight / resultDivisor;
+        final int sourceDivisor = greatestCommonDivisor(sourceWidth, sourceHeight);
+        final int sourceRatioWidth = sourceWidth / sourceDivisor;
+        final int sourceRatioHeight = sourceHeight / sourceDivisor;
+        final int resultDivisor = greatestCommonDivisor(resultWidth, resultHeight);
+        final int resultRatioWidth = resultWidth / resultDivisor;
+        final int resultRatioHeight = resultHeight / resultDivisor;
         if (sourceRatioWidth == resultRatioWidth && sourceRatioHeight == resultRatioHeight) {
             return Bitmap.createScaledBitmap(image, resultWidth, resultHeight, true);
         }
-        Bitmap result = Bitmap.createBitmap(resultWidth, resultHeight, Bitmap.Config.ARGB_8888);
+        final Bitmap result = Bitmap.createBitmap(resultWidth, resultHeight, Bitmap.Config.ARGB_8888);
         result.setDensity(image.getDensity());
-        Canvas canvas = new Canvas(result);
-        int fitWidth = sourceRatioWidth * resultHeight / sourceRatioHeight;
+        final Canvas canvas = new Canvas(result);
+        final int fitWidth = sourceRatioWidth * resultHeight / sourceRatioHeight;
         if (fitWidth > resultWidth) {
-            int fitHeight = sourceRatioHeight * resultWidth / sourceRatioWidth;
-            int top = (resultHeight - fitHeight) / 2;
+            final int fitHeight = sourceRatioHeight * resultWidth / sourceRatioWidth;
+            final int top = (resultHeight - fitHeight) / 2;
             canvas.drawBitmap(image, null, new Rect(0, top, resultWidth, top + fitHeight),
                     new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG));
         } else {
-            int left = (resultWidth - fitWidth) / 2;
+            final int left = (resultWidth - fitWidth) / 2;
             canvas.drawBitmap(image, null, new Rect(left, 0, left + fitWidth, resultHeight),
                     new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG));
         }
@@ -461,7 +463,7 @@ public final class ImageUtils {
      * @return Scaled image or original image
      */
     @NonNull
-    public static Bitmap scaleToFit(@NonNull Bitmap image, int resultWidth, int resultHeight) {
+    public static Bitmap scaleToFit(@NonNull final Bitmap image, final int resultWidth, final int resultHeight) {
         return scaleToFit(image, resultWidth, resultHeight, false);
     }
 
@@ -477,30 +479,31 @@ public final class ImageUtils {
      * @return Scaled image or original image
      */
     @NonNull
-    public static Bitmap scaleToFit(@NonNull Bitmap image, int resultWidth, int resultHeight, boolean upscale) {
-        int sourceWidth = image.getWidth();
-        int sourceHeight = image.getHeight();
+    public static Bitmap scaleToFit(@NonNull final Bitmap image, final int resultWidth, final int resultHeight,
+            final boolean upscale) {
+        final int sourceWidth = image.getWidth();
+        final int sourceHeight = image.getHeight();
         if (sourceWidth == resultWidth && sourceHeight == resultHeight) {
             return image;
         }
         if (!upscale && sourceWidth < resultWidth && sourceHeight < resultHeight) {
             return image;
         }
-        int sourceDivisor = greatestCommonDivisor(sourceWidth, sourceHeight);
-        int sourceRatioWidth = sourceWidth / sourceDivisor;
-        int sourceRatioHeight = sourceHeight / sourceDivisor;
-        int resultDivisor = greatestCommonDivisor(resultWidth, resultHeight);
-        int resultRatioWidth = resultWidth / resultDivisor;
-        int resultRatioHeight = resultHeight / resultDivisor;
+        final int sourceDivisor = greatestCommonDivisor(sourceWidth, sourceHeight);
+        final int sourceRatioWidth = sourceWidth / sourceDivisor;
+        final int sourceRatioHeight = sourceHeight / sourceDivisor;
+        final int resultDivisor = greatestCommonDivisor(resultWidth, resultHeight);
+        final int resultRatioWidth = resultWidth / resultDivisor;
+        final int resultRatioHeight = resultHeight / resultDivisor;
         if (sourceRatioWidth == resultRatioWidth && sourceRatioHeight == resultRatioHeight) {
             return Bitmap.createScaledBitmap(image, resultWidth, resultHeight, true);
         }
-        int fitWidth = sourceRatioWidth * resultHeight / sourceRatioHeight;
+        final int fitWidth = sourceRatioWidth * resultHeight / sourceRatioHeight;
         if (fitWidth > resultWidth) {
             if (sourceWidth == resultWidth) {
                 return image;
             } else {
-                int fitHeight = sourceRatioHeight * resultWidth / sourceRatioWidth;
+                final int fitHeight = sourceRatioHeight * resultWidth / sourceRatioWidth;
                 return Bitmap.createScaledBitmap(image, resultWidth, fitHeight, true);
             }
         } else {
@@ -526,7 +529,7 @@ public final class ImageUtils {
     private static final class InvertColorsTransformation implements BitmapTransformation {
         @NonNull
         @Override
-        public Bitmap transform(@NonNull Bitmap bitmap) throws Throwable {
+        public Bitmap transform(@NonNull final Bitmap bitmap) throws Throwable {
             return invertColors(bitmap);
         }
 
@@ -540,7 +543,7 @@ public final class ImageUtils {
     private static final class GrayScaleTransformation implements BitmapTransformation {
         @NonNull
         @Override
-        public Bitmap transform(@NonNull Bitmap bitmap) throws Throwable {
+        public Bitmap transform(@NonNull final Bitmap bitmap) throws Throwable {
             return convertToGrayScale(bitmap);
         }
 
@@ -556,7 +559,7 @@ public final class ImageUtils {
         private final PorterDuff.Mode mMode;
         private final String mKey;
 
-        private TintTransformation(@ColorInt int color, @NonNull PorterDuff.Mode mode) {
+        private TintTransformation(@ColorInt final int color, @NonNull final PorterDuff.Mode mode) {
             mColor = color;
             mMode = mode;
             mKey = "_tint_" + color + "_" + mode;
@@ -564,7 +567,7 @@ public final class ImageUtils {
 
         @NonNull
         @Override
-        public Bitmap transform(@NonNull Bitmap bitmap) throws Throwable {
+        public Bitmap transform(@NonNull final Bitmap bitmap) throws Throwable {
             return tint(bitmap, mColor, mMode);
         }
 
@@ -578,7 +581,7 @@ public final class ImageUtils {
     private static final class MirrorHorizontallyTransformation implements BitmapTransformation {
         @NonNull
         @Override
-        public Bitmap transform(@NonNull Bitmap bitmap) throws Throwable {
+        public Bitmap transform(@NonNull final Bitmap bitmap) throws Throwable {
             return mirrorHorizontally(bitmap);
         }
 
@@ -592,7 +595,7 @@ public final class ImageUtils {
     private static final class MirrorVerticallyTransformation implements BitmapTransformation {
         @NonNull
         @Override
-        public Bitmap transform(@NonNull Bitmap bitmap) throws Throwable {
+        public Bitmap transform(@NonNull final Bitmap bitmap) throws Throwable {
             return mirrorVertically(bitmap);
         }
 
@@ -615,7 +618,7 @@ public final class ImageUtils {
 
         @NonNull
         @Override
-        public Bitmap transform(@NonNull Bitmap bitmap) throws Throwable {
+        public Bitmap transform(@NonNull final Bitmap bitmap) throws Throwable {
             return rotate(bitmap, mAngle);
         }
 
@@ -630,7 +633,7 @@ public final class ImageUtils {
         private final float mRadius;
         private final String mKey;
 
-        public RoundCornersTransformation(float radius) {
+        public RoundCornersTransformation(final float radius) {
             mRadius = radius;
             mKey = "_round_corners_" + radius;
         }
@@ -642,7 +645,7 @@ public final class ImageUtils {
 
         @NonNull
         @Override
-        public Bitmap transform(@NonNull Bitmap bitmap) throws Throwable {
+        public Bitmap transform(@NonNull final Bitmap bitmap) throws Throwable {
             float radius = mRadius;
             if (radius == -1f) {
                 radius = Math.min(bitmap.getWidth(), bitmap.getHeight()) / 2f;
@@ -662,7 +665,7 @@ public final class ImageUtils {
         private final int mHeight;
         private final String mKey;
 
-        public CropCenterTransformation(int width, int height) {
+        public CropCenterTransformation(final int width, final int height) {
             mWidth = width;
             mHeight = height;
             mKey = "_crop_center_" + width + "x" + height;
@@ -676,7 +679,7 @@ public final class ImageUtils {
 
         @NonNull
         @Override
-        public Bitmap transform(@NonNull Bitmap bitmap) throws Throwable {
+        public Bitmap transform(@NonNull final Bitmap bitmap) throws Throwable {
             if (mWidth > 0 && mHeight > 0) {
                 return cropCenter(bitmap, mWidth, mHeight);
             } else {
@@ -702,7 +705,7 @@ public final class ImageUtils {
             mKey = "_fit_center_square";
         }
 
-        public FitCenterTransformation(int width, int height) {
+        public FitCenterTransformation(final int width, final int height) {
             mWidth = width;
             mHeight = height;
             mKey = "_fit_center_" + width + "x" + height;
@@ -710,7 +713,7 @@ public final class ImageUtils {
 
         @NonNull
         @Override
-        public Bitmap transform(@NonNull Bitmap bitmap) throws Throwable {
+        public Bitmap transform(@NonNull final Bitmap bitmap) throws Throwable {
             if (mWidth > 0 && mHeight > 0) {
                 return fitCenter(bitmap, mWidth, mHeight);
             } else {
@@ -731,7 +734,7 @@ public final class ImageUtils {
         private final boolean mUpscale;
         private final String mKey;
 
-        public ScaleToFitTransformation(int width, int height, boolean upscale) {
+        public ScaleToFitTransformation(final int width, final int height, final boolean upscale) {
             mWidth = width;
             mHeight = height;
             mUpscale = upscale;
@@ -740,7 +743,7 @@ public final class ImageUtils {
 
         @NonNull
         @Override
-        public Bitmap transform(@NonNull Bitmap bitmap) throws Throwable {
+        public Bitmap transform(@NonNull final Bitmap bitmap) throws Throwable {
             return scaleToFit(bitmap, mWidth, mHeight, mUpscale);
         }
 

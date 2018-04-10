@@ -78,10 +78,11 @@ public final class ImageRequest<T> {
     private boolean mStorageCacheEnabled = true;
     private boolean mExecuted;
 
-    ImageRequest(@NonNull Resources resources, @NonNull ExecutorService loadExecutor,
-            @NonNull ExecutorService cacheExecutor, @NonNull PauseLock pauseLock, @NonNull Handler mainThreadHandler,
-            @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache, @NonNull BitmapLoader<T> bitmapLoader,
-            @NonNull DataDescriptor<T> descriptor) {
+    ImageRequest(@NonNull final Resources resources, @NonNull final ExecutorService loadExecutor,
+            @NonNull final ExecutorService cacheExecutor, @NonNull final PauseLock pauseLock,
+            @NonNull final Handler mainThreadHandler, @Nullable final ImageCache memoryCache,
+            @Nullable final ImageCache storageCache, @NonNull final BitmapLoader<T> bitmapLoader,
+            @NonNull final DataDescriptor<T> descriptor) {
         mResources = resources;
         mLoadExecutor = loadExecutor;
         mCacheExecutor = cacheExecutor;
@@ -97,7 +98,7 @@ public final class ImageRequest<T> {
      * Required image size
      */
     @NonNull
-    public ImageRequest<T> size(@Nullable Size requiredSize) {
+    public ImageRequest<T> size(@Nullable final Size requiredSize) {
         if (requiredSize != null) {
             checkSize(requiredSize.getWidth(), requiredSize.getHeight());
         }
@@ -109,7 +110,7 @@ public final class ImageRequest<T> {
      * Required image size
      */
     @NonNull
-    public ImageRequest<T> size(@Px int requiredWidth, @Px int requiredHeight) {
+    public ImageRequest<T> size(@Px final int requiredWidth, @Px final int requiredHeight) {
         checkSize(requiredWidth, requiredHeight);
         mRequiredSize = new Size(requiredWidth, requiredHeight);
         return this;
@@ -131,7 +132,7 @@ public final class ImageRequest<T> {
      * and image view scale type
      */
     @NonNull
-    public ImageRequest<T> roundCorners(@FloatRange(from = 0f, to = Float.MAX_VALUE) float radius) {
+    public ImageRequest<T> roundCorners(@FloatRange(from = 0f, to = Float.MAX_VALUE) final float radius) {
         if (radius < 0f) {
             throw new IllegalArgumentException("Corner radius should be greater than or equal to zero");
         }
@@ -143,7 +144,7 @@ public final class ImageRequest<T> {
      * Placeholder
      */
     @NonNull
-    public ImageRequest<T> placeholder(@Nullable Drawable placeholder) {
+    public ImageRequest<T> placeholder(@Nullable final Drawable placeholder) {
         mPlaceholder = placeholder;
         return this;
     }
@@ -152,7 +153,7 @@ public final class ImageRequest<T> {
      * Placeholder
      */
     @NonNull
-    public ImageRequest<T> placeholder(@DrawableRes int resId) {
+    public ImageRequest<T> placeholder(@DrawableRes final int resId) {
         mPlaceholder = mResources.getDrawable(resId);
         return this;
     }
@@ -161,7 +162,7 @@ public final class ImageRequest<T> {
      * Error drawable, that will be displayed when image, couldn't be loaded
      */
     @NonNull
-    public ImageRequest<T> errorDrawable(@Nullable Drawable errorDrawable) {
+    public ImageRequest<T> errorDrawable(@Nullable final Drawable errorDrawable) {
         mErrorDrawable = errorDrawable;
         return this;
     }
@@ -170,7 +171,7 @@ public final class ImageRequest<T> {
      * Error drawable, that will be displayed when image, couldn't be loaded
      */
     @NonNull
-    public ImageRequest<T> errorDrawable(@DrawableRes int resId) {
+    public ImageRequest<T> errorDrawable(@DrawableRes final int resId) {
         mErrorDrawable = mResources.getDrawable(resId);
         return this;
     }
@@ -182,7 +183,7 @@ public final class ImageRequest<T> {
      * @see BitmapTransformation
      */
     @NonNull
-    public ImageRequest<T> transform(@NonNull BitmapTransformation transformation) {
+    public ImageRequest<T> transform(@NonNull final BitmapTransformation transformation) {
         transformations().add(InternalUtils.requireNonNull(transformation));
         return this;
     }
@@ -194,7 +195,7 @@ public final class ImageRequest<T> {
      * @see BitmapTransformation
      */
     @NonNull
-    public ImageRequest<T> transform(@NonNull Collection<BitmapTransformation> transformations) {
+    public ImageRequest<T> transform(@NonNull final Collection<BitmapTransformation> transformations) {
         transformations().addAll(InternalUtils.requireNonNull(transformations));
         return this;
     }
@@ -206,7 +207,7 @@ public final class ImageRequest<T> {
      * @see BitmapTransformation
      */
     @NonNull
-    public ImageRequest<T> transform(@NonNull BitmapTransformation... transformations) {
+    public ImageRequest<T> transform(@NonNull final BitmapTransformation... transformations) {
         Collections.addAll(transformations(), InternalUtils.requireNonNull(transformations));
         return this;
     }
@@ -238,7 +239,7 @@ public final class ImageRequest<T> {
      * supported on API 19+
      */
     @NonNull
-    public ImageRequest<T> fade(@IntRange(from = 0L) long duration) {
+    public ImageRequest<T> fade(@IntRange(from = 0L) final long duration) {
         if (duration < 0L) {
             throw new IllegalArgumentException("Fade duration should be greater than or equal to zero");
         }
@@ -251,7 +252,7 @@ public final class ImageRequest<T> {
      * Load callback
      */
     @NonNull
-    public ImageRequest<T> onLoaded(@Nullable LoadCallback callback) {
+    public ImageRequest<T> onLoaded(@Nullable final LoadCallback callback) {
         mLoadCallback = callback;
         return this;
     }
@@ -260,7 +261,7 @@ public final class ImageRequest<T> {
      * Error callback
      */
     @NonNull
-    public ImageRequest<T> onError(@Nullable ErrorCallback callback) {
+    public ImageRequest<T> onError(@Nullable final ErrorCallback callback) {
         mErrorCallback = callback;
         return this;
     }
@@ -269,7 +270,7 @@ public final class ImageRequest<T> {
      * Display callback
      */
     @NonNull
-    public ImageRequest<T> onDisplayed(@Nullable DisplayCallback callback) {
+    public ImageRequest<T> onDisplayed(@Nullable final DisplayCallback callback) {
         mDisplayCallback = callback;
         return this;
     }
@@ -331,22 +332,22 @@ public final class ImageRequest<T> {
      */
     @NonNull
     @MainThread
-    public ImageRequestDelegate load(@NonNull View view) {
+    public ImageRequestDelegate load(@NonNull final View view) {
         checkAndSetExecutedState();
-        Resources resources = mResources;
-        DataDescriptor<T> descriptor = mDescriptor;
-        Size requiredSize = mRequiredSize;
-        BitmapTransformation transformation = getTransformation();
-        LoadCallback loadCallback = mLoadCallback;
-        DisplayCallback displayCallback = mDisplayCallback;
-        ImageCache memoryCache = getMemoryCache();
-        float cornerRadius = mCornerRadius;
+        final Resources resources = mResources;
+        final DataDescriptor<T> descriptor = mDescriptor;
+        final Size requiredSize = mRequiredSize;
+        final BitmapTransformation transformation = getTransformation();
+        final LoadCallback loadCallback = mLoadCallback;
+        final DisplayCallback displayCallback = mDisplayCallback;
+        final ImageCache memoryCache = getMemoryCache();
+        final float cornerRadius = mCornerRadius;
         Bitmap image = null;
-        String key = InternalUtils.buildFullKey(descriptor.getKey(), requiredSize, transformation);
+        final String key = InternalUtils.buildFullKey(descriptor.getKey(), requiredSize, transformation);
         if (key != null && memoryCache != null) {
             image = memoryCache.get(key);
         }
-        DisplayImageAction<?> currentAction = InternalUtils.getDisplayImageAction(view);
+        final DisplayImageAction<?> currentAction = InternalUtils.getDisplayImageAction(view);
         if (image != null) {
             if (currentAction != null) {
                 currentAction.cancel();
@@ -374,7 +375,7 @@ public final class ImageRequest<T> {
         if (placeholder == null) {
             placeholder = new ColorDrawable(Color.TRANSPARENT);
         }
-        DisplayImageAction<T> action =
+        final DisplayImageAction<T> action =
                 new DisplayImageAction<>(resources, view, descriptor, mBitmapLoader, requiredSize, transformation,
                         placeholder, mErrorDrawable, memoryCache, getStorageCache(), mCacheExecutor, loadCallback,
                         mErrorCallback, displayCallback, mPauseLock, mMainThreadHandler, mFadeEnabled, mFadeDuration,
@@ -408,7 +409,7 @@ public final class ImageRequest<T> {
 
     @Nullable
     private BitmapTransformation getTransformation() {
-        List<BitmapTransformation> t = mTransformations;
+        final List<BitmapTransformation> t = mTransformations;
         if (t != null && !t.isEmpty()) {
             if (t.size() == 1) {
                 return t.get(0);
@@ -437,7 +438,7 @@ public final class ImageRequest<T> {
         mExecuted = true;
     }
 
-    private void checkSize(int width, int height) {
+    private void checkSize(final int width, final int height) {
         if (width < 1 || height < 1) {
             throw new IllegalArgumentException("Width and height should be greater than zero");
         }

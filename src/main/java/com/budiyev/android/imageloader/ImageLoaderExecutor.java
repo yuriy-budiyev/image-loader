@@ -34,20 +34,20 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 final class ImageLoaderExecutor extends ThreadPoolExecutor {
-    public ImageLoaderExecutor(int poolSize) {
+    public ImageLoaderExecutor(final int poolSize) {
         super(poolSize, poolSize, 0L, TimeUnit.NANOSECONDS, new LinkedBlockingQueue<Runnable>(),
                 new ImageLoaderThreadFactory(), new DiscardPolicy());
     }
 
     @Override
-    protected void afterExecute(@NonNull Runnable r, @Nullable Throwable t) {
+    protected void afterExecute(@NonNull final Runnable r, @Nullable final Throwable t) {
         if (t == null && r instanceof Future<?>) {
-            Future<?> f = (Future<?>) r;
+            final Future<?> f = (Future<?>) r;
             if (f.isDone()) {
                 try {
                     f.get();
                 } catch (InterruptedException | CancellationException ignored) {
-                } catch (ExecutionException e) {
+                } catch (final ExecutionException e) {
                     throw new RuntimeException(e.getCause());
                 }
             }

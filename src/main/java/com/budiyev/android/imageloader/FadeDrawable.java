@@ -45,7 +45,8 @@ final class FadeDrawable extends LayerDrawable {
     private int mFadeState = STATE_IDLE;
     private boolean mIgnoreInvalidation;
 
-    public FadeDrawable(@NonNull Drawable startDrawable, @NonNull Drawable endDrawable, long fadeDuration) {
+    public FadeDrawable(@NonNull final Drawable startDrawable, @NonNull final Drawable endDrawable,
+            final long fadeDuration) {
         super(new Drawable[] {startDrawable, endDrawable});
         mFadeDuration = fadeDuration;
         mStartAlpha = startDrawable.getAlpha();
@@ -53,7 +54,7 @@ final class FadeDrawable extends LayerDrawable {
     }
 
     @Override
-    public void draw(Canvas canvas) {
+    public void draw(final Canvas canvas) {
         switch (mFadeState) {
             case STATE_IDLE: {
                 getDrawable(START_DRAWABLE).draw(canvas);
@@ -64,11 +65,11 @@ final class FadeDrawable extends LayerDrawable {
             }
             case STATE_RUNNING: {
                 mIgnoreInvalidation = true;
-                long elapsed = SystemClock.uptimeMillis() - mStartTime;
-                int endAlpha = (int) (mEndAlpha * elapsed / mFadeDuration);
-                Drawable startDrawable = getDrawable(START_DRAWABLE);
-                Drawable endDrawable = getDrawable(END_DRAWABLE);
-                boolean done = endAlpha >= mEndAlpha;
+                final long elapsed = SystemClock.uptimeMillis() - mStartTime;
+                final int endAlpha = (int) (mEndAlpha * elapsed / mFadeDuration);
+                final Drawable startDrawable = getDrawable(START_DRAWABLE);
+                final Drawable endDrawable = getDrawable(END_DRAWABLE);
+                final boolean done = endAlpha >= mEndAlpha;
                 if (done) {
                     mFadeState = STATE_DONE;
                     endDrawable.setAlpha(mEndAlpha);
@@ -100,7 +101,7 @@ final class FadeDrawable extends LayerDrawable {
     }
 
     @Override
-    public void invalidateDrawable(@NonNull Drawable drawable) {
+    public void invalidateDrawable(@NonNull final Drawable drawable) {
         if (!mIgnoreInvalidation) {
             super.invalidateDrawable(drawable);
         }

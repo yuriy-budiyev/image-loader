@@ -33,14 +33,14 @@ import android.support.annotation.Nullable;
 final class ResourceBitmapLoader implements BitmapLoader<Integer> {
     private final Context mContext;
 
-    public ResourceBitmapLoader(@NonNull Context context) {
+    public ResourceBitmapLoader(@NonNull final Context context) {
         mContext = context;
     }
 
     @Nullable
     @Override
-    public Bitmap load(@NonNull Integer data, @Nullable Size requiredSize) throws Throwable {
-        Resources resources = mContext.getResources();
+    public Bitmap load(@NonNull final Integer data, @Nullable final Size requiredSize) throws Throwable {
+        final Resources resources = mContext.getResources();
         if (requiredSize != null) {
             return DataUtils
                     .loadSampledBitmapFromResource(resources, data, requiredSize.getWidth(), requiredSize.getHeight());

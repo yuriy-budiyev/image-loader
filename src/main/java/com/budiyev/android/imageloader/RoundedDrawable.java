@@ -49,18 +49,18 @@ final class RoundedDrawable extends Drawable {
     private final int mWidth;
     private final int mHeight;
 
-    public RoundedDrawable(@NonNull Resources resources, @NonNull Bitmap bitmap, float cornerRadius) {
+    public RoundedDrawable(@NonNull final Resources resources, @NonNull final Bitmap bitmap, final float cornerRadius) {
         mShader = new BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
         mPaint.setShader(mShader);
         mBitmap = bitmap;
-        int density = resources.getDisplayMetrics().densityDpi;
+        final int density = resources.getDisplayMetrics().densityDpi;
         mWidth = bitmap.getScaledWidth(density);
         mHeight = bitmap.getScaledHeight(density);
         mCornerRadius = cornerRadius;
     }
 
     @Override
-    public void draw(@NonNull Canvas canvas) {
+    public void draw(@NonNull final Canvas canvas) {
         float cornerRadius = mCornerRadius;
         if (cornerRadius > 0.5f) {
             canvas.drawRoundRect(mDrawRect, cornerRadius, cornerRadius, mPaint);
@@ -73,13 +73,13 @@ final class RoundedDrawable extends Drawable {
     }
 
     @Override
-    public void setAlpha(int alpha) {
+    public void setAlpha(final int alpha) {
         mPaint.setAlpha(alpha);
         invalidateSelf();
     }
 
     @Override
-    public void setColorFilter(@Nullable ColorFilter colorFilter) {
+    public void setColorFilter(@Nullable final ColorFilter colorFilter) {
         mPaint.setColorFilter(colorFilter);
         invalidateSelf();
     }
@@ -101,7 +101,7 @@ final class RoundedDrawable extends Drawable {
     }
 
     @Override
-    protected void onBoundsChange(@NonNull Rect bounds) {
+    protected void onBoundsChange(@NonNull final Rect bounds) {
         mShaderMatrix.setScale((float) bounds.width() / (float) mBitmap.getWidth(),
                 (float) bounds.height() / (float) mBitmap.getHeight());
         mShader.setLocalMatrix(mShaderMatrix);

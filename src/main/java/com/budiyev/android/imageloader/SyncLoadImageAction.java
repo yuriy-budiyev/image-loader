@@ -31,10 +31,11 @@ import android.support.annotation.WorkerThread;
 final class SyncLoadImageAction<T> extends LoadImageAction<T> {
     private Bitmap mImage;
 
-    public SyncLoadImageAction(@NonNull DataDescriptor<T> descriptor, @NonNull BitmapLoader<T> bitmapLoader,
-            @Nullable Size requiredSize, @Nullable BitmapTransformation transformation,
-            @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache, @Nullable LoadCallback loadCallback,
-            @Nullable ErrorCallback errorCallback, @NonNull PauseLock pauseLock) {
+    public SyncLoadImageAction(@NonNull final DataDescriptor<T> descriptor, @NonNull final BitmapLoader<T> bitmapLoader,
+            @Nullable final Size requiredSize, @Nullable final BitmapTransformation transformation,
+            @Nullable final ImageCache memoryCache, @Nullable final ImageCache storageCache,
+            @Nullable final LoadCallback loadCallback, @Nullable final ErrorCallback errorCallback,
+            @NonNull final PauseLock pauseLock) {
         super(descriptor, bitmapLoader, requiredSize, transformation, memoryCache, storageCache, null, loadCallback,
                 errorCallback, pauseLock);
     }
@@ -47,12 +48,12 @@ final class SyncLoadImageAction<T> extends LoadImageAction<T> {
     }
 
     @Override
-    protected void onImageLoaded(@NonNull Bitmap image) {
+    protected void onImageLoaded(@NonNull final Bitmap image) {
         mImage = image;
     }
 
     @Override
-    protected void onError(@NonNull Throwable error) {
+    protected void onError(@NonNull final Throwable error) {
         // Do nothing
     }
 

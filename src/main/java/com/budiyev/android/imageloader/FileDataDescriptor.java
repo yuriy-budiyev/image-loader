@@ -28,7 +28,7 @@ import java.io.File;
 import android.support.annotation.NonNull;
 
 final class FileDataDescriptor extends IdentifiableDataDescriptor<File> {
-    public FileDataDescriptor(@NonNull File data) {
+    public FileDataDescriptor(@NonNull final File data) {
         super(data, data.getAbsolutePath());
     }
 

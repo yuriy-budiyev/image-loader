@@ -45,7 +45,7 @@ abstract class ImageRequestAction implements ImageRequestDelegate, Callable<Void
     }
 
     @NonNull
-    public final ImageRequestDelegate submit(@NonNull ExecutorService executor) {
+    public final ImageRequestDelegate submit(@NonNull final ExecutorService executor) {
         if (!mCancelled.get()) {
             mFuture = executor.submit(this);
         }
@@ -55,7 +55,7 @@ abstract class ImageRequestAction implements ImageRequestDelegate, Callable<Void
     @Override
     public final boolean cancel() {
         if (mCancelled.compareAndSet(false, true)) {
-            Future<?> future = mFuture;
+            final Future<?> future = mFuture;
             if (future != null) {
                 future.cancel(false);
             }

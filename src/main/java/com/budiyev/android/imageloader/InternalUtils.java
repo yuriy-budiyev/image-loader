@@ -57,9 +57,9 @@ final class InternalUtils {
     private InternalUtils() {
     }
 
-    public static void invalidate(@Nullable ImageCache memoryCache, @Nullable ImageCache storageCache,
-            @NonNull DataDescriptor<?> descriptor) {
-        String key = descriptor.getKey();
+    public static void invalidate(@Nullable final ImageCache memoryCache, @Nullable final ImageCache storageCache,
+            @NonNull final DataDescriptor<?> descriptor) {
+        final String key = descriptor.getKey();
         if (key == null) {
             return;
         }
@@ -72,15 +72,15 @@ final class InternalUtils {
     }
 
     @Nullable
-    public static String buildFullKey(@Nullable String base, @Nullable Size requiredSize,
-            @Nullable BitmapTransformation transformation) {
+    public static String buildFullKey(@Nullable final String base, @Nullable final Size requiredSize,
+            @Nullable final BitmapTransformation transformation) {
         if (base == null) {
             return null;
         }
         if (requiredSize == null && transformation == null) {
             return base;
         }
-        StringBuilder sb = new StringBuilder(base);
+        final StringBuilder sb = new StringBuilder(base);
         if (requiredSize != null) {
             sb.append("_required_size_").append(requiredSize.getWidth()).append("x").append(requiredSize.getHeight());
         }
@@ -90,22 +90,23 @@ final class InternalUtils {
         return sb.toString();
     }
 
-    public static void close(@Nullable Closeable closeable) {
+    public static void close(@Nullable final Closeable closeable) {
         if (closeable == null) {
             return;
         }
         try {
             closeable.close();
-        } catch (IOException ignored) {
+        } catch (final IOException ignored) {
         }
     }
 
     @Nullable
-    public static InputStream getDataStreamFromUri(@NonNull Context context, @NonNull Uri uri) throws IOException {
-        String scheme = uri.getScheme();
+    public static InputStream getDataStreamFromUri(@NonNull final Context context, @NonNull final Uri uri)
+            throws IOException {
+        final String scheme = uri.getScheme();
         if (URI_SCHEME_HTTP.equalsIgnoreCase(scheme) || URI_SCHEME_HTTPS.equalsIgnoreCase(scheme) ||
                 URI_SCHEME_FTP.equalsIgnoreCase(scheme)) {
-            URLConnection connection = new URL(uri.toString()).openConnection();
+            final URLConnection connection = new URL(uri.toString()).openConnection();
             connection.setConnectTimeout(CONNECT_TIMEOUT);
             return connection.getInputStream();
         } else {
@@ -114,17 +115,17 @@ final class InternalUtils {
     }
 
     @Nullable
-    public static InputStream getDataStreamFromUrl(@NonNull String url) throws IOException {
-        URLConnection connection = new URL(url).openConnection();
+    public static InputStream getDataStreamFromUrl(@NonNull final String url) throws IOException {
+        final URLConnection connection = new URL(url).openConnection();
         connection.setConnectTimeout(CONNECT_TIMEOUT);
         return connection.getInputStream();
     }
 
     @Nullable
     @MainThread
-    public static DisplayImageAction<?> getDisplayImageAction(@Nullable View view) {
+    public static DisplayImageAction<?> getDisplayImageAction(@Nullable final View view) {
         if (view != null) {
-            Drawable drawable = getDrawable(view);
+            final Drawable drawable = getDrawable(view);
             if (drawable instanceof PlaceholderDrawable) {
                 return ((PlaceholderDrawable) drawable).getAction();
             }
@@ -132,7 +133,7 @@ final class InternalUtils {
         return null;
     }
 
-    public static void setDrawable(@NonNull Drawable drawable, @NonNull View view) {
+    public static void setDrawable(@NonNull final Drawable drawable, @NonNull final View view) {
         if (view instanceof ImageView) {
             ((ImageView) view).setImageDrawable(drawable);
         } else {
@@ -144,11 +145,12 @@ final class InternalUtils {
         }
     }
 
-    public static void setBitmap(@NonNull Resources resources, @NonNull Bitmap bitmap, @NonNull View view) {
+    public static void setBitmap(@NonNull final Resources resources, @NonNull final Bitmap bitmap,
+            @NonNull final View view) {
         if (view instanceof ImageView) {
             ((ImageView) view).setImageBitmap(bitmap);
         } else {
-            Drawable drawable = new BitmapDrawable(resources, bitmap);
+            final Drawable drawable = new BitmapDrawable(resources, bitmap);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 view.setBackground(drawable);
             } else {
@@ -158,7 +160,7 @@ final class InternalUtils {
     }
 
     @Nullable
-    public static Drawable getDrawable(@NonNull View view) {
+    public static Drawable getDrawable(@NonNull final View view) {
         if (view instanceof ImageView) {
             return ((ImageView) view).getDrawable();
         } else {
@@ -171,7 +173,7 @@ final class InternalUtils {
     }
 
     public static int getCachePoolSize() {
-        int size = getLoadPoolSize() / 2;
+        final int size = getLoadPoolSize() / 2;
         if (size < MIN_POOL_SIZE) {
             return MIN_POOL_SIZE;
         } else {
@@ -179,22 +181,22 @@ final class InternalUtils {
         }
     }
 
-    public static boolean isUriLocal(@NonNull Uri uri) {
+    public static boolean isUriLocal(@NonNull final Uri uri) {
         return isUriSchemeLocal(uri.getScheme());
     }
 
-    public static boolean isUriLocal(@NonNull String uri) {
-        int ssi = uri.indexOf(':');
+    public static boolean isUriLocal(@NonNull final String uri) {
+        final int ssi = uri.indexOf(':');
         return ssi != -1 && isUriSchemeLocal(uri.substring(0, ssi));
 
     }
 
-    private static boolean isUriSchemeLocal(@NonNull String scheme) {
+    private static boolean isUriSchemeLocal(@NonNull final String scheme) {
         return ContentResolver.SCHEME_FILE.equals(scheme) || ContentResolver.SCHEME_CONTENT.equals(scheme) ||
                 ContentResolver.SCHEME_ANDROID_RESOURCE.equals(scheme);
     }
 
-    public static int getExifRotation(@NonNull Context context, @NonNull Uri uri) {
+    public static int getExifRotation(@NonNull final Context context, @NonNull final Uri uri) {
         InputStream inputStream = null;
         try {
             inputStream = context.getContentResolver().openInputStream(uri);
@@ -203,30 +205,30 @@ final class InternalUtils {
             } else {
                 return 0;
             }
-        } catch (IOException e) {
+        } catch (final IOException e) {
             return 0;
         } finally {
             close(inputStream);
         }
     }
 
-    public static int getExifRotation(@NonNull File file) {
+    public static int getExifRotation(@NonNull final File file) {
         try {
             return getExifRotation(new ExifInterface(file.getAbsolutePath()));
-        } catch (IOException e) {
+        } catch (final IOException e) {
             return 0;
         }
     }
 
-    public static int getExifRotation(@NonNull byte[] bytes) {
+    public static int getExifRotation(@NonNull final byte[] bytes) {
         try {
             return getExifRotation(new ExifInterface(new ByteArrayInputStream(bytes)));
-        } catch (IOException e) {
+        } catch (final IOException e) {
             return 0;
         }
     }
 
-    public static int getExifRotation(@NonNull ExifInterface exifInterface) {
+    public static int getExifRotation(@NonNull final ExifInterface exifInterface) {
         switch (exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)) {
             case ExifInterface.ORIENTATION_ROTATE_90:
                 return 90;
@@ -240,8 +242,8 @@ final class InternalUtils {
     }
 
     @NonNull
-    public static Bitmap rotateAndRecycle(@NonNull Bitmap bitmap, int rotation) {
-        Bitmap rotated = ImageUtils.rotate(bitmap, rotation);
+    public static Bitmap rotateAndRecycle(@NonNull final Bitmap bitmap, final int rotation) {
+        final Bitmap rotated = ImageUtils.rotate(bitmap, rotation);
         if (bitmap != rotated) {
             bitmap.recycle();
         }
@@ -249,7 +251,7 @@ final class InternalUtils {
     }
 
     @NonNull
-    public static <T> T requireNonNull(@Nullable T value) {
+    public static <T> T requireNonNull(@Nullable final T value) {
         if (value == null) {
             throw new NullPointerException();
         }

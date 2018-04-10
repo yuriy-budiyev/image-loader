@@ -26,7 +26,7 @@ package com.budiyev.android.imageloader;
 import android.support.annotation.NonNull;
 
 final class ResourceDataDescriptor extends IdentifiableDataDescriptor<Integer> {
-    public ResourceDataDescriptor(@NonNull Integer data) {
+    public ResourceDataDescriptor(@NonNull final Integer data) {
         super(data, data.toString());
     }
 

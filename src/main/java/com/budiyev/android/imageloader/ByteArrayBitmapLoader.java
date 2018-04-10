@@ -31,7 +31,7 @@ import android.support.annotation.Nullable;
 final class ByteArrayBitmapLoader implements BitmapLoader<byte[]> {
     @Nullable
     @Override
-    public Bitmap load(@NonNull byte[] data, @Nullable Size requiredSize) throws Throwable {
+    public Bitmap load(@NonNull final byte[] data, @Nullable final Size requiredSize) throws Throwable {
         Bitmap bitmap;
         if (requiredSize != null) {
             bitmap = DataUtils.loadSampledBitmapFromByteArray(data, requiredSize.getWidth(), requiredSize.getHeight());
@@ -39,7 +39,7 @@ final class ByteArrayBitmapLoader implements BitmapLoader<byte[]> {
             bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
         }
         if (bitmap != null) {
-            int rotation = InternalUtils.getExifRotation(data);
+            final int rotation = InternalUtils.getExifRotation(data);
             if (rotation != 0) {
                 bitmap = InternalUtils.rotateAndRecycle(bitmap, rotation);
             }

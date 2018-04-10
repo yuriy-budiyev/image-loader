@@ -28,7 +28,7 @@ import android.support.annotation.NonNull;
 final class StringUriDataDescriptor extends IdentifiableDataDescriptor<String> {
     private final DataLocation mLocation;
 
-    public StringUriDataDescriptor(@NonNull String data) {
+    public StringUriDataDescriptor(@NonNull final String data) {
         super(data, data);
         mLocation = InternalUtils.isUriLocal(data) ? DataLocation.LOCAL : DataLocation.REMOTE;
     }

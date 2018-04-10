@@ -28,7 +28,7 @@ import android.support.annotation.NonNull;
 final class ByteArrayDataDescriptorFactory implements DataDescriptorFactory<byte[]> {
     @NonNull
     @Override
-    public DataDescriptor<byte[]> newDescriptor(@NonNull byte[] data) {
+    public DataDescriptor<byte[]> newDescriptor(@NonNull final byte[] data) {
         return new ByteArrayDataDescriptor(data);
     }
 }

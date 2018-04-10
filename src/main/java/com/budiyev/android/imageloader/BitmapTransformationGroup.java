@@ -32,10 +32,10 @@ final class BitmapTransformationGroup implements BitmapTransformation {
     private final List<BitmapTransformation> mTransformations;
     private final String mKey;
 
-    public BitmapTransformationGroup(@NonNull List<BitmapTransformation> transformations) {
+    public BitmapTransformationGroup(@NonNull final List<BitmapTransformation> transformations) {
         mTransformations = transformations;
-        StringBuilder sb = new StringBuilder();
-        for (BitmapTransformation t : transformations) {
+        final StringBuilder sb = new StringBuilder();
+        for (final BitmapTransformation t : transformations) {
             sb.append(t.getKey());
         }
         mKey = sb.toString();
@@ -44,8 +44,8 @@ final class BitmapTransformationGroup implements BitmapTransformation {
     @NonNull
     @Override
     public Bitmap transform(@NonNull Bitmap bitmap) throws Throwable {
-        for (BitmapTransformation t : mTransformations) {
-            Bitmap transformed = t.transform(bitmap);
+        for (final BitmapTransformation t : mTransformations) {
+            final Bitmap transformed = t.transform(bitmap);
             if (bitmap != transformed && !bitmap.isRecycled()) {
                 bitmap.recycle();
             }

@@ -30,22 +30,23 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 final class AsyncLoadImageAction<T> extends LoadImageAction<T> {
-    public AsyncLoadImageAction(@NonNull DataDescriptor<T> descriptor, @NonNull BitmapLoader<T> bitmapLoader,
-            @Nullable Size requiredSize, @Nullable BitmapTransformation transformation,
-            @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache,
-            @Nullable ExecutorService cacheExecutor, @Nullable LoadCallback loadCallback,
-            @Nullable ErrorCallback errorCallback, @NonNull PauseLock pauseLock) {
+    public AsyncLoadImageAction(@NonNull final DataDescriptor<T> descriptor,
+            @NonNull final BitmapLoader<T> bitmapLoader, @Nullable final Size requiredSize,
+            @Nullable final BitmapTransformation transformation, @Nullable final ImageCache memoryCache,
+            @Nullable final ImageCache storageCache, @Nullable final ExecutorService cacheExecutor,
+            @Nullable final LoadCallback loadCallback, @Nullable final ErrorCallback errorCallback,
+            @NonNull final PauseLock pauseLock) {
         super(descriptor, bitmapLoader, requiredSize, transformation, memoryCache, storageCache, cacheExecutor,
                 loadCallback, errorCallback, pauseLock);
     }
 
     @Override
-    protected void onImageLoaded(@NonNull Bitmap image) {
+    protected void onImageLoaded(@NonNull final Bitmap image) {
         // Do nothing
     }
 
     @Override
-    protected void onError(@NonNull Throwable error) {
+    protected void onError(@NonNull final Throwable error) {
         // Do nothing
     }
 

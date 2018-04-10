@@ -28,7 +28,7 @@ import android.support.annotation.NonNull;
 final class StringUriDataDescriptorFactory implements DataDescriptorFactory<String> {
     @NonNull
     @Override
-    public DataDescriptor<String> newDescriptor(@NonNull String data) {
+    public DataDescriptor<String> newDescriptor(@NonNull final String data) {
         return new StringUriDataDescriptor(data);
     }
 }

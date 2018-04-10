@@ -62,9 +62,9 @@ final class ImageLoaderHolder {
 
     private static final class ClearMemoryCallbacks implements ComponentCallbacks2 {
         @Override
-        public void onTrimMemory(int level) {
+        public void onTrimMemory(final int level) {
             if (level >= TRIM_MEMORY_BACKGROUND) {
-                ImageLoader loader = sInstance;
+                final ImageLoader loader = sInstance;
                 if (loader != null) {
                     loader.clearMemoryCache();
                 }
@@ -72,13 +72,13 @@ final class ImageLoaderHolder {
         }
 
         @Override
-        public void onConfigurationChanged(Configuration newConfig) {
+        public void onConfigurationChanged(final Configuration newConfig) {
             // Do nothing
         }
 
         @Override
         public void onLowMemory() {
-            ImageLoader loader = sInstance;
+            final ImageLoader loader = sInstance;
             if (loader != null) {
                 loader.clearMemoryCache();
             }

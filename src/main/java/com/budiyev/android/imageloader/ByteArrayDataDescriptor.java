@@ -26,7 +26,7 @@ package com.budiyev.android.imageloader;
 import android.support.annotation.NonNull;
 
 final class ByteArrayDataDescriptor extends UnidentifiableDataDescriptor<byte[]> {
-    public ByteArrayDataDescriptor(@NonNull byte[] data) {
+    public ByteArrayDataDescriptor(@NonNull final byte[] data) {
         super(data);
     }
 }

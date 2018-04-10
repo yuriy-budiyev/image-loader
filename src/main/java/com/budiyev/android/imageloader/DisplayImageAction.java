@@ -48,14 +48,15 @@ final class DisplayImageAction<T> extends LoadImageAction<T> {
     private final long mFadeDuration;
     private final float mCornerRadius;
 
-    public DisplayImageAction(@NonNull Resources resources, @NonNull View view, @NonNull DataDescriptor<T> descriptor,
-            @NonNull BitmapLoader<T> bitmapLoader, @Nullable Size requiredSize,
-            @Nullable BitmapTransformation transformation, @NonNull Drawable placeholder,
-            @Nullable Drawable errorDrawable, @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache,
-            @Nullable ExecutorService cacheExecutor, @Nullable LoadCallback loadCallback,
-            @Nullable ErrorCallback errorCallback, @Nullable DisplayCallback displayCallback,
-            @NonNull PauseLock pauseLock, @NonNull Handler mainThreadHandler, boolean fadeEnabled, long fadeDuration,
-            float cornerRadius) {
+    public DisplayImageAction(@NonNull final Resources resources, @NonNull final View view,
+            @NonNull final DataDescriptor<T> descriptor, @NonNull final BitmapLoader<T> bitmapLoader,
+            @Nullable final Size requiredSize, @Nullable final BitmapTransformation transformation,
+            @NonNull final Drawable placeholder, @Nullable final Drawable errorDrawable,
+            @Nullable final ImageCache memoryCache, @Nullable final ImageCache storageCache,
+            @Nullable final ExecutorService cacheExecutor, @Nullable final LoadCallback loadCallback,
+            @Nullable final ErrorCallback errorCallback, @Nullable final DisplayCallback displayCallback,
+            @NonNull final PauseLock pauseLock, @NonNull final Handler mainThreadHandler, final boolean fadeEnabled,
+            final long fadeDuration, final float cornerRadius) {
         super(descriptor, bitmapLoader, requiredSize, transformation, memoryCache, storageCache, cacheExecutor,
                 loadCallback, errorCallback, pauseLock);
         mResources = new WeakReference<>(resources);
@@ -69,18 +70,18 @@ final class DisplayImageAction<T> extends LoadImageAction<T> {
         mCornerRadius = cornerRadius;
     }
 
-    public boolean hasSameKey(@Nullable String key) {
-        String k = getKey();
+    public boolean hasSameKey(@Nullable final String key) {
+        final String k = getKey();
         return k != null && key != null && k.equals(key);
     }
 
     @Override
-    protected void onImageLoaded(@NonNull Bitmap image) {
+    protected void onImageLoaded(@NonNull final Bitmap image) {
         mMainThreadHandler.post(new SetImageAction(image));
     }
 
     @Override
-    protected void onError(@NonNull Throwable error) {
+    protected void onError(@NonNull final Throwable error) {
         if (mErrorDrawable != null) {
             mMainThreadHandler.post(new SetErrorDrawableAction());
         }
@@ -98,8 +99,8 @@ final class DisplayImageAction<T> extends LoadImageAction<T> {
             if (isCancelled()) {
                 return;
             }
-            Drawable errorDrawable = mErrorDrawable;
-            View view = mView.get();
+            final Drawable errorDrawable = mErrorDrawable;
+            final View view = mView.get();
             if (errorDrawable == null || view == null ||
                     InternalUtils.getDisplayImageAction(view) != DisplayImageAction.this) {
                 return;
@@ -115,7 +116,7 @@ final class DisplayImageAction<T> extends LoadImageAction<T> {
     private final class SetImageAction implements Runnable {
         private final Bitmap mImage;
 
-        public SetImageAction(@NonNull Bitmap image) {
+        public SetImageAction(@NonNull final Bitmap image) {
             mImage = image;
         }
 
@@ -125,15 +126,15 @@ final class DisplayImageAction<T> extends LoadImageAction<T> {
             if (isCancelled()) {
                 return;
             }
-            View view = mView.get();
-            Resources resources = mResources.get();
+            final View view = mView.get();
+            final Resources resources = mResources.get();
             if (view == null || resources == null ||
                     InternalUtils.getDisplayImageAction(view) != DisplayImageAction.this) {
                 return;
             }
-            Bitmap image = mImage;
-            float cornerRadius = mCornerRadius;
-            boolean roundCorners = cornerRadius > 0 || cornerRadius == RoundedDrawable.MAX_RADIUS;
+            final Bitmap image = mImage;
+            final float cornerRadius = mCornerRadius;
+            final boolean roundCorners = cornerRadius > 0 || cornerRadius == RoundedDrawable.MAX_RADIUS;
             if (mFadeEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 InternalUtils.setDrawable(new FadeDrawable(mPlaceholder,
                         roundCorners ? new RoundedDrawable(resources, image, cornerRadius) :
@@ -145,7 +146,7 @@ final class DisplayImageAction<T> extends LoadImageAction<T> {
                     InternalUtils.setBitmap(resources, image, view);
                 }
             }
-            DisplayCallback displayCallback = mDisplayCallback;
+            final DisplayCallback displayCallback = mDisplayCallback;
             if (displayCallback != null) {
                 displayCallback.onDisplayed(image, view);
             }

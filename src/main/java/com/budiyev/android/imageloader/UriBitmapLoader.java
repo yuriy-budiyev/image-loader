@@ -35,15 +35,15 @@ import android.support.annotation.Nullable;
 final class UriBitmapLoader implements BitmapLoader<Uri> {
     private final Context mContext;
 
-    public UriBitmapLoader(@NonNull Context context) {
+    public UriBitmapLoader(@NonNull final Context context) {
         mContext = context;
     }
 
     @Nullable
     @Override
-    public Bitmap load(@NonNull Uri data, @Nullable Size requiredSize) throws Throwable {
+    public Bitmap load(@NonNull final Uri data, @Nullable final Size requiredSize) throws Throwable {
         Bitmap bitmap;
-        Context context = mContext;
+        final Context context = mContext;
         if (requiredSize != null) {
             bitmap = DataUtils
                     .loadSampledBitmapFromUri(context, data, requiredSize.getWidth(), requiredSize.getHeight());
@@ -60,7 +60,7 @@ final class UriBitmapLoader implements BitmapLoader<Uri> {
             }
         }
         if (bitmap != null && InternalUtils.isUriLocal(data)) {
-            int rotation = InternalUtils.getExifRotation(context, data);
+            final int rotation = InternalUtils.getExifRotation(context, data);
             if (rotation != 0) {
                 bitmap = InternalUtils.rotateAndRecycle(bitmap, rotation);
             }

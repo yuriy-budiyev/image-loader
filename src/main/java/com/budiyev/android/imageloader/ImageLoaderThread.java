@@ -27,7 +27,7 @@ import android.os.Process;
 import android.support.annotation.NonNull;
 
 final class ImageLoaderThread extends Thread {
-    public ImageLoaderThread(@NonNull Runnable target, @NonNull String name) {
+    public ImageLoaderThread(@NonNull final Runnable target, @NonNull final String name) {
         super(target, name);
     }
 

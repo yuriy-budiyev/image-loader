@@ -60,8 +60,9 @@ public final class ImageLoader {
      * @see #with
      * @see #builder
      */
-    ImageLoader(@NonNull Context context, @NonNull ExecutorService loadExecutor, @NonNull ExecutorService cacheExecutor,
-            @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache) {
+    ImageLoader(@NonNull final Context context, @NonNull final ExecutorService loadExecutor,
+            @NonNull final ExecutorService cacheExecutor, @Nullable final ImageCache memoryCache,
+            @Nullable final ImageCache storageCache) {
         mContext = context;
         mLoadExecutor = loadExecutor;
         mMainThreadHandler = new Handler(context.getMainLooper());
@@ -89,10 +90,11 @@ public final class ImageLoader {
      */
     @NonNull
     @SuppressWarnings("unchecked")
-    public <T> ImageRequest<T> from(@NonNull T data) {
-        String dataClassName = data.getClass().getName();
-        DataDescriptorFactory<T> descriptorFactory = (DataDescriptorFactory<T>) mDescriptorFactories.get(dataClassName);
-        BitmapLoader<T> bitmapLoader = (BitmapLoader<T>) mBitmapLoaders.get(dataClassName);
+    public <T> ImageRequest<T> from(@NonNull final T data) {
+        final String dataClassName = data.getClass().getName();
+        final DataDescriptorFactory<T> descriptorFactory =
+                (DataDescriptorFactory<T>) mDescriptorFactories.get(dataClassName);
+        final BitmapLoader<T> bitmapLoader = (BitmapLoader<T>) mBitmapLoaders.get(dataClassName);
         if (descriptorFactory == null || bitmapLoader == null) {
             throw new IllegalArgumentException("Unsupported data type: " + dataClassName);
         }
@@ -107,9 +109,9 @@ public final class ImageLoader {
      * @throws IllegalArgumentException if specified data type is not registered
      * @see #registerDataType
      */
-    public void invalidate(@NonNull Object data) {
-        String dataClassName = data.getClass().getName();
-        DataDescriptorFactory<Object> descriptorFactory = mDescriptorFactories.get(dataClassName);
+    public void invalidate(@NonNull final Object data) {
+        final String dataClassName = data.getClass().getName();
+        final DataDescriptorFactory<Object> descriptorFactory = mDescriptorFactories.get(dataClassName);
         if (descriptorFactory == null) {
             throw new IllegalArgumentException("Unsupported data type: " + dataClassName);
         }
@@ -128,9 +130,9 @@ public final class ImageLoader {
      * @see #unregisterDataType
      */
     @SuppressWarnings("unchecked")
-    public <T> void registerDataType(@NonNull Class<T> dataClass, @NonNull DataDescriptorFactory<T> descriptorFactory,
-            @NonNull BitmapLoader<T> bitmapLoader) {
-        String dataClassName = dataClass.getName();
+    public <T> void registerDataType(@NonNull final Class<T> dataClass,
+            @NonNull final DataDescriptorFactory<T> descriptorFactory, @NonNull final BitmapLoader<T> bitmapLoader) {
+        final String dataClassName = dataClass.getName();
         mDescriptorFactories
                 .put(dataClassName, (DataDescriptorFactory<Object>) InternalUtils.requireNonNull(descriptorFactory));
         mBitmapLoaders.put(dataClassName, (BitmapLoader<Object>) InternalUtils.requireNonNull(bitmapLoader));
@@ -141,8 +143,8 @@ public final class ImageLoader {
      *
      * @param dataClass Source data class
      */
-    public void unregisterDataType(@NonNull Class<?> dataClass) {
-        String dataClassName = dataClass.getName();
+    public void unregisterDataType(@NonNull final Class<?> dataClass) {
+        final String dataClassName = dataClass.getName();
         mDescriptorFactories.remove(dataClassName);
         mBitmapLoaders.remove(dataClassName);
     }
@@ -158,14 +160,14 @@ public final class ImageLoader {
      * Whether to pause image loading. If this method is invoked with {@code true} parameter,
      * all loading actions will be paused until it will be invoked with {@code false}.
      */
-    public void setPauseLoading(boolean paused) {
+    public void setPauseLoading(final boolean paused) {
         mPauseLock.setPaused(paused);
     }
 
     /**
      * Set all loading tasks to finish before any loading actions started
      */
-    public void setInterruptLoadingEarly(boolean interrupt) {
+    public void setInterruptLoadingEarly(final boolean interrupt) {
         mPauseLock.setInterruptEarly(interrupt);
     }
 
@@ -179,7 +181,7 @@ public final class ImageLoader {
      * @see Context#registerComponentCallbacks
      */
     public void clearMemoryCache() {
-        ImageCache memoryCache = mMemoryCache;
+        final ImageCache memoryCache = mMemoryCache;
         if (memoryCache != null) {
             memoryCache.clear();
         }
@@ -189,7 +191,7 @@ public final class ImageLoader {
      * Clear storage cache
      */
     public void clearStorageCache() {
-        ImageCache storageCache = mStorageCache;
+        final ImageCache storageCache = mStorageCache;
         if (storageCache != null) {
             storageCache.clear();
         }
@@ -208,7 +210,7 @@ public final class ImageLoader {
      * automatically cares about memory and storage caching
      */
     @NonNull
-    public static ImageLoader with(@NonNull Context context) {
+    public static ImageLoader with(@NonNull final Context context) {
         return ImageLoaderHolder.get(context);
     }
 
@@ -218,7 +220,7 @@ public final class ImageLoader {
      * if instance is static
      */
     @NonNull
-    public static ImageLoaderBuilder builder(@NonNull Context context) {
+    public static ImageLoaderBuilder builder(@NonNull final Context context) {
         return new ImageLoaderBuilder(context);
     }
 }

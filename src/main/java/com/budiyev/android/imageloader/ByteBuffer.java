@@ -33,19 +33,19 @@ final class ByteBuffer extends OutputStream {
     private byte[] mArray;
     private int mSize;
 
-    public ByteBuffer(int initialCapacity) {
+    public ByteBuffer(final int initialCapacity) {
         mArray = new byte[initialCapacity];
     }
 
     @Override
-    public void write(int b) {
+    public void write(final int b) {
         grow(mSize + 1);
         mArray[mSize] = (byte) b;
         mSize++;
     }
 
     @Override
-    public void write(@NonNull byte[] bytes, int offset, int length) {
+    public void write(@NonNull final byte[] bytes, final int offset, final int length) {
         grow(mSize + length);
         System.arraycopy(bytes, offset, mArray, mSize, length);
         mSize += length;
@@ -60,7 +60,7 @@ final class ByteBuffer extends OutputStream {
         return mSize;
     }
 
-    private void grow(int capacity) {
+    private void grow(final int capacity) {
         int length = mArray.length;
         if (capacity > length) {
             length *= 2;

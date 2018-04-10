@@ -28,7 +28,7 @@ import android.support.annotation.NonNull;
 abstract class IdentifiableDataDescriptor<T> extends BaseDataDescriptor<T> {
     private final String mKey;
 
-    protected IdentifiableDataDescriptor(@NonNull T data, @NonNull String keyBase) {
+    protected IdentifiableDataDescriptor(@NonNull final T data, @NonNull final String keyBase) {
         super(data);
         mKey = DataUtils.generateSHA256(keyBase);
     }

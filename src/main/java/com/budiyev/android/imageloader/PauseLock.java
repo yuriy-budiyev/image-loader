@@ -37,7 +37,7 @@ final class PauseLock {
         return mPaused;
     }
 
-    public void setPaused(boolean paused) {
+    public void setPaused(final boolean paused) {
         mLock.lock();
         try {
             mPaused = paused;
@@ -53,7 +53,7 @@ final class PauseLock {
         return mInterruptEarly;
     }
 
-    public void setInterruptEarly(boolean interrupt) {
+    public void setInterruptEarly(final boolean interrupt) {
         mInterruptEarly = interrupt;
         if (interrupt) {
             setPaused(false);

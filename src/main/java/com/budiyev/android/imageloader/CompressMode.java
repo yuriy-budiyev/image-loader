@@ -41,7 +41,7 @@ public enum CompressMode {
     private final Bitmap.CompressFormat mFormat;
     private final int mQuality;
 
-    CompressMode(@NonNull Bitmap.CompressFormat format, int quality) {
+    CompressMode(@NonNull final Bitmap.CompressFormat format, final int quality) {
         mFormat = format;
         mQuality = quality;
     }

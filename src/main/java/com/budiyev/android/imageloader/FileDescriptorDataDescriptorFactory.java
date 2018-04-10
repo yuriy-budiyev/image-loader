@@ -30,7 +30,7 @@ import android.support.annotation.NonNull;
 final class FileDescriptorDataDescriptorFactory implements DataDescriptorFactory<FileDescriptor> {
     @NonNull
     @Override
-    public DataDescriptor<FileDescriptor> newDescriptor(@NonNull FileDescriptor data) {
+    public DataDescriptor<FileDescriptor> newDescriptor(@NonNull final FileDescriptor data) {
         return new FileDescriptorDataDescriptor(data);
     }
 }

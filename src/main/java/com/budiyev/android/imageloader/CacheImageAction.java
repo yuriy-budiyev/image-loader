@@ -33,7 +33,7 @@ final class CacheImageAction extends ImageRequestAction {
     private final WeakReference<Bitmap> mImage;
     private final ImageCache mCache;
 
-    public CacheImageAction(@NonNull String key, @NonNull Bitmap image, @NonNull ImageCache cache) {
+    public CacheImageAction(@NonNull final String key, @NonNull final Bitmap image, @NonNull final ImageCache cache) {
         mKey = key;
         mImage = new WeakReference<>(image);
         mCache = cache;
@@ -42,7 +42,7 @@ final class CacheImageAction extends ImageRequestAction {
     @Override
     protected void execute() {
         if (!isCancelled()) {
-            Bitmap image = mImage.get();
+            final Bitmap image = mImage.get();
             if (image != null) {
                 mCache.put(mKey, image);
             }

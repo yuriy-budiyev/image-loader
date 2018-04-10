@@ -27,7 +27,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 abstract class UnidentifiableDataDescriptor<T> extends BaseDataDescriptor<T> {
-    public UnidentifiableDataDescriptor(@NonNull T data) {
+    public UnidentifiableDataDescriptor(@NonNull final T data) {
         super(data);
     }
 

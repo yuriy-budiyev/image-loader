@@ -34,7 +34,7 @@ final class ImageLoaderThreadFactory implements ThreadFactory {
 
     @NonNull
     @Override
-    public Thread newThread(@NonNull Runnable r) {
+    public Thread newThread(@NonNull final Runnable r) {
         return new ImageLoaderThread(r, nextThreadName());
     }
 

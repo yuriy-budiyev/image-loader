@@ -28,7 +28,7 @@ import android.support.annotation.NonNull;
 final class ResourceDataDescriptorFactory implements DataDescriptorFactory<Integer> {
     @NonNull
     @Override
-    public DataDescriptor<Integer> newDescriptor(@NonNull Integer data) {
+    public DataDescriptor<Integer> newDescriptor(@NonNull final Integer data) {
         return new ResourceDataDescriptor(data);
     }
 }

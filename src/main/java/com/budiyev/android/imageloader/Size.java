@@ -36,7 +36,7 @@ public final class Size {
      * @param width  Width
      * @param height Height
      */
-    public Size(int width, int height) {
+    public Size(final int width, final int height) {
         mWidth = width;
         mHeight = height;
     }
@@ -61,11 +61,11 @@ public final class Size {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == this) {
             return true;
         } else if (obj instanceof Size) {
-            Size other = (Size) obj;
+            final Size other = (Size) obj;
             return mWidth == other.mWidth && mHeight == other.mHeight;
         } else {
             return false;

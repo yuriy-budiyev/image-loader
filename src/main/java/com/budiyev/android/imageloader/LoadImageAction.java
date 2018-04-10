@@ -43,11 +43,11 @@ abstract class LoadImageAction<T> extends ImageRequestAction {
     private final ErrorCallback mErrorCallback;
     private volatile ImageRequestDelegate mCacheDelegate;
 
-    protected LoadImageAction(@NonNull DataDescriptor<T> descriptor, @NonNull BitmapLoader<T> bitmapLoader,
-            @Nullable Size requiredSize, @Nullable BitmapTransformation transformation,
-            @Nullable ImageCache memoryCache, @Nullable ImageCache storageCache,
-            @Nullable ExecutorService cacheExecutor, @Nullable LoadCallback loadCallback,
-            @Nullable ErrorCallback errorCallback, @NonNull PauseLock pauseLock) {
+    protected LoadImageAction(@NonNull final DataDescriptor<T> descriptor, @NonNull final BitmapLoader<T> bitmapLoader,
+            @Nullable final Size requiredSize, @Nullable final BitmapTransformation transformation,
+            @Nullable final ImageCache memoryCache, @Nullable final ImageCache storageCache,
+            @Nullable final ExecutorService cacheExecutor, @Nullable final LoadCallback loadCallback,
+            @Nullable final ErrorCallback errorCallback, @NonNull final PauseLock pauseLock) {
         mDescriptor = descriptor;
         mBitmapLoader = bitmapLoader;
         mRequiredSize = requiredSize;
@@ -68,7 +68,7 @@ abstract class LoadImageAction<T> extends ImageRequestAction {
 
     @Override
     protected void onCancelled() {
-        ImageRequestDelegate delegate = mCacheDelegate;
+        final ImageRequestDelegate delegate = mCacheDelegate;
         if (delegate != null) {
             delegate.cancel();
         }
@@ -125,19 +125,19 @@ abstract class LoadImageAction<T> extends ImageRequestAction {
         while (!isCancelled() && !mPauseLock.shouldInterruptEarly() && mPauseLock.isPaused()) {
             try {
                 mPauseLock.await();
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 return;
             }
         }
         if (isCancelled() || mPauseLock.shouldInterruptEarly()) {
             return;
         }
-        DataDescriptor<T> descriptor = mDescriptor;
-        String key = getKey();
-        T data = descriptor.getData();
+        final DataDescriptor<T> descriptor = mDescriptor;
+        final String key = getKey();
+        final T data = descriptor.getData();
         Bitmap image;
         // Memory cache
-        ImageCache memoryCache = mMemoryCache;
+        final ImageCache memoryCache = mMemoryCache;
         if (key != null && memoryCache != null) {
             image = memoryCache.get(key);
             if (image != null) {
@@ -149,7 +149,7 @@ abstract class LoadImageAction<T> extends ImageRequestAction {
             return;
         }
         // Storage cache
-        ImageCache storageCache = mStorageCache;
+        final ImageCache storageCache = mStorageCache;
         if (key != null && storageCache != null) {
             image = storageCache.get(key);
             if (image != null) {
@@ -164,10 +164,10 @@ abstract class LoadImageAction<T> extends ImageRequestAction {
             return;
         }
         // Load new image
-        Size requiredSize = mRequiredSize;
+        final Size requiredSize = mRequiredSize;
         try {
             image = mBitmapLoader.load(data, requiredSize);
-        } catch (Throwable error) {
+        } catch (final Throwable error) {
             processError(error);
             return;
         }
@@ -179,15 +179,15 @@ abstract class LoadImageAction<T> extends ImageRequestAction {
             return;
         }
         // Transform image
-        BitmapTransformation transformation = mTransformation;
+        final BitmapTransformation transformation = mTransformation;
         if (transformation != null) {
             try {
-                Bitmap transformed = transformation.transform(image);
+                final Bitmap transformed = transformation.transform(image);
                 if (image != transformed && !image.isRecycled()) {
                     image.recycle();
                 }
                 image = transformed;
-            } catch (Throwable error) {
+            } catch (final Throwable error) {
                 processError(error);
                 return;
             }
@@ -202,7 +202,7 @@ abstract class LoadImageAction<T> extends ImageRequestAction {
             }
             if (storageCache != null && (requiredSize != null || transformation != null ||
                     descriptor.getLocation() != DataLocation.LOCAL)) {
-                ExecutorService cacheExecutor = mCacheExecutor;
+                final ExecutorService cacheExecutor = mCacheExecutor;
                 if (cacheExecutor != null) {
                     mCacheDelegate = new CacheImageAction(key, image, storageCache).submit(cacheExecutor);
                 } else {
@@ -213,8 +213,8 @@ abstract class LoadImageAction<T> extends ImageRequestAction {
     }
 
     @WorkerThread
-    private void processImage(@NonNull Bitmap image) {
-        LoadCallback loadCallback = mLoadCallback;
+    private void processImage(@NonNull final Bitmap image) {
+        final LoadCallback loadCallback = mLoadCallback;
         if (loadCallback != null) {
             loadCallback.onLoaded(image);
         }
@@ -222,8 +222,8 @@ abstract class LoadImageAction<T> extends ImageRequestAction {
     }
 
     @WorkerThread
-    private void processError(@NonNull Throwable error) {
-        ErrorCallback errorCallback = mErrorCallback;
+    private void processError(@NonNull final Throwable error) {
+        final ErrorCallback errorCallback = mErrorCallback;
         if (errorCallback != null) {
             errorCallback.onError(error);
         }
