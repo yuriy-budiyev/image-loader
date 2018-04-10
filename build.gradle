@@ -1,4 +1,7 @@
 buildscript {
+    ext.kotlin_version = '1.2.31'
+    ext.support_version = '27.1.1'
+
     repositories {
         google()
         jcenter()
@@ -8,6 +11,7 @@ buildscript {
         classpath 'com.android.tools.build:gradle:3.1.1'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
@@ -21,6 +25,7 @@ allprojects {
 apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
+apply plugin: 'kotlin-android'
 
 ext {
     libraryName = 'ImageLoader'
@@ -43,7 +48,7 @@ android {
     compileSdkVersion 27
 
     defaultConfig {
-        minSdkVersion 14
+        minSdkVersion 19
         targetSdkVersion 27
         versionCode 87
         versionName libraryVersion
@@ -62,8 +67,9 @@ android {
 }
 
 dependencies {
-    api 'com.android.support:support-annotations:27.1.1'
-    api 'com.android.support:exifinterface:27.1.1'
+    api "com.android.support:support-annotations:$support_version"
+    api "com.android.support:exifinterface:$support_version"
+    api "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
 
 group = publishedGroupId
