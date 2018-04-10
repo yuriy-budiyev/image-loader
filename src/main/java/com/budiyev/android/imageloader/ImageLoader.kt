@@ -127,9 +127,8 @@ internal constructor(private val mContext: Context, private val mLoadExecutor: E
     fun <T> registerDataType(dataClass: Class<T>, descriptorFactory: DataDescriptorFactory<T>,
             bitmapLoader: BitmapLoader<T>) {
         val dataClassName = dataClass.name
-        mDescriptorFactories[dataClassName] =
-                InternalUtils.requireNonNull(descriptorFactory) as DataDescriptorFactory<Any>
-        mBitmapLoaders[dataClassName] = InternalUtils.requireNonNull(bitmapLoader) as BitmapLoader<Any>
+        mDescriptorFactories[dataClassName] = descriptorFactory as DataDescriptorFactory<Any>
+        mBitmapLoaders[dataClassName] = bitmapLoader as BitmapLoader<Any>
     }
 
     /**

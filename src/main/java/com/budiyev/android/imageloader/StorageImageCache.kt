@@ -59,8 +59,8 @@ internal class StorageImageCache(directory: File, compressMode: CompressMode, pr
     }
 
     init {
-        mDirectory = InternalUtils.requireNonNull(directory)
-        mCompressMode = InternalUtils.requireNonNull(compressMode)
+        mDirectory = directory
+        mCompressMode = compressMode
         if (mMaxSize < 0L) {
             throw IllegalArgumentException("Cache size should be greater than or equal to zero")
         }
