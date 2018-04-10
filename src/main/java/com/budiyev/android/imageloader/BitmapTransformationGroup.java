@@ -43,15 +43,16 @@ final class BitmapTransformationGroup implements BitmapTransformation {
 
     @NonNull
     @Override
-    public Bitmap transform(@NonNull Bitmap bitmap) throws Throwable {
+    public Bitmap transform(@NonNull final Bitmap bitmap) throws Throwable {
+        Bitmap buffer = bitmap;
         for (final BitmapTransformation t : mTransformations) {
-            final Bitmap transformed = t.transform(bitmap);
-            if (bitmap != transformed && !bitmap.isRecycled()) {
-                bitmap.recycle();
+            final Bitmap transformed = t.transform(buffer);
+            if (buffer != transformed && !buffer.isRecycled()) {
+                buffer.recycle();
             }
-            bitmap = transformed;
+            buffer = transformed;
         }
-        return bitmap;
+        return buffer;
     }
 
     @NonNull
