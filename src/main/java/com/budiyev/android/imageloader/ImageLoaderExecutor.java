@@ -46,7 +46,7 @@ final class ImageLoaderExecutor extends ThreadPoolExecutor {
             if (f.isDone()) {
                 try {
                     f.get();
-                } catch (InterruptedException | CancellationException ignored) {
+                } catch (final InterruptedException | CancellationException ignored) {
                 } catch (final ExecutionException e) {
                     throw new RuntimeException(e.getCause());
                 }
