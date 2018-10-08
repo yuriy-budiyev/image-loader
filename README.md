@@ -17,7 +17,7 @@ Image loader library for Android.
 Add dependency:
 ```gradle
 dependencies {
-    implementation 'com.budiyev.android:image-loader:2.5.5'
+    implementation 'com.budiyev.android:image-loader:2.5.6'
 }
 ```
 And load images simply:
