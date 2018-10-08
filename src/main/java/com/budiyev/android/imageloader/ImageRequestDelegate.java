@@ -23,7 +23,7 @@
  */
 package com.budiyev.android.imageloader;
 
-import android.support.annotation.AnyThread;
+import androidx.annotation.AnyThread;
 
 /**
  * Image request delegate

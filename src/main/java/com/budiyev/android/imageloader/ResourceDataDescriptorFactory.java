@@ -23,7 +23,7 @@
  */
 package com.budiyev.android.imageloader;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 final class ResourceDataDescriptorFactory implements DataDescriptorFactory<Integer> {
     @NonNull

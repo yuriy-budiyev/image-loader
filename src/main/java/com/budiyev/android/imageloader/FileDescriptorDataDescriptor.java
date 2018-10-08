@@ -25,7 +25,7 @@ package com.budiyev.android.imageloader;
 
 import java.io.FileDescriptor;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 final class FileDescriptorDataDescriptor extends UnidentifiableDataDescriptor<FileDescriptor> {
     public FileDescriptorDataDescriptor(@NonNull final FileDescriptor data) {

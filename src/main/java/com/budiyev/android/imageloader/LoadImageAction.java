@@ -26,9 +26,10 @@ package com.budiyev.android.imageloader;
 import java.util.concurrent.ExecutorService;
 
 import android.graphics.Bitmap;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.WorkerThread;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.WorkerThread;
 
 abstract class LoadImageAction<T> extends ImageRequestAction {
     private final DataDescriptor<T> mDescriptor;

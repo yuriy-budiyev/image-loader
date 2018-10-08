@@ -30,8 +30,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 final class ImageLoaderExecutor extends ThreadPoolExecutor {
     public ImageLoaderExecutor(final int poolSize) {

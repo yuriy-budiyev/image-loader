@@ -24,7 +24,8 @@
 package com.budiyev.android.imageloader;
 
 import android.net.Uri;
-import android.support.annotation.NonNull;
+
+import androidx.annotation.NonNull;
 
 final class UriDataDescriptorFactory implements DataDescriptorFactory<Uri> {
     @NonNull

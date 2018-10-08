@@ -23,7 +23,7 @@
  */
 package com.budiyev.android.imageloader;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 abstract class IdentifiableDataDescriptor<T> extends BaseDataDescriptor<T> {
     private final String mKey;

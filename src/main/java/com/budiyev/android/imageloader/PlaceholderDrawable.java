@@ -27,8 +27,9 @@ import java.lang.ref.WeakReference;
 
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * {@link Drawable} that holds reference to {@link DisplayImageAction}

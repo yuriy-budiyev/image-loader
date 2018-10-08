@@ -25,7 +25,7 @@ package com.budiyev.android.imageloader;
 
 import java.io.File;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 final class FileDataDescriptorFactory implements DataDescriptorFactory<File> {
     @NonNull

@@ -28,7 +28,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 abstract class ImageRequestAction implements ImageRequestDelegate, Callable<Void> {
     private final AtomicBoolean mCancelled = new AtomicBoolean();

@@ -39,8 +39,9 @@ import java.util.concurrent.locks.ReentrantLock;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 final class StorageImageCache implements ImageCache {

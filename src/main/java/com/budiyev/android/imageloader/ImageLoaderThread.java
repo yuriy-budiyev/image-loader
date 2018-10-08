@@ -24,7 +24,8 @@
 package com.budiyev.android.imageloader;
 
 import android.os.Process;
-import android.support.annotation.NonNull;
+
+import androidx.annotation.NonNull;
 
 final class ImageLoaderThread extends Thread {
     public ImageLoaderThread(@NonNull final Runnable target, @NonNull final String name) {

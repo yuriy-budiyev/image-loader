@@ -26,7 +26,7 @@ package com.budiyev.android.imageloader;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 final class ImageLoaderThreadFactory implements ThreadFactory {
     private static final AtomicInteger THREAD_COUNTER = new AtomicInteger(1);

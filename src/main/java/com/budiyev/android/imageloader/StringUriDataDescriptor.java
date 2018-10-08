@@ -23,7 +23,7 @@
  */
 package com.budiyev.android.imageloader;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 final class StringUriDataDescriptor extends IdentifiableDataDescriptor<String> {
     private final DataLocation mLocation;

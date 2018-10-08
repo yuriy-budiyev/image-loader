@@ -24,7 +24,8 @@
 package com.budiyev.android.imageloader;
 
 import android.graphics.Bitmap;
-import android.support.annotation.NonNull;
+
+import androidx.annotation.NonNull;
 
 public enum CompressMode {
     /**

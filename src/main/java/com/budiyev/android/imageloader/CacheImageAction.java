@@ -26,7 +26,8 @@ package com.budiyev.android.imageloader;
 import java.lang.ref.WeakReference;
 
 import android.graphics.Bitmap;
-import android.support.annotation.NonNull;
+
+import androidx.annotation.NonNull;
 
 final class CacheImageAction extends ImageRequestAction {
     private final String mKey;

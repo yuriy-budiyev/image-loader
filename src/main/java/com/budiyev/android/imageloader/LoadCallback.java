@@ -24,8 +24,9 @@
 package com.budiyev.android.imageloader;
 
 import android.graphics.Bitmap;
-import android.support.annotation.AnyThread;
-import android.support.annotation.NonNull;
+
+import androidx.annotation.AnyThread;
+import androidx.annotation.NonNull;
 
 /**
  * Load callback

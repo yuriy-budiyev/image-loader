@@ -34,8 +34,9 @@ import android.content.ComponentCallbacks2;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * Image loader is a universal tool for loading bitmaps efficiently in Android

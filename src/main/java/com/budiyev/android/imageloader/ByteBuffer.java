@@ -26,7 +26,7 @@ package com.budiyev.android.imageloader;
 import java.io.OutputStream;
 import java.util.Arrays;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 final class ByteBuffer extends OutputStream {
     private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;

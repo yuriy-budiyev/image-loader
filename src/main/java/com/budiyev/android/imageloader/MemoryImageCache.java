@@ -31,8 +31,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import android.graphics.Bitmap;
 import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 final class MemoryImageCache implements ImageCache {
     private static final float DEFAULT_MEMORY_FRACTION = 0.25f;
