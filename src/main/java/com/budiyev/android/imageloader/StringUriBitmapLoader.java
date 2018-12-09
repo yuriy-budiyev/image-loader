@@ -42,13 +42,14 @@ final class StringUriBitmapLoader implements BitmapLoader<String> {
 
     @Nullable
     @Override
-    public Bitmap load(@NonNull final String data, @Nullable final Size requiredSize) throws Throwable {
+    public Bitmap load(@NonNull final String data, @Nullable final Size requiredSize)
+            throws Throwable {
         Bitmap bitmap;
         final Context context = mContext;
         final Uri uri = Uri.parse(data);
         if (requiredSize != null) {
-            bitmap =
-                    DataUtils.loadSampledBitmapFromUri(context, uri, requiredSize.getWidth(), requiredSize.getHeight());
+            bitmap = DataUtils.loadSampledBitmapFromUri(context, uri, requiredSize.getWidth(),
+                    requiredSize.getHeight());
         } else {
             InputStream inputStream = null;
             try {

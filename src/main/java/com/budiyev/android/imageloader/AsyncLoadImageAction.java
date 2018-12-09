@@ -33,12 +33,13 @@ import androidx.annotation.Nullable;
 final class AsyncLoadImageAction<T> extends LoadImageAction<T> {
     public AsyncLoadImageAction(@NonNull final DataDescriptor<T> descriptor,
             @NonNull final BitmapLoader<T> bitmapLoader, @Nullable final Size requiredSize,
-            @Nullable final BitmapTransformation transformation, @Nullable final ImageCache memoryCache,
-            @Nullable final ImageCache storageCache, @Nullable final ExecutorService cacheExecutor,
+            @Nullable final BitmapTransformation transformation,
+            @Nullable final ImageCache memoryCache, @Nullable final ImageCache storageCache,
+            @Nullable final ExecutorService cacheExecutor,
             @Nullable final LoadCallback loadCallback, @Nullable final ErrorCallback errorCallback,
             @NonNull final PauseLock pauseLock) {
-        super(descriptor, bitmapLoader, requiredSize, transformation, memoryCache, storageCache, cacheExecutor,
-                loadCallback, errorCallback, pauseLock);
+        super(descriptor, bitmapLoader, requiredSize, transformation, memoryCache, storageCache,
+                cacheExecutor, loadCallback, errorCallback, pauseLock);
     }
 
     @Override

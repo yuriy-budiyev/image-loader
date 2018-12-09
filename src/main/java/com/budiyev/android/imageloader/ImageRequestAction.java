@@ -39,7 +39,7 @@ abstract class ImageRequestAction implements ImageRequestDelegate, Callable<Void
     protected abstract void onCancelled();
 
     @Override
-    public final Void call() throws Exception {
+    public final Void call() {
         execute();
         return null;
     }

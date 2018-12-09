@@ -29,7 +29,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.net.URLConnection;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -48,18 +47,14 @@ import androidx.annotation.Nullable;
 import androidx.exifinterface.media.ExifInterface;
 
 final class InternalUtils {
-    private static final int CONNECT_TIMEOUT = 10000;
     private static final int MAX_POOL_SIZE = 4;
     private static final int MIN_POOL_SIZE = 1;
-    private static final String URI_SCHEME_HTTP = "http";
-    private static final String URI_SCHEME_HTTPS = "https";
-    private static final String URI_SCHEME_FTP = "ftp";
 
     private InternalUtils() {
     }
 
-    public static void invalidate(@Nullable final ImageCache memoryCache, @Nullable final ImageCache storageCache,
-            @NonNull final DataDescriptor<?> descriptor) {
+    public static void invalidate(@Nullable final ImageCache memoryCache,
+            @Nullable final ImageCache storageCache, @NonNull final DataDescriptor<?> descriptor) {
         final String key = descriptor.getKey();
         if (key == null) {
             return;
@@ -73,7 +68,8 @@ final class InternalUtils {
     }
 
     @Nullable
-    public static String buildFullKey(@Nullable final String base, @Nullable final Size requiredSize,
+    public static String buildFullKey(@Nullable final String base,
+            @Nullable final Size requiredSize,
             @Nullable final BitmapTransformation transformation) {
         if (base == null) {
             return null;
@@ -83,7 +79,8 @@ final class InternalUtils {
         }
         final StringBuilder sb = new StringBuilder(base);
         if (requiredSize != null) {
-            sb.append("_required_size_").append(requiredSize.getWidth()).append("x").append(requiredSize.getHeight());
+            sb.append("_required_size_").append(requiredSize.getWidth()).append("x")
+                    .append(requiredSize.getHeight());
         }
         if (transformation != null) {
             sb.append(transformation.getKey());
@@ -102,24 +99,18 @@ final class InternalUtils {
     }
 
     @Nullable
-    public static InputStream getDataStreamFromUri(@NonNull final Context context, @NonNull final Uri uri)
-            throws IOException {
-        final String scheme = uri.getScheme();
-        if (URI_SCHEME_HTTP.equalsIgnoreCase(scheme) || URI_SCHEME_HTTPS.equalsIgnoreCase(scheme) ||
-                URI_SCHEME_FTP.equalsIgnoreCase(scheme)) {
-            final URLConnection connection = new URL(uri.toString()).openConnection();
-            connection.setConnectTimeout(CONNECT_TIMEOUT);
-            return connection.getInputStream();
-        } else {
+    public static InputStream getDataStreamFromUri(@NonNull final Context context,
+            @NonNull final Uri uri) throws IOException {
+        if (isUriLocal(uri)) {
             return context.getContentResolver().openInputStream(uri);
+        } else {
+            return getDataStreamFromUrl(uri.toString());
         }
     }
 
     @Nullable
     public static InputStream getDataStreamFromUrl(@NonNull final String url) throws IOException {
-        final URLConnection connection = new URL(url).openConnection();
-        connection.setConnectTimeout(CONNECT_TIMEOUT);
-        return connection.getInputStream();
+        return new URL(url).openConnection().getInputStream();
     }
 
     @Nullable
@@ -183,18 +174,23 @@ final class InternalUtils {
     }
 
     public static boolean isUriLocal(@NonNull final Uri uri) {
-        return isUriSchemeLocal(uri.getScheme());
+        final String scheme = uri.getScheme();
+        if (scheme != null) {
+            return isUriSchemeLocal(scheme);
+        } else {
+            return false;
+        }
     }
 
     public static boolean isUriLocal(@NonNull final String uri) {
         final int ssi = uri.indexOf(':');
         return ssi != -1 && isUriSchemeLocal(uri.substring(0, ssi));
-
     }
 
     private static boolean isUriSchemeLocal(@NonNull final String scheme) {
-        return ContentResolver.SCHEME_FILE.equals(scheme) || ContentResolver.SCHEME_CONTENT.equals(scheme) ||
-                ContentResolver.SCHEME_ANDROID_RESOURCE.equals(scheme);
+        return ContentResolver.SCHEME_FILE.equalsIgnoreCase(scheme) ||
+                ContentResolver.SCHEME_CONTENT.equalsIgnoreCase(scheme) ||
+                ContentResolver.SCHEME_ANDROID_RESOURCE.equalsIgnoreCase(scheme);
     }
 
     public static int getExifRotation(@NonNull final Context context, @NonNull final Uri uri) {
@@ -230,7 +226,8 @@ final class InternalUtils {
     }
 
     public static int getExifRotation(@NonNull final ExifInterface exifInterface) {
-        switch (exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)) {
+        switch (exifInterface
+                .getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)) {
             case ExifInterface.ORIENTATION_ROTATE_90:
                 return 90;
             case ExifInterface.ORIENTATION_ROTATE_180:

@@ -121,7 +121,8 @@ public final class ImageLoaderBuilder {
      * Storage cache with specified directory and maximum size
      */
     @NonNull
-    public ImageLoaderBuilder storageCache(@NonNull final File directory, @IntRange(from = 0L) final long maxSize) {
+    public ImageLoaderBuilder storageCache(@NonNull final File directory,
+            @IntRange(from = 0L) final long maxSize) {
         mStorageCache = new StorageImageCache(directory, maxSize);
         return this;
     }
@@ -132,8 +133,8 @@ public final class ImageLoaderBuilder {
      * @see CompressMode
      */
     @NonNull
-    public ImageLoaderBuilder storageCache(@NonNull final File directory, @NonNull final CompressMode compressMode,
-            final long maxSize) {
+    public ImageLoaderBuilder storageCache(@NonNull final File directory,
+            @NonNull final CompressMode compressMode, final long maxSize) {
         mStorageCache = new StorageImageCache(directory, compressMode, maxSize);
         return this;
     }
@@ -179,14 +180,20 @@ public final class ImageLoaderBuilder {
             cacheExecutor = new ImageLoaderExecutor(InternalUtils.getCachePoolSize());
         }
         final Context context = mContext;
-        final ImageLoader loader = new ImageLoader(context, loadExecutor, cacheExecutor, mMemoryCache, mStorageCache);
-        loader.registerDataType(Uri.class, new UriDataDescriptorFactory(), new UriBitmapLoader(context));
-        loader.registerDataType(File.class, new FileDataDescriptorFactory(), new FileBitmapLoader());
-        loader.registerDataType(String.class, new StringUriDataDescriptorFactory(), new StringUriBitmapLoader(context));
-        loader.registerDataType(Integer.class, new ResourceDataDescriptorFactory(), new ResourceBitmapLoader(context));
+        final ImageLoader loader =
+                new ImageLoader(context, loadExecutor, cacheExecutor, mMemoryCache, mStorageCache);
+        loader.registerDataType(Uri.class, new UriDataDescriptorFactory(),
+                new UriBitmapLoader(context));
+        loader.registerDataType(File.class, new FileDataDescriptorFactory(),
+                new FileBitmapLoader());
+        loader.registerDataType(String.class, new StringUriDataDescriptorFactory(),
+                new StringUriBitmapLoader(context));
+        loader.registerDataType(Integer.class, new ResourceDataDescriptorFactory(),
+                new ResourceBitmapLoader(context));
         loader.registerDataType(FileDescriptor.class, new FileDescriptorDataDescriptorFactory(),
                 new FileDescriptorBitmapLoader());
-        loader.registerDataType(byte[].class, new ByteArrayDataDescriptorFactory(), new ByteArrayBitmapLoader());
+        loader.registerDataType(byte[].class, new ByteArrayDataDescriptorFactory(),
+                new ByteArrayBitmapLoader());
         return loader;
     }
 }

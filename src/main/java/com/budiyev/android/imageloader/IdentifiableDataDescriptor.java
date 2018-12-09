@@ -30,7 +30,7 @@ abstract class IdentifiableDataDescriptor<T> extends BaseDataDescriptor<T> {
 
     protected IdentifiableDataDescriptor(@NonNull final T data, @NonNull final String keyBase) {
         super(data);
-        mKey = DataUtils.generateSHA256(keyBase);
+        mKey = DataUtils.generateSha256(keyBase);
     }
 
     @NonNull

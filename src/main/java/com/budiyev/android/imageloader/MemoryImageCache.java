@@ -48,7 +48,8 @@ final class MemoryImageCache implements ImageCache {
 
     public MemoryImageCache(final int maxSize) {
         if (maxSize < 0) {
-            throw new IllegalArgumentException("Cache size should be greater than or equal to zero");
+            throw new IllegalArgumentException(
+                    "Cache size should be greater than or equal to zero");
         }
         mImages = new LinkedHashMap<>(0, 0.75f, true);
         mLock = new ReentrantLock();

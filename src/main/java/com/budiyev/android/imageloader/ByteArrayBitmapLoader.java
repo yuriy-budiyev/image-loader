@@ -32,10 +32,11 @@ import androidx.annotation.Nullable;
 final class ByteArrayBitmapLoader implements BitmapLoader<byte[]> {
     @Nullable
     @Override
-    public Bitmap load(@NonNull final byte[] data, @Nullable final Size requiredSize) throws Throwable {
+    public Bitmap load(@NonNull final byte[] data, @Nullable final Size requiredSize) {
         Bitmap bitmap;
         if (requiredSize != null) {
-            bitmap = DataUtils.loadSampledBitmapFromByteArray(data, requiredSize.getWidth(), requiredSize.getHeight());
+            bitmap = DataUtils.loadSampledBitmapFromByteArray(data, requiredSize.getWidth(),
+                    requiredSize.getHeight());
         } else {
             bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
         }

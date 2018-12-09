@@ -133,9 +133,11 @@ public final class ImageRequest<T> {
      * and image view scale type
      */
     @NonNull
-    public ImageRequest<T> roundCorners(@FloatRange(from = 0f, to = Float.MAX_VALUE) final float radius) {
+    public ImageRequest<T> roundCorners(
+            @FloatRange(from = 0f, to = Float.MAX_VALUE) final float radius) {
         if (radius < 0f) {
-            throw new IllegalArgumentException("Corner radius should be greater than or equal to zero");
+            throw new IllegalArgumentException(
+                    "Corner radius should be greater than or equal to zero");
         }
         mCornerRadius = radius;
         return this;
@@ -196,7 +198,8 @@ public final class ImageRequest<T> {
      * @see BitmapTransformation
      */
     @NonNull
-    public ImageRequest<T> transform(@NonNull final Collection<BitmapTransformation> transformations) {
+    public ImageRequest<T> transform(
+            @NonNull final Collection<BitmapTransformation> transformations) {
         transformations().addAll(InternalUtils.requireNonNull(transformations));
         return this;
     }
@@ -242,7 +245,8 @@ public final class ImageRequest<T> {
     @NonNull
     public ImageRequest<T> fade(@IntRange(from = 0L) final long duration) {
         if (duration < 0L) {
-            throw new IllegalArgumentException("Fade duration should be greater than or equal to zero");
+            throw new IllegalArgumentException(
+                    "Fade duration should be greater than or equal to zero");
         }
         mFadeEnabled = true;
         mFadeDuration = duration;
@@ -304,8 +308,9 @@ public final class ImageRequest<T> {
     @WorkerThread
     public Bitmap loadSync() {
         checkAndSetExecutedState();
-        return new SyncLoadImageAction<>(mDescriptor, mBitmapLoader, mRequiredSize, getTransformation(),
-                getMemoryCache(), getStorageCache(), mLoadCallback, mErrorCallback, mPauseLock).load();
+        return new SyncLoadImageAction<>(mDescriptor, mBitmapLoader, mRequiredSize,
+                getTransformation(), getMemoryCache(), getStorageCache(), mLoadCallback,
+                mErrorCallback, mPauseLock).load();
     }
 
     /**
@@ -320,9 +325,9 @@ public final class ImageRequest<T> {
     @AnyThread
     public ImageRequestDelegate load() {
         checkAndSetExecutedState();
-        return new AsyncLoadImageAction<>(mDescriptor, mBitmapLoader, mRequiredSize, getTransformation(),
-                getMemoryCache(), getStorageCache(), mCacheExecutor, mLoadCallback, mErrorCallback, mPauseLock)
-                .submit(mLoadExecutor);
+        return new AsyncLoadImageAction<>(mDescriptor, mBitmapLoader, mRequiredSize,
+                getTransformation(), getMemoryCache(), getStorageCache(), mCacheExecutor,
+                mLoadCallback, mErrorCallback, mPauseLock).submit(mLoadExecutor);
     }
 
     /**
@@ -344,7 +349,8 @@ public final class ImageRequest<T> {
         final ImageCache memoryCache = getMemoryCache();
         final float cornerRadius = mCornerRadius;
         Bitmap image = null;
-        final String key = InternalUtils.buildFullKey(descriptor.getKey(), requiredSize, transformation);
+        final String key =
+                InternalUtils.buildFullKey(descriptor.getKey(), requiredSize, transformation);
         if (key != null && memoryCache != null) {
             image = memoryCache.get(key);
         }
@@ -357,7 +363,8 @@ public final class ImageRequest<T> {
                 loadCallback.onLoaded(image);
             }
             if (cornerRadius > 0 || cornerRadius == RoundedDrawable.MAX_RADIUS) {
-                InternalUtils.setDrawable(new RoundedDrawable(resources, image, cornerRadius), view);
+                InternalUtils
+                        .setDrawable(new RoundedDrawable(resources, image, cornerRadius), view);
             } else {
                 InternalUtils.setBitmap(resources, image, view);
             }
@@ -377,10 +384,10 @@ public final class ImageRequest<T> {
             placeholder = new ColorDrawable(Color.TRANSPARENT);
         }
         final DisplayImageAction<T> action =
-                new DisplayImageAction<>(resources, view, descriptor, mBitmapLoader, requiredSize, transformation,
-                        placeholder, mErrorDrawable, memoryCache, getStorageCache(), mCacheExecutor, loadCallback,
-                        mErrorCallback, displayCallback, mPauseLock, mMainThreadHandler, mFadeEnabled, mFadeDuration,
-                        cornerRadius);
+                new DisplayImageAction<>(resources, view, descriptor, mBitmapLoader, requiredSize,
+                        transformation, placeholder, mErrorDrawable, memoryCache, getStorageCache(),
+                        mCacheExecutor, loadCallback, mErrorCallback, displayCallback, mPauseLock,
+                        mMainThreadHandler, mFadeEnabled, mFadeDuration, cornerRadius);
         InternalUtils.setDrawable(new PlaceholderDrawable(placeholder, action), view);
         return action.submit(mLoadExecutor);
     }
@@ -395,7 +402,8 @@ public final class ImageRequest<T> {
     @AnyThread
     public ImageRequestDelegate invalidate() {
         checkAndSetExecutedState();
-        return new InvalidateAction(mDescriptor, getMemoryCache(), getStorageCache()).submit(mCacheExecutor);
+        return new InvalidateAction(mDescriptor, getMemoryCache(), getStorageCache())
+                .submit(mCacheExecutor);
     }
 
     @NonNull

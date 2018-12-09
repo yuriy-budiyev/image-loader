@@ -40,11 +40,11 @@ final class ResourceBitmapLoader implements BitmapLoader<Integer> {
 
     @Nullable
     @Override
-    public Bitmap load(@NonNull final Integer data, @Nullable final Size requiredSize) throws Throwable {
+    public Bitmap load(@NonNull final Integer data, @Nullable final Size requiredSize) {
         final Resources resources = mContext.getResources();
         if (requiredSize != null) {
-            return DataUtils
-                    .loadSampledBitmapFromResource(resources, data, requiredSize.getWidth(), requiredSize.getHeight());
+            return DataUtils.loadSampledBitmapFromResource(resources, data, requiredSize.getWidth(),
+                    requiredSize.getHeight());
         } else {
             return BitmapFactory.decodeResource(resources, data);
         }

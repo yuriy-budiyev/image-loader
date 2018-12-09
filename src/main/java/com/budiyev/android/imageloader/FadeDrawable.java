@@ -76,7 +76,9 @@ final class FadeDrawable extends LayerDrawable {
                     endDrawable.setAlpha(mEndAlpha);
                     endDrawable.draw(canvas);
                 } else {
-                    startDrawable.setAlpha(Math.max(mStartAlpha - (int) (mStartAlpha * elapsed / mFadeDuration), 0));
+                    startDrawable.setAlpha(
+                            Math.max(mStartAlpha - (int) (mStartAlpha * elapsed / mFadeDuration),
+                                    0));
                     startDrawable.draw(canvas);
                     endDrawable.setAlpha(endAlpha);
                     endDrawable.draw(canvas);

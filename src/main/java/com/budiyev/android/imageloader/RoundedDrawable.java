@@ -50,7 +50,8 @@ final class RoundedDrawable extends Drawable {
     private final int mWidth;
     private final int mHeight;
 
-    public RoundedDrawable(@NonNull final Resources resources, @NonNull final Bitmap bitmap, final float cornerRadius) {
+    public RoundedDrawable(@NonNull final Resources resources, @NonNull final Bitmap bitmap,
+            final float cornerRadius) {
         mShader = new BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
         mPaint.setShader(mShader);
         mBitmap = bitmap;
@@ -87,8 +88,8 @@ final class RoundedDrawable extends Drawable {
 
     @Override
     public int getOpacity() {
-        return mBitmap.hasAlpha() || mPaint.getAlpha() < 255 || mCornerRadius > 0.5f || mCornerRadius == MAX_RADIUS ?
-                PixelFormat.TRANSLUCENT : PixelFormat.OPAQUE;
+        return mBitmap.hasAlpha() || mPaint.getAlpha() < 255 || mCornerRadius > 0.5f ||
+                mCornerRadius == MAX_RADIUS ? PixelFormat.TRANSLUCENT : PixelFormat.OPAQUE;
     }
 
     @Override

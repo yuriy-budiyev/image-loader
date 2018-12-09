@@ -49,7 +49,7 @@ public interface DataDescriptor<T> {
      * caching is not available if this method returns {@code null}
      *
      * @return Unique identifier or {@code null}
-     * @see DataUtils#generateSHA256
+     * @see DataUtils#generateSha256
      */
     @Nullable
     @AnyThread

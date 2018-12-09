@@ -36,10 +36,10 @@ import androidx.annotation.Nullable;
 final class FileDescriptorBitmapLoader implements BitmapLoader<FileDescriptor> {
     @Nullable
     @Override
-    public Bitmap load(@NonNull final FileDescriptor data, @Nullable final Size requiredSize) throws Throwable {
+    public Bitmap load(@NonNull final FileDescriptor data, @Nullable final Size requiredSize) {
         if (requiredSize != null) {
-            return DataUtils
-                    .loadSampledBitmapFromFileDescriptor(data, requiredSize.getWidth(), requiredSize.getHeight());
+            return DataUtils.loadSampledBitmapFromFileDescriptor(data, requiredSize.getWidth(),
+                    requiredSize.getHeight());
         } else {
             InputStream inputStream = null;
             try {

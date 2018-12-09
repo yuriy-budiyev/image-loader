@@ -31,8 +31,8 @@ final class InvalidateAction extends ImageRequestAction {
     private final ImageCache mMemoryCache;
     private final ImageCache mStorageCache;
 
-    public InvalidateAction(@NonNull final DataDescriptor<?> descriptor, @Nullable final ImageCache memoryCache,
-            @Nullable final ImageCache storageCache) {
+    public InvalidateAction(@NonNull final DataDescriptor<?> descriptor,
+            @Nullable final ImageCache memoryCache, @Nullable final ImageCache storageCache) {
         mDescriptor = descriptor;
         mMemoryCache = memoryCache;
         mStorageCache = storageCache;

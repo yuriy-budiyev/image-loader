@@ -66,8 +66,8 @@ final class StorageImageCache implements ImageCache {
         this(getDefaultDirectory(context), maxSize);
     }
 
-    public StorageImageCache(@NonNull final Context context, @NonNull final CompressMode compressMode,
-            final long maxSize) {
+    public StorageImageCache(@NonNull final Context context,
+            @NonNull final CompressMode compressMode, final long maxSize) {
         this(getDefaultDirectory(context), compressMode, maxSize);
     }
 
@@ -79,12 +79,13 @@ final class StorageImageCache implements ImageCache {
         this(directory, CompressMode.LOSSLESS, maxSize);
     }
 
-    public StorageImageCache(@NonNull final File directory, @NonNull final CompressMode compressMode,
-            final long maxSize) {
+    public StorageImageCache(@NonNull final File directory,
+            @NonNull final CompressMode compressMode, final long maxSize) {
         mDirectory = InternalUtils.requireNonNull(directory);
         mCompressMode = InternalUtils.requireNonNull(compressMode);
         if (maxSize < 0L) {
-            throw new IllegalArgumentException("Cache size should be greater than or equal to zero");
+            throw new IllegalArgumentException(
+                    "Cache size should be greater than or equal to zero");
         }
         mMaxSize = maxSize;
     }
@@ -116,7 +117,8 @@ final class StorageImageCache implements ImageCache {
                 }
                 outputBuffer.write(buffer, 0, read);
             }
-            bitmap = BitmapFactory.decodeByteArray(outputBuffer.getArray(), 0, outputBuffer.getSize());
+            bitmap = BitmapFactory
+                    .decodeByteArray(outputBuffer.getArray(), 0, outputBuffer.getSize());
         } catch (final IOException ignored) {
         } finally {
             InternalUtils.close(inputStream);

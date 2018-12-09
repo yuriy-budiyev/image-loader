@@ -28,7 +28,6 @@ import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -45,24 +44,33 @@ import androidx.annotation.WorkerThread;
 @SuppressWarnings("SameParameterValue")
 public final class DataUtils {
     private static final String HASH_ALGORITHM_SHA256 = "SHA-256";
+    private static final char[] HEX_DIGITS =
+            new char[] {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e',
+                    'f'};
 
     private DataUtils() {
     }
 
     /**
-     * Generate SHA-256 hash string with {@link Character#MAX_RADIX} radix
-     * for specified {@link String}; usable for keys of {@link DataDescriptor} implementations
+     * Generate SHA-256 hash string for specified {@link String},
+     * usable for keys of {@link DataDescriptor} implementations
      *
      * @param string Source string
      * @return SHA-256 hash string
      * @see DataDescriptor#getKey
      */
     @NonNull
-    public static String generateSHA256(@NonNull final String string) {
+    public static String generateSha256(@NonNull final String string) {
         try {
             final MessageDigest messageDigest = MessageDigest.getInstance(HASH_ALGORITHM_SHA256);
             messageDigest.update(string.getBytes());
-            return new BigInteger(1, messageDigest.digest()).toString(Character.MAX_RADIX);
+            final byte[] digest = messageDigest.digest();
+            final StringBuilder hexBuilder = new StringBuilder(digest.length << 1);
+            for (final byte b : digest) {
+                hexBuilder.append(HEX_DIGITS[b >> 4 & 15]);
+                hexBuilder.append(HEX_DIGITS[b & 15]);
+            }
+            return hexBuilder.toString();
         } catch (final NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
@@ -79,8 +87,9 @@ public final class DataUtils {
      */
     @Nullable
     @WorkerThread
-    public static Bitmap loadSampledBitmapFromUri(@NonNull final Context context, @NonNull final Uri uri,
-            final int requiredWidth, final int requiredHeight) throws IOException {
+    public static Bitmap loadSampledBitmapFromUri(@NonNull final Context context,
+            @NonNull final Uri uri, final int requiredWidth, final int requiredHeight)
+            throws IOException {
         final BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         InputStream inputStream = null;
@@ -117,8 +126,8 @@ public final class DataUtils {
      */
     @Nullable
     @WorkerThread
-    public static Bitmap loadSampledBitmapFromUrl(@NonNull final String url, final int requiredWidth,
-            final int requiredHeight) throws IOException {
+    public static Bitmap loadSampledBitmapFromUrl(@NonNull final String url,
+            final int requiredWidth, final int requiredHeight) throws IOException {
         final BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         InputStream inputStream = null;
@@ -155,8 +164,8 @@ public final class DataUtils {
      */
     @Nullable
     @WorkerThread
-    public static Bitmap loadSampledBitmapFromFile(@NonNull final File file, final int requiredWidth,
-            final int requiredHeight) throws IOException {
+    public static Bitmap loadSampledBitmapFromFile(@NonNull final File file,
+            final int requiredWidth, final int requiredHeight) throws IOException {
         final BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         InputStream inputStream = null;
@@ -188,8 +197,9 @@ public final class DataUtils {
      */
     @Nullable
     @WorkerThread
-    public static Bitmap loadSampledBitmapFromFileDescriptor(@NonNull final FileDescriptor fileDescriptor,
-            final int requiredWidth, final int requiredHeight) {
+    public static Bitmap loadSampledBitmapFromFileDescriptor(
+            @NonNull final FileDescriptor fileDescriptor, final int requiredWidth,
+            final int requiredHeight) {
         final BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         InputStream inputStream = null;
@@ -221,8 +231,8 @@ public final class DataUtils {
      */
     @Nullable
     @WorkerThread
-    public static Bitmap loadSampledBitmapFromResource(@NonNull final Resources resources, final int resourceId,
-            final int requiredWidth, final int requiredHeight) {
+    public static Bitmap loadSampledBitmapFromResource(@NonNull final Resources resources,
+            final int resourceId, final int requiredWidth, final int requiredHeight) {
         final BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeResource(resources, resourceId, options);
@@ -241,8 +251,8 @@ public final class DataUtils {
      */
     @Nullable
     @WorkerThread
-    public static Bitmap loadSampledBitmapFromByteArray(@NonNull final byte[] byteArray, final int requiredWidth,
-            final int requiredHeight) {
+    public static Bitmap loadSampledBitmapFromByteArray(@NonNull final byte[] byteArray,
+            final int requiredWidth, final int requiredHeight) {
         final BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length, options);
@@ -251,8 +261,8 @@ public final class DataUtils {
         return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length, options);
     }
 
-    private static void calculateSampleSize(@NonNull final BitmapFactory.Options options, final int requiredWidth,
-            final int requiredHeight) {
+    private static void calculateSampleSize(@NonNull final BitmapFactory.Options options,
+            final int requiredWidth, final int requiredHeight) {
         int width = options.outWidth;
         int height = options.outHeight;
         final int threshold = Math.max(requiredWidth, requiredHeight) / 4;

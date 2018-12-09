@@ -34,7 +34,8 @@ final class CacheImageAction extends ImageRequestAction {
     private final WeakReference<Bitmap> mImage;
     private final ImageCache mCache;
 
-    public CacheImageAction(@NonNull final String key, @NonNull final Bitmap image, @NonNull final ImageCache cache) {
+    public CacheImageAction(@NonNull final String key, @NonNull final Bitmap image,
+            @NonNull final ImageCache cache) {
         mKey = key;
         mImage = new WeakReference<>(image);
         mCache = cache;

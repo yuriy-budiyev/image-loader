@@ -50,16 +50,18 @@ final class DisplayImageAction<T> extends LoadImageAction<T> {
     private final float mCornerRadius;
 
     public DisplayImageAction(@NonNull final Resources resources, @NonNull final View view,
-            @NonNull final DataDescriptor<T> descriptor, @NonNull final BitmapLoader<T> bitmapLoader,
-            @Nullable final Size requiredSize, @Nullable final BitmapTransformation transformation,
+            @NonNull final DataDescriptor<T> descriptor,
+            @NonNull final BitmapLoader<T> bitmapLoader, @Nullable final Size requiredSize,
+            @Nullable final BitmapTransformation transformation,
             @NonNull final Drawable placeholder, @Nullable final Drawable errorDrawable,
             @Nullable final ImageCache memoryCache, @Nullable final ImageCache storageCache,
-            @Nullable final ExecutorService cacheExecutor, @Nullable final LoadCallback loadCallback,
-            @Nullable final ErrorCallback errorCallback, @Nullable final DisplayCallback displayCallback,
-            @NonNull final PauseLock pauseLock, @NonNull final Handler mainThreadHandler, final boolean fadeEnabled,
+            @Nullable final ExecutorService cacheExecutor,
+            @Nullable final LoadCallback loadCallback, @Nullable final ErrorCallback errorCallback,
+            @Nullable final DisplayCallback displayCallback, @NonNull final PauseLock pauseLock,
+            @NonNull final Handler mainThreadHandler, final boolean fadeEnabled,
             final long fadeDuration, final float cornerRadius) {
-        super(descriptor, bitmapLoader, requiredSize, transformation, memoryCache, storageCache, cacheExecutor,
-                loadCallback, errorCallback, pauseLock);
+        super(descriptor, bitmapLoader, requiredSize, transformation, memoryCache, storageCache,
+                cacheExecutor, loadCallback, errorCallback, pauseLock);
         mResources = new WeakReference<>(resources);
         mView = new WeakReference<>(view);
         mDisplayCallback = displayCallback;
@@ -73,7 +75,7 @@ final class DisplayImageAction<T> extends LoadImageAction<T> {
 
     public boolean hasSameKey(@Nullable final String key) {
         final String k = getKey();
-        return k != null && key != null && k.equals(key);
+        return k != null && k.equals(key);
     }
 
     @Override
@@ -107,7 +109,9 @@ final class DisplayImageAction<T> extends LoadImageAction<T> {
                 return;
             }
             if (mFadeEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                InternalUtils.setDrawable(new FadeDrawable(mPlaceholder, errorDrawable, mFadeDuration), view);
+                InternalUtils
+                        .setDrawable(new FadeDrawable(mPlaceholder, errorDrawable, mFadeDuration),
+                                view);
             } else {
                 InternalUtils.setDrawable(errorDrawable, view);
             }
@@ -135,14 +139,16 @@ final class DisplayImageAction<T> extends LoadImageAction<T> {
             }
             final Bitmap image = mImage;
             final float cornerRadius = mCornerRadius;
-            final boolean roundCorners = cornerRadius > 0 || cornerRadius == RoundedDrawable.MAX_RADIUS;
+            final boolean roundCorners =
+                    cornerRadius > 0 || cornerRadius == RoundedDrawable.MAX_RADIUS;
             if (mFadeEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 InternalUtils.setDrawable(new FadeDrawable(mPlaceholder,
                         roundCorners ? new RoundedDrawable(resources, image, cornerRadius) :
                                 new BitmapDrawable(resources, image), mFadeDuration), view);
             } else {
                 if (roundCorners) {
-                    InternalUtils.setDrawable(new RoundedDrawable(resources, image, cornerRadius), view);
+                    InternalUtils
+                            .setDrawable(new RoundedDrawable(resources, image, cornerRadius), view);
                 } else {
                     InternalUtils.setBitmap(resources, image, view);
                 }

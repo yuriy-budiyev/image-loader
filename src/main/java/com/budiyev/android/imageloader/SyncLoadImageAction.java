@@ -32,13 +32,14 @@ import androidx.annotation.WorkerThread;
 final class SyncLoadImageAction<T> extends LoadImageAction<T> {
     private Bitmap mImage;
 
-    public SyncLoadImageAction(@NonNull final DataDescriptor<T> descriptor, @NonNull final BitmapLoader<T> bitmapLoader,
-            @Nullable final Size requiredSize, @Nullable final BitmapTransformation transformation,
+    public SyncLoadImageAction(@NonNull final DataDescriptor<T> descriptor,
+            @NonNull final BitmapLoader<T> bitmapLoader, @Nullable final Size requiredSize,
+            @Nullable final BitmapTransformation transformation,
             @Nullable final ImageCache memoryCache, @Nullable final ImageCache storageCache,
             @Nullable final LoadCallback loadCallback, @Nullable final ErrorCallback errorCallback,
             @NonNull final PauseLock pauseLock) {
-        super(descriptor, bitmapLoader, requiredSize, transformation, memoryCache, storageCache, null, loadCallback,
-                errorCallback, pauseLock);
+        super(descriptor, bitmapLoader, requiredSize, transformation, memoryCache, storageCache,
+                null, loadCallback, errorCallback, pauseLock);
     }
 
     @Nullable

@@ -37,7 +37,8 @@ import androidx.annotation.Nullable;
 final class PlaceholderDrawable extends LayerDrawable {
     private final WeakReference<DisplayImageAction<?>> mActionReference;
 
-    public PlaceholderDrawable(@NonNull final Drawable placeholder, @NonNull final DisplayImageAction<?> action) {
+    public PlaceholderDrawable(@NonNull final Drawable placeholder,
+            @NonNull final DisplayImageAction<?> action) {
         super(new Drawable[] {placeholder});
         mActionReference = new WeakReference<DisplayImageAction<?>>(action);
     }
