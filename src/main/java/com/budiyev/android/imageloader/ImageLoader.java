@@ -107,25 +107,6 @@ public final class ImageLoader {
     }
 
     /**
-     * Delete all cached images for specified data
-     *
-     * @param data Data
-     * @throws IllegalArgumentException if specified data type is not registered
-     * @see #registerDataType
-     */
-    //TODO
-    public void invalidate(@NonNull final Object data) {
-        final String dataClassName = data.getClass().getName();
-        final DataDescriptorFactory<Object> descriptorFactory =
-                mDescriptorFactories.get(dataClassName);
-        if (descriptorFactory == null) {
-            throw new IllegalArgumentException("Unsupported data type: " + dataClassName);
-        }
-        InternalUtils
-                .invalidate(mMemoryCache, mStorageCache, descriptorFactory.newDescriptor(data));
-    }
-
-    /**
      * Register data type
      *
      * @param dataClass         Source data class
@@ -204,14 +185,6 @@ public final class ImageLoader {
         if (storageCache != null) {
             storageCache.clear();
         }
-    }
-
-    /**
-     * Clear all caches
-     */
-    public void clearAllCaches() {
-        clearMemoryCache();
-        clearStorageCache();
     }
 
     /**

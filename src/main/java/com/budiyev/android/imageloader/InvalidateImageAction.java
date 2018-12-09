@@ -26,15 +26,15 @@ package com.budiyev.android.imageloader;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-final class InvalidateAction extends BaseAction {
-    private final DataDescriptor<?> mDescriptor;
+final class InvalidateImageAction extends BaseAction {
+    private final String mKey;
     private final MemoryImageCache mMemoryCache;
     private final StorageImageCache mStorageCache;
 
-    public InvalidateAction(@NonNull final DataDescriptor<?> descriptor,
+    public InvalidateImageAction(@NonNull final String key,
             @Nullable final MemoryImageCache memoryCache,
             @Nullable final StorageImageCache storageCache) {
-        mDescriptor = descriptor;
+        mKey = key;
         mMemoryCache = memoryCache;
         mStorageCache = storageCache;
     }
@@ -42,7 +42,15 @@ final class InvalidateAction extends BaseAction {
     @Override
     protected void execute() {
         if (!isCancelled()) {
-            InternalUtils.invalidate(mMemoryCache, mStorageCache, mDescriptor);
+            final String key = mKey;
+            final MemoryImageCache memoryCache = mMemoryCache;
+            if (memoryCache != null) {
+                memoryCache.remove(key);
+            }
+            final StorageImageCache storageCache = mStorageCache;
+            if (storageCache != null) {
+                storageCache.remove(key);
+            }
         }
     }
 

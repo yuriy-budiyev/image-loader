@@ -394,7 +394,8 @@ public final class ImageRequest<T> {
     }
 
     /**
-     * Delete all cached images for specified data asynchronously
+     * Delete cached image for specified data, required size and transformations
+     * asynchronously
      *
      * @return {@link ImageRequestDelegate} object, associated with execution of the request
      * @throws IllegalStateException if request has already been executed
@@ -403,8 +404,14 @@ public final class ImageRequest<T> {
     @AnyThread
     public ImageRequestDelegate invalidate() {
         checkAndSetExecutedState();
-        return new InvalidateAction(mDescriptor, getMemoryCache(), getStorageCache())
-                .submit(mCacheExecutor);
+        final String key = InternalUtils
+                .buildFullKey(mDescriptor.getKey(), mRequiredSize, getTransformation());
+        if (key != null) {
+            return new InvalidateImageAction(key, getMemoryCache(), getStorageCache())
+                    .submit(mCacheExecutor);
+        } else {
+            return EmptyImageRequestDelegate.INSTANCE;
+        }
     }
 
     @NonNull

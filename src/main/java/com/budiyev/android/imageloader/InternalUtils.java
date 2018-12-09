@@ -53,21 +53,6 @@ final class InternalUtils {
     private InternalUtils() {
     }
 
-    public static void invalidate(@Nullable final MemoryImageCache memoryCache,
-            @Nullable final StorageImageCache storageCache,
-            @NonNull final DataDescriptor<?> descriptor) {
-        final String key = descriptor.getKey();
-        if (key == null) {
-            return;
-        }
-        if (memoryCache != null) {
-            memoryCache.remove(key);
-        }
-        if (storageCache != null) {
-            storageCache.remove(key);
-        }
-    }
-
     @Nullable
     public static String buildFullKey(@Nullable final String base,
             @Nullable final Size requiredSize,
