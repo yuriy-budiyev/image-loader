@@ -23,48 +23,51 @@
  */
 package com.budiyev.android.imageloader;
 
-import android.graphics.Bitmap;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-import androidx.annotation.AnyThread;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
-/**
- * Common image cache interface, implementations should be thread safe
- */
-public interface ImageCache {
-    /**
-     * Get {@link Bitmap} for the specified {@code key}, this method called on the main thread
-     * if it's a memory cache, and on a worker thread otherwise
-     *
-     * @param key Unique key
-     * @return Image {@link Bitmap} or {@code null}, if there are no entry
-     * for the specified {@code key}
-     */
-    @Nullable
-    @AnyThread
-    Bitmap get(@NonNull String key);
+abstract class BaseAction implements ImageRequestDelegate, Callable<Void> {
+    private final AtomicBoolean mCancelled = new AtomicBoolean();
+    private volatile Future<?> mFuture;
 
-    /**
-     * Put {@link Bitmap} into cache
-     *
-     * @param key   Unique key
-     * @param value Image bitmap
-     */
-    @AnyThread
-    void put(@NonNull String key, @NonNull Bitmap value);
+    protected abstract void execute();
 
-    /**
-     * Remove entry with specified {@code key} from cache
-     *
-     * @param key Unique key
-     */
-    @AnyThread
-    void remove(@NonNull String key);
+    protected abstract void onCancelled();
 
-    /**
-     * Clear cache
-     */
-    @AnyThread
-    void clear();
+    @Override
+    public final Void call() {
+        execute();
+        return null;
+    }
+
+    @NonNull
+    public final ImageRequestDelegate submit(@NonNull final ExecutorService executor) {
+        if (!mCancelled.get()) {
+            mFuture = executor.submit(this);
+        }
+        return this;
+    }
+
+    @Override
+    public final boolean cancel() {
+        if (mCancelled.compareAndSet(false, true)) {
+            final Future<?> future = mFuture;
+            if (future != null) {
+                future.cancel(false);
+            }
+            onCancelled();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public final boolean isCancelled() {
+        return mCancelled.get();
+    }
 }

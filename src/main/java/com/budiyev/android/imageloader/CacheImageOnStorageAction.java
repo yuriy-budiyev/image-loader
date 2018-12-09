@@ -23,51 +23,36 @@
  */
 package com.budiyev.android.imageloader;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.lang.ref.WeakReference;
+
+import android.graphics.Bitmap;
 
 import androidx.annotation.NonNull;
 
-abstract class ImageRequestAction implements ImageRequestDelegate, Callable<Void> {
-    private final AtomicBoolean mCancelled = new AtomicBoolean();
-    private volatile Future<?> mFuture;
+final class CacheImageOnStorageAction extends BaseAction {
+    private final String mKey;
+    private final WeakReference<Bitmap> mImage;
+    private final StorageImageCache mCache;
 
-    protected abstract void execute();
-
-    protected abstract void onCancelled();
-
-    @Override
-    public final Void call() {
-        execute();
-        return null;
-    }
-
-    @NonNull
-    public final ImageRequestDelegate submit(@NonNull final ExecutorService executor) {
-        if (!mCancelled.get()) {
-            mFuture = executor.submit(this);
-        }
-        return this;
+    public CacheImageOnStorageAction(@NonNull final String key, @NonNull final Bitmap image,
+            @NonNull final StorageImageCache cache) {
+        mKey = key;
+        mImage = new WeakReference<>(image);
+        mCache = cache;
     }
 
     @Override
-    public final boolean cancel() {
-        if (mCancelled.compareAndSet(false, true)) {
-            final Future<?> future = mFuture;
-            if (future != null) {
-                future.cancel(false);
+    protected void execute() {
+        if (!isCancelled()) {
+            final Bitmap image = mImage.get();
+            if (image != null) {
+                mCache.put(mKey, image);
             }
-            onCancelled();
-            return true;
-        } else {
-            return false;
         }
     }
 
     @Override
-    public final boolean isCancelled() {
-        return mCancelled.get();
+    protected void onCancelled() {
+        mImage.clear();
     }
 }

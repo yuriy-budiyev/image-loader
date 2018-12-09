@@ -31,14 +31,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
 
-abstract class LoadImageAction<T> extends ImageRequestAction {
+abstract class LoadImageAction<T> extends BaseAction {
     private final DataDescriptor<T> mDescriptor;
     private final BitmapLoader<T> mBitmapLoader;
     private final Size mRequiredSize;
     private final BitmapTransformation mTransformation;
     private final PauseLock mPauseLock;
-    private final ImageCache mMemoryCache;
-    private final ImageCache mStorageCache;
+    private final MemoryImageCache mMemoryCache;
+    private final StorageImageCache mStorageCache;
     private final ExecutorService mCacheExecutor;
     private final LoadCallback mLoadCallback;
     private final ErrorCallback mErrorCallback;
@@ -47,7 +47,8 @@ abstract class LoadImageAction<T> extends ImageRequestAction {
     protected LoadImageAction(@NonNull final DataDescriptor<T> descriptor,
             @NonNull final BitmapLoader<T> bitmapLoader, @Nullable final Size requiredSize,
             @Nullable final BitmapTransformation transformation,
-            @Nullable final ImageCache memoryCache, @Nullable final ImageCache storageCache,
+            @Nullable final MemoryImageCache memoryCache,
+            @Nullable final StorageImageCache storageCache,
             @Nullable final ExecutorService cacheExecutor,
             @Nullable final LoadCallback loadCallback, @Nullable final ErrorCallback errorCallback,
             @NonNull final PauseLock pauseLock) {
@@ -103,12 +104,12 @@ abstract class LoadImageAction<T> extends ImageRequestAction {
     }
 
     @Nullable
-    protected final ImageCache getMemoryCache() {
+    protected final MemoryImageCache getMemoryCache() {
         return mMemoryCache;
     }
 
     @Nullable
-    protected final ImageCache getStorageCache() {
+    protected final StorageImageCache getStorageCache() {
         return mStorageCache;
     }
 
@@ -140,7 +141,7 @@ abstract class LoadImageAction<T> extends ImageRequestAction {
         final T data = descriptor.getData();
         Bitmap image;
         // Memory cache
-        final ImageCache memoryCache = mMemoryCache;
+        final MemoryImageCache memoryCache = mMemoryCache;
         if (key != null && memoryCache != null) {
             image = memoryCache.get(key);
             if (image != null) {
@@ -152,7 +153,7 @@ abstract class LoadImageAction<T> extends ImageRequestAction {
             return;
         }
         // Storage cache
-        final ImageCache storageCache = mStorageCache;
+        final StorageImageCache storageCache = mStorageCache;
         if (key != null && storageCache != null) {
             image = storageCache.get(key);
             if (image != null) {
@@ -207,8 +208,8 @@ abstract class LoadImageAction<T> extends ImageRequestAction {
                     descriptor.getLocation() != DataLocation.LOCAL)) {
                 final ExecutorService cacheExecutor = mCacheExecutor;
                 if (cacheExecutor != null) {
-                    mCacheDelegate =
-                            new CacheImageAction(key, image, storageCache).submit(cacheExecutor);
+                    mCacheDelegate = new CacheImageOnStorageAction(key, image, storageCache)
+                            .submit(cacheExecutor);
                 } else {
                     storageCache.put(key, image);
                 }

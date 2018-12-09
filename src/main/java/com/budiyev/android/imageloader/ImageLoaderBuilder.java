@@ -39,8 +39,8 @@ import androidx.annotation.Nullable;
  */
 public final class ImageLoaderBuilder {
     private final Context mContext;
-    private ImageCache mMemoryCache;
-    private ImageCache mStorageCache;
+    private MemoryImageCache mMemoryCache;
+    private StorageImageCache mStorageCache;
     private ExecutorService mLoadExecutor;
     private ExecutorService mCacheExecutor;
 
@@ -53,7 +53,7 @@ public final class ImageLoaderBuilder {
      */
     @NonNull
     public ImageLoaderBuilder memoryCache() {
-        mMemoryCache = new MemoryImageCache();
+        mMemoryCache = new MemoryImageCacheImpl();
         return this;
     }
 
@@ -62,7 +62,7 @@ public final class ImageLoaderBuilder {
      */
     @NonNull
     public ImageLoaderBuilder memoryCache(@IntRange(from = 0) final int maxSize) {
-        mMemoryCache = new MemoryImageCache(maxSize);
+        mMemoryCache = new MemoryImageCacheImpl(maxSize);
         return this;
     }
 
@@ -70,7 +70,7 @@ public final class ImageLoaderBuilder {
      * Custom memory cache
      */
     @NonNull
-    public ImageLoaderBuilder memoryCache(@Nullable final ImageCache memoryCache) {
+    public ImageLoaderBuilder memoryCache(@Nullable final MemoryImageCache memoryCache) {
         mMemoryCache = memoryCache;
         return this;
     }
@@ -81,7 +81,7 @@ public final class ImageLoaderBuilder {
      */
     @NonNull
     public ImageLoaderBuilder storageCache() {
-        mStorageCache = new StorageImageCache(mContext);
+        mStorageCache = new StorageImageCacheImpl(mContext);
         return this;
     }
 
@@ -91,7 +91,7 @@ public final class ImageLoaderBuilder {
      */
     @NonNull
     public ImageLoaderBuilder storageCache(@IntRange(from = 0L) final long maxSize) {
-        mStorageCache = new StorageImageCache(mContext, maxSize);
+        mStorageCache = new StorageImageCacheImpl(mContext, maxSize);
         return this;
     }
 
@@ -104,7 +104,7 @@ public final class ImageLoaderBuilder {
     @NonNull
     public ImageLoaderBuilder storageCache(@NonNull final CompressMode compressMode,
             @IntRange(from = 0L) final long maxSize) {
-        mStorageCache = new StorageImageCache(mContext, compressMode, maxSize);
+        mStorageCache = new StorageImageCacheImpl(mContext, compressMode, maxSize);
         return this;
     }
 
@@ -113,7 +113,7 @@ public final class ImageLoaderBuilder {
      */
     @NonNull
     public ImageLoaderBuilder storageCache(@NonNull final File directory) {
-        mStorageCache = new StorageImageCache(directory);
+        mStorageCache = new StorageImageCacheImpl(directory);
         return this;
     }
 
@@ -123,7 +123,7 @@ public final class ImageLoaderBuilder {
     @NonNull
     public ImageLoaderBuilder storageCache(@NonNull final File directory,
             @IntRange(from = 0L) final long maxSize) {
-        mStorageCache = new StorageImageCache(directory, maxSize);
+        mStorageCache = new StorageImageCacheImpl(directory, maxSize);
         return this;
     }
 
@@ -135,7 +135,7 @@ public final class ImageLoaderBuilder {
     @NonNull
     public ImageLoaderBuilder storageCache(@NonNull final File directory,
             @NonNull final CompressMode compressMode, final long maxSize) {
-        mStorageCache = new StorageImageCache(directory, compressMode, maxSize);
+        mStorageCache = new StorageImageCacheImpl(directory, compressMode, maxSize);
         return this;
     }
 
@@ -143,7 +143,7 @@ public final class ImageLoaderBuilder {
      * Custom storage cache
      */
     @NonNull
-    public ImageLoaderBuilder storageCache(@Nullable final ImageCache storageCache) {
+    public ImageLoaderBuilder storageCache(@Nullable final StorageImageCache storageCache) {
         mStorageCache = storageCache;
         return this;
     }

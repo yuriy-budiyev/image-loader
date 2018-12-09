@@ -61,8 +61,8 @@ public final class ImageRequest<T> {
     private final ExecutorService mCacheExecutor;
     private final PauseLock mPauseLock;
     private final Handler mMainThreadHandler;
-    private final ImageCache mMemoryCache;
-    private final ImageCache mStorageCache;
+    private final MemoryImageCache mMemoryCache;
+    private final StorageImageCache mStorageCache;
     private final BitmapLoader<T> mBitmapLoader;
     private final DataDescriptor<T> mDescriptor;
     private Size mRequiredSize;
@@ -81,8 +81,9 @@ public final class ImageRequest<T> {
 
     ImageRequest(@NonNull final Resources resources, @NonNull final ExecutorService loadExecutor,
             @NonNull final ExecutorService cacheExecutor, @NonNull final PauseLock pauseLock,
-            @NonNull final Handler mainThreadHandler, @Nullable final ImageCache memoryCache,
-            @Nullable final ImageCache storageCache, @NonNull final BitmapLoader<T> bitmapLoader,
+            @NonNull final Handler mainThreadHandler, @Nullable final MemoryImageCache memoryCache,
+            @Nullable final StorageImageCache storageCache,
+            @NonNull final BitmapLoader<T> bitmapLoader,
             @NonNull final DataDescriptor<T> descriptor) {
         mResources = resources;
         mLoadExecutor = loadExecutor;
@@ -346,7 +347,7 @@ public final class ImageRequest<T> {
         final BitmapTransformation transformation = getTransformation();
         final LoadCallback loadCallback = mLoadCallback;
         final DisplayCallback displayCallback = mDisplayCallback;
-        final ImageCache memoryCache = getMemoryCache();
+        final MemoryImageCache memoryCache = getMemoryCache();
         final float cornerRadius = mCornerRadius;
         Bitmap image = null;
         final String key =
@@ -431,12 +432,12 @@ public final class ImageRequest<T> {
     }
 
     @Nullable
-    private ImageCache getMemoryCache() {
+    private MemoryImageCache getMemoryCache() {
         return mMemoryCacheEnabled ? mMemoryCache : null;
     }
 
     @Nullable
-    private ImageCache getStorageCache() {
+    private StorageImageCache getStorageCache() {
         return mStorageCacheEnabled ? mStorageCache : null;
     }
 

@@ -23,109 +23,48 @@
  */
 package com.budiyev.android.imageloader;
 
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
 import android.graphics.Bitmap;
-import android.os.Build;
 
+import androidx.annotation.AnyThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-final class MemoryImageCache implements ImageCache {
-    private static final float DEFAULT_MEMORY_FRACTION = 0.25f;
-    private final LinkedHashMap<String, Bitmap> mImages;
-    private final Lock mLock;
-    private final int mMaxSize;
-    private volatile int mSize;
-
-    public MemoryImageCache() {
-        this(Math.round(Runtime.getRuntime().maxMemory() * DEFAULT_MEMORY_FRACTION));
-    }
-
-    public MemoryImageCache(final int maxSize) {
-        if (maxSize < 0) {
-            throw new IllegalArgumentException(
-                    "Cache size should be greater than or equal to zero");
-        }
-        mImages = new LinkedHashMap<>(0, 0.75f, true);
-        mLock = new ReentrantLock();
-        mMaxSize = maxSize;
-    }
-
+/**
+ * Memory image cache interface, implementations should be thread safe
+ */
+public interface MemoryImageCache {
+    /**
+     * Get {@link Bitmap} for the specified {@code key}, this method called on the main thread
+     * if it's a memory cache, and on a worker thread otherwise
+     *
+     * @param key Unique key
+     * @return Image {@link Bitmap} or {@code null}, if there are no entry
+     * for the specified {@code key}
+     */
     @Nullable
-    @Override
-    public Bitmap get(@NonNull final String key) {
-        mLock.lock();
-        try {
-            return mImages.get(key);
-        } finally {
-            mLock.unlock();
-        }
-    }
+    @AnyThread
+    Bitmap get(@NonNull String key);
 
-    @Override
-    public void put(@NonNull final String key, @NonNull final Bitmap value) {
-        mLock.lock();
-        try {
-            int size = mSize;
-            size += getBitmapSize(value);
-            mImages.put(key, value);
-            final int maxSize = mMaxSize;
-            if (size > maxSize) {
-                final Iterator<Map.Entry<String, Bitmap>> i = mImages.entrySet().iterator();
-                while (i.hasNext()) {
-                    size -= getBitmapSize(i.next().getValue());
-                    i.remove();
-                    if (size <= maxSize) {
-                        break;
-                    }
-                }
-            }
-            mSize = size;
-        } finally {
-            mLock.unlock();
-        }
-    }
+    /**
+     * Put {@link Bitmap} into cache
+     *
+     * @param key   Unique key
+     * @param value Image bitmap
+     */
+    @AnyThread
+    void put(@NonNull String key, @NonNull Bitmap value);
 
-    @Override
-    public void remove(@NonNull final String key) {
-        mLock.lock();
-        try {
-            final Iterator<Map.Entry<String, Bitmap>> i = mImages.entrySet().iterator();
-            int size = mSize;
-            while (i.hasNext()) {
-                final Map.Entry<String, Bitmap> entry = i.next();
-                if (entry.getKey().startsWith(key)) {
-                    size -= getBitmapSize(entry.getValue());
-                    i.remove();
-                }
-            }
-            mSize = size;
-        } finally {
-            mLock.unlock();
-        }
-    }
+    /**
+     * Remove entry with specified {@code key} from cache
+     *
+     * @param key Unique key
+     */
+    @AnyThread
+    void remove(@NonNull String key);
 
-    @Override
-    public void clear() {
-        mLock.lock();
-        try {
-            mImages.clear();
-            mSize = 0;
-        } finally {
-            mLock.unlock();
-        }
-    }
-
-    private static int getBitmapSize(@NonNull final Bitmap bitmap) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            return bitmap.getAllocationByteCount();
-        } else {
-            return bitmap.getByteCount();
-        }
-    }
+    /**
+     * Clear cache
+     */
+    @AnyThread
+    void clear();
 }

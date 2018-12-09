@@ -34,7 +34,8 @@ final class AsyncLoadImageAction<T> extends LoadImageAction<T> {
     public AsyncLoadImageAction(@NonNull final DataDescriptor<T> descriptor,
             @NonNull final BitmapLoader<T> bitmapLoader, @Nullable final Size requiredSize,
             @Nullable final BitmapTransformation transformation,
-            @Nullable final ImageCache memoryCache, @Nullable final ImageCache storageCache,
+            @Nullable final MemoryImageCache memoryCache,
+            @Nullable final StorageImageCache storageCache,
             @Nullable final ExecutorService cacheExecutor,
             @Nullable final LoadCallback loadCallback, @Nullable final ErrorCallback errorCallback,
             @NonNull final PauseLock pauseLock) {

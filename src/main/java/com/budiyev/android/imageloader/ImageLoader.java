@@ -49,8 +49,8 @@ public final class ImageLoader {
     private final ExecutorService mLoadExecutor;
     private final ExecutorService mCacheExecutor;
     private final Handler mMainThreadHandler;
-    private final ImageCache mMemoryCache;
-    private final ImageCache mStorageCache;
+    private final MemoryImageCache mMemoryCache;
+    private final StorageImageCache mStorageCache;
     private final PauseLock mPauseLock = new PauseLock();
     private final Map<String, DataDescriptorFactory<Object>> mDescriptorFactories =
             new ConcurrentHashMap<>();
@@ -63,8 +63,9 @@ public final class ImageLoader {
      * @see #builder
      */
     ImageLoader(@NonNull final Context context, @NonNull final ExecutorService loadExecutor,
-            @NonNull final ExecutorService cacheExecutor, @Nullable final ImageCache memoryCache,
-            @Nullable final ImageCache storageCache) {
+            @NonNull final ExecutorService cacheExecutor,
+            @Nullable final MemoryImageCache memoryCache,
+            @Nullable final StorageImageCache storageCache) {
         mContext = context;
         mLoadExecutor = loadExecutor;
         mMainThreadHandler = new Handler(context.getMainLooper());
@@ -112,6 +113,7 @@ public final class ImageLoader {
      * @throws IllegalArgumentException if specified data type is not registered
      * @see #registerDataType
      */
+    //TODO
     public void invalidate(@NonNull final Object data) {
         final String dataClassName = data.getClass().getName();
         final DataDescriptorFactory<Object> descriptorFactory =
@@ -188,7 +190,7 @@ public final class ImageLoader {
      * @see Context#registerComponentCallbacks
      */
     public void clearMemoryCache() {
-        final ImageCache memoryCache = mMemoryCache;
+        final MemoryImageCache memoryCache = mMemoryCache;
         if (memoryCache != null) {
             memoryCache.clear();
         }
@@ -198,7 +200,7 @@ public final class ImageLoader {
      * Clear storage cache
      */
     public void clearStorageCache() {
-        final ImageCache storageCache = mStorageCache;
+        final StorageImageCache storageCache = mStorageCache;
         if (storageCache != null) {
             storageCache.clear();
         }

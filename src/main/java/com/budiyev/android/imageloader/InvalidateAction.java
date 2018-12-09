@@ -26,13 +26,14 @@ package com.budiyev.android.imageloader;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-final class InvalidateAction extends ImageRequestAction {
+final class InvalidateAction extends BaseAction {
     private final DataDescriptor<?> mDescriptor;
-    private final ImageCache mMemoryCache;
-    private final ImageCache mStorageCache;
+    private final MemoryImageCache mMemoryCache;
+    private final StorageImageCache mStorageCache;
 
     public InvalidateAction(@NonNull final DataDescriptor<?> descriptor,
-            @Nullable final ImageCache memoryCache, @Nullable final ImageCache storageCache) {
+            @Nullable final MemoryImageCache memoryCache,
+            @Nullable final StorageImageCache storageCache) {
         mDescriptor = descriptor;
         mMemoryCache = memoryCache;
         mStorageCache = storageCache;
