@@ -69,8 +69,8 @@ android {
 
 dependencies {
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    compileOnly 'androidx.exifinterface:exifinterface:1.0.0'
-    compileOnly 'androidx.annotation:annotation:1.0.1'
+    api 'androidx.exifinterface:exifinterface:1.0.0'
+    api 'androidx.annotation:annotation:1.0.1'
 }
 
 group = publishedGroupId
