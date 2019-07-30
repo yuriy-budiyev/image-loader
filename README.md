@@ -6,7 +6,7 @@
 
 Image loader library for Android.
 
-Deprecated. See [Glide](https://github.com/bumptech/glide).
+**Deprecated**. See [Glide](https://github.com/bumptech/glide).
 
 ### Features
 * Image transformations
