@@ -5,8 +5,6 @@
 
 Image loader library for Android.
 
-**Deprecated**. See [Glide](https://github.com/bumptech/glide).
-
 ### Features
 * Image transformations
 * Automatic memory and storage caching
