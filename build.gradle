@@ -1,57 +1,53 @@
 buildscript {
+
     repositories {
+
         google()
-        jcenter()
+
+        mavenCentral()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.1'
-        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
+
+        classpath 'com.android.tools.build:gradle:7.1.1'
     }
 }
 
 allprojects {
+
     repositories {
+
         google()
-        jcenter()
+
+        mavenCentral()
     }
 }
 
 apply plugin: 'com.android.library'
-apply plugin: 'com.github.dcendents.android-maven'
-apply plugin: 'com.jfrog.bintray'
+apply plugin: 'maven-publish'
 
 ext {
-    libraryName = 'ImageLoader'
-    libraryDescription = 'Image loader tool for Android'
-    libraryVersion = '2.5.6'
-    artifact = 'image-loader'
-    developerId = 'yuriy-budiyev'
-    developerName = 'Yuriy Budiyev'
-    developerEmail = 'yuriy.budiyev@yandex.ru'
+    libraryVersion = '2.5.7'
     publishedGroupId = 'com.budiyev.android'
-    siteUrl = 'https://github.com/yuriy-budiyev/image-loader'
-    gitUrl = 'https://github.com/yuriy-budiyev/image-loader.git'
-    bintrayRepo = 'maven'
-    bintrayName = 'image-loader'
-    licenseName = 'MIT License'
-    allLicenses = ['MIT']
 }
 
+group = publishedGroupId
+version = libraryVersion
+
 android {
-    compileSdkVersion 28
-    buildToolsVersion '28.0.3'
+    compileSdkVersion 31
+    buildToolsVersion '31.0.0'
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 28
-        versionCode 88
+        targetSdkVersion 31
+        versionCode 89
         versionName libraryVersion
     }
 
-    dexOptions {
-        javaMaxHeapSize "2048m"
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
     }
 
     buildTypes {
@@ -63,90 +59,41 @@ android {
 }
 
 dependencies {
-    api 'androidx.annotation:annotation:1.0.1'
-    api 'androidx.exifinterface:exifinterface:1.0.0'
+    api 'androidx.annotation:annotation:1.3.0'
+    api 'androidx.exifinterface:exifinterface:1.3.3'
 }
-
-group = publishedGroupId
-
-install {
-    repositories.mavenInstaller {
-        pom {
-            project {
-                packaging 'aar'
-                groupId publishedGroupId
-                artifactId artifact
-                name libraryName
-                description libraryDescription
-                url siteUrl
-
-                licenses {
-                    license {
-                        name licenseName
-                    }
-                }
-
-                developers {
-                    developer {
-                        id developerId
-                        name developerName
-                        email developerEmail
-                    }
-                }
-
-                scm {
-                    connection gitUrl
-                    developerConnection gitUrl
-                    url siteUrl
-                }
-            }
-        }
-    }
-}
-
-version = libraryVersion
 
 task sourcesJar(type: Jar) {
-    classifier = 'sources'
+    archiveClassifier.set('sources')
     from android.sourceSets.main.java.srcDirs
 }
 
 task javadoc(type: Javadoc) {
-    source = android.sourceSets.main.java.srcDirs
+    options.charSet = 'UTF-8'
+    failOnError false
+    source = android.sourceSets.main.java.sourceFiles
     classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-    failOnError = false
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.getDestinationDir()
+    archiveClassifier.set('javadoc')
+    from javadoc.destinationDir
 }
 
 artifacts {
-    archives javadocJar
     archives sourcesJar
+    archives javadocJar
 }
 
-Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
-
-bintray {
-    user = properties.getProperty('bintray.user')
-    key = properties.getProperty('bintray.apikey')
-    configurations = ['archives']
-
-    pkg {
-        repo = bintrayRepo
-        name = bintrayName
-        desc = libraryDescription
-        websiteUrl = siteUrl
-        vcsUrl = gitUrl
-        licenses = allLicenses
-        publish = true
-
-        version {
-            desc = libraryDescription
-            vcsTag = 'v' + libraryVersion
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+                artifactId = 'circular-progress-bar'
+                groupId = publishedGroupId
+                version = libraryVersion
+            }
         }
     }
 }
