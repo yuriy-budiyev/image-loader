@@ -39,7 +39,7 @@ dependencyResolutionManagement {
 Step 2. Add dependency:
 ```gradle
 dependencies {
-    implementation 'com.github.yuriy-budiyev:image-loaderr:2.5.7'
+    implementation 'com.github.yuriy-budiyev:image-loader:2.5.7'
 }
 ```
 
