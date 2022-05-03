@@ -94,16 +94,25 @@ public final class ImageLoader {
     @NonNull
     @SuppressWarnings("unchecked")
     public <T> ImageRequest<T> from(@NonNull final T data) {
-        final String dataClassName = data.getClass().getName();
-        final DataDescriptorFactory<T> descriptorFactory =
-                (DataDescriptorFactory<T>) mDescriptorFactories.get(dataClassName);
-        final BitmapLoader<T> bitmapLoader = (BitmapLoader<T>) mBitmapLoaders.get(dataClassName);
-        if (descriptorFactory == null || bitmapLoader == null) {
-            throw new IllegalArgumentException("Unsupported data type: " + dataClassName);
+        Class<?> dataClass = data.getClass();
+        for (; ; ) {
+            final String dataClassName = dataClass.getName();
+            final DataDescriptorFactory<T> descriptorFactory =
+                    (DataDescriptorFactory<T>) mDescriptorFactories.get(dataClassName);
+            final BitmapLoader<T> bitmapLoader =
+                    (BitmapLoader<T>) mBitmapLoaders.get(dataClassName);
+            if (descriptorFactory == null || bitmapLoader == null) {
+                dataClass = dataClass.getSuperclass();
+                if (dataClass == null) {
+                    throw new IllegalArgumentException(
+                            "Unsupported data type: " + data.getClass().getName());
+                }
+                continue;
+            }
+            return new ImageRequest<>(mContext.getResources(), mLoadExecutor, mCacheExecutor,
+                    mPauseLock, mMainThreadHandler, mMemoryCache, mStorageCache, bitmapLoader,
+                    descriptorFactory.newDescriptor(data));
         }
-        return new ImageRequest<>(mContext.getResources(), mLoadExecutor, mCacheExecutor,
-                mPauseLock, mMainThreadHandler, mMemoryCache, mStorageCache, bitmapLoader,
-                descriptorFactory.newDescriptor(data));
     }
 
     /**
